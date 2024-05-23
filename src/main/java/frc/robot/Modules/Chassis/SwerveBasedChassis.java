@@ -74,8 +74,8 @@ public class SwerveBasedChassis extends RobotModuleBase {
 
     @Override
     protected void periodic(double dt) {
-        EasyShuffleBoard.putNumber("chassis", "chassis task (x)", translationalTask.translationValue.getX());
-        EasyShuffleBoard.putNumber("chassis", "chassis task (y)", translationalTask.translationValue.getY());
+        DashboardImpl.putNumber("chassis", "chassis task (x)", translationalTask.translationValue.getX());
+        DashboardImpl.putNumber("chassis", "chassis task (y)", translationalTask.translationValue.getY());
         Vector2D processedTranslationalSpeed = processTranslationalMotion(dt);
         // SmartDashboard.putNumber("decided vel(x)", processedTranslationalSpeed.getValue()[0]);
         double rotationalSpeed = processRotationalMotion(dt);
@@ -100,15 +100,15 @@ public class SwerveBasedChassis extends RobotModuleBase {
         }
 
         /* then we slow it down to max rotationalSpeedMaxSacrifice */
-        EasyShuffleBoard.putNumber("chassis", "highest wheel speed:", highestWheelSpeed);
-        EasyShuffleBoard.putNumber("chassis", "sacrificing rotational part by scale: ", rotationMinScale);
+        DashboardImpl.putNumber("chassis", "highest wheel speed:", highestWheelSpeed);
+        DashboardImpl.putNumber("chassis", "sacrificing rotational part by scale: ", rotationMinScale);
         rotationalSpeed *= Math.sqrt(rotationMinScale);
         highestWheelSpeed = driveWheels(processedTranslationalSpeed, rotationalSpeed);
         if (highestWheelSpeed <= wheelsPowerConstrain) return;
 
         /* finally, we start scaling down the translational part */
-        EasyShuffleBoard.putNumber("chassis", "highest wheel speed:", highestWheelSpeed);
-        EasyShuffleBoard.putNumber("chassis", "scaling down translational speed by factor:", wheelsPowerConstrain/highestWheelSpeed);
+        DashboardImpl.putNumber("chassis", "highest wheel speed:", highestWheelSpeed);
+        DashboardImpl.putNumber("chassis", "scaling down translational speed by factor:", wheelsPowerConstrain/highestWheelSpeed);
         processedTranslationalSpeed = processedTranslationalSpeed.multiplyBy(wheelsPowerConstrain/highestWheelSpeed);
         rotationalSpeed *= wheelsPowerConstrain/highestWheelSpeed;
         driveWheels(processedTranslationalSpeed, rotationalSpeed);
@@ -230,7 +230,7 @@ public class SwerveBasedChassis extends RobotModuleBase {
                 decidedVelocity.multiplyBy(-1)
         );
 
-        EasyShuffleBoard.putNumber("chassis", "vel ctrl decided", decidedVelocity.getMagnitude());
+        DashboardImpl.putNumber("chassis", "vel ctrl decided", decidedVelocity.getMagnitude());
         Vector2D step = new Vector2D(velocityDifference.getHeading(),
                 Math.min(dt * maxAcceleration, velocityDifference.getMagnitude())
         );

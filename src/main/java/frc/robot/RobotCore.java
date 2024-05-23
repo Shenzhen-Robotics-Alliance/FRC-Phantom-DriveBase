@@ -44,8 +44,6 @@ public class RobotCore {
         private final List<RobotModuleBase> modules;
         private List<RobotServiceBase> services;
         protected boolean wasEnabled;
-        private Vector2D chassisCurrentPositionForCameraCalculation = new Vector2D();
-        private double chassisCurrentRotationForCameraCalculation = 0;
 
         /**
          * creates a robot core
@@ -246,9 +244,6 @@ public class RobotCore {
          * */
         private long t = System.currentTimeMillis();
         public void updateRobot() {
-                chassisCurrentPositionForCameraCalculation = positionReader.getRobotPosition2D();
-                chassisCurrentRotationForCameraCalculation = positionReader.getRobotRotation();
-
                 updateServices();
                 updateModules();
 

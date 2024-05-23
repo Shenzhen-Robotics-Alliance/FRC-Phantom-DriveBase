@@ -2,7 +2,6 @@ package frc.robot.Utils;
 
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import frc.robot.Utils.MathUtils.LookUpTable;
-import frc.robot.Utils.MathUtils.StatisticsUtils;
 
 public interface LEDAnimation {
     void play(AddressableLEDBuffer buffer, double t);
@@ -73,8 +72,8 @@ public interface LEDAnimation {
             final double
                     lowerEdge = LookUpTable.linearInterpretation(0, -slideLength, 1, 1, t),
                     upperEdge = lowerEdge + slideLength;
-            EasyShuffleBoard.putNumber("led", "lowerEdge", lowerEdge);
-            EasyShuffleBoard.putNumber("led", "upperEdge", upperEdge);
+            DashboardImpl.putNumber("led", "lowerEdge", lowerEdge);
+            DashboardImpl.putNumber("led", "upperEdge", upperEdge);
             for (int i = 0; i < buffer.getLength() / 2; i++) {
                 int r = colorR, g = colorG, b = colorB;
                 if (i > upperEdge * buffer.getLength() || i < lowerEdge * buffer.getLength()) r = g = b = 0;

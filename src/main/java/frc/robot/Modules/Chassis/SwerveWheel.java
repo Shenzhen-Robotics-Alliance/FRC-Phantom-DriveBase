@@ -1,9 +1,6 @@
 package frc.robot.Modules.Chassis;
 
-import java.util.ArrayList;
-
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Drivers.Encoders.Encoder;
 import frc.robot.Modules.RobotModuleBase;
 import frc.robot.Utils.*;
@@ -172,9 +169,9 @@ public class SwerveWheel extends RobotModuleBase {
         /** the correction speed obtained from pid controller */
         double correctionMotorSpeed = steerPIDController.getMotorPower(steerEncoderCurrentReading, steerEncoderCurrentVelocity, dt);
 
-        EasyShuffleBoard.putNumber("chassis", "steer " + swerveWheelID + " position", steerEncoderCurrentReading);
-        EasyShuffleBoard.putNumber("chassis", "steer " + swerveWheelID + " velocity", steerEncoderCurrentVelocity);
-        EasyShuffleBoard.putNumber("chassis", "steer " + swerveWheelID + "target", finalTargetedHeading);
+        DashboardImpl.putNumber("chassis", "steer " + swerveWheelID + " position", steerEncoderCurrentReading);
+        DashboardImpl.putNumber("chassis", "steer " + swerveWheelID + " velocity", steerEncoderCurrentVelocity);
+        DashboardImpl.putNumber("chassis", "steer " + swerveWheelID + "target", finalTargetedHeading);
 
         /* given the power ratio of the steer, pass the PID feedback to the motor */
         final double steerPowerRate = locked ? 1: getSteerPowerRate(targetedSpeed);

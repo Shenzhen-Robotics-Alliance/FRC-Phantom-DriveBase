@@ -1,10 +1,8 @@
 package frc.robot.Services;
 
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Modules.Chassis.SwerveBasedChassis;
-import frc.robot.Utils.EasyShuffleBoard;
+import frc.robot.Utils.DashboardImpl;
 import frc.robot.Utils.MathUtils.BezierCurveSchedule;
 import frc.robot.Utils.MathUtils.BezierCurveScheduleGenerator;
 import frc.robot.Utils.MathUtils.Vector2D;
@@ -13,7 +11,6 @@ import frc.robot.Utils.SequentialCommandSegment;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Vector;
 
 /**
  * runs a sequence of command segment
@@ -69,10 +66,10 @@ public class AutoProgramRunner extends RobotServiceBase {
                                     currentSegmentID == commandSegments.size()-1 ?
                                             inAdvanceSpaceWithConstrain : inAdvanceSpaceWithoutConstrain)),
                     this);
-            EasyShuffleBoard.putNumber("auto", "segment ID", currentSegmentID);
-            EasyShuffleBoard.putNumber("auto", "translational scaled T", translationalT);
-            EasyShuffleBoard.putNumber("auto", "position (x)", currentPathSchedule.getPositionWithLERP().getX());
-            EasyShuffleBoard.putNumber("auto", "position (y)", currentPathSchedule.getPositionWithLERP().getY());
+            DashboardImpl.putNumber("auto", "segment ID", currentSegmentID);
+            DashboardImpl.putNumber("auto", "translational scaled T", translationalT);
+            DashboardImpl.putNumber("auto", "position (x)", currentPathSchedule.getPositionWithLERP().getX());
+            DashboardImpl.putNumber("auto", "position (y)", currentPathSchedule.getPositionWithLERP().getY());
         }
 
         if (currentSegmentRotationScheduleETA != -1) {
@@ -84,8 +81,8 @@ public class AutoProgramRunner extends RobotServiceBase {
                             SwerveBasedChassis.ChassisTaskRotation.TaskType.FACE_DIRECTION,
                             currentCommandSegment.getCurrentRotationWithLERP(rotationTSyncedToTranslationT)),
                     this);
-            EasyShuffleBoard.putNumber("auto", "rotation T", rotationT);
-            EasyShuffleBoard.putNumber("auto", "rotation (deg)", Math.toDegrees(currentCommandSegment.getCurrentRotationWithLERP(rotationTSyncedToTranslationT)));
+            DashboardImpl.putNumber("auto", "rotation T", rotationT);
+            DashboardImpl.putNumber("auto", "rotation (deg)", Math.toDegrees(currentCommandSegment.getCurrentRotationWithLERP(rotationTSyncedToTranslationT)));
         }
         currentCommandSegment.periodic.run();
 

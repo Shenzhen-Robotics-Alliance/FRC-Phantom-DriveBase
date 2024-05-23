@@ -1,12 +1,11 @@
 package frc.robot.Modules.PositionReader;
 
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Drivers.IMUs.SimpleGyro;
 import frc.robot.Modules.RobotModuleBase;
 import frc.robot.Modules.Chassis.SwerveWheel;
 import frc.robot.Utils.ChassisUnit;
-import frc.robot.Utils.EasyShuffleBoard;
+import frc.robot.Utils.DashboardImpl;
 import frc.robot.Utils.MathUtils.Rotation2D;
 import frc.robot.Utils.MathUtils.Vector2D;
 
@@ -56,8 +55,8 @@ public class SwerveWheelPositionEstimator extends RobotModuleBase implements Pos
             wheelVelocities[wheelID] = wheelVelocity; // keep a copy of the velocity
         }
 
-        EasyShuffleBoard.putNumber("chassis", "old position estimator (x)", getRobotPosition2D().getX());
-        EasyShuffleBoard.putNumber("chassis", "old position estimator (y)", getRobotPosition2D().getY());
+        DashboardImpl.putNumber("chassis", "old position estimator (x)", getRobotPosition2D().getX());
+        DashboardImpl.putNumber("chassis", "old position estimator (y)", getRobotPosition2D().getY());
     }
 
     @Override
