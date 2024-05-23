@@ -1,0 +1,61 @@
+{
+  "version": 1.0,
+  "startingPose": {
+    "position": {
+      "x": 1.3725738150477713,
+      "y": 5.574358195791997
+    },
+    "rotation": 180.0
+  },
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "shoot preloaded move to second"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "shoot secondgrab third"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "shoot third move to fourth"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "shoot fourth"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "shoot second grab third"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "shoot fifth move to sixth"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "shoot sixth grab seventh"
+          }
+        }
+      ]
+    }
+  },
+  "folder": null,
+  "choreoAuto": false
+}

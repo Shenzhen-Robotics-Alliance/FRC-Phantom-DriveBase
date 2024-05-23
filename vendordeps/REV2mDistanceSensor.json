@@ -1,0 +1,56 @@
+{
+    "fileName": "REV2mDistanceSensor.json",
+    "name": "REV2mDistanceSensor",
+    "version": "0.4.0",
+    "frcYear": "2024",
+    "uuid": "9e352acd-4eec-40f7-8490-3357b5ed65ae",
+    "mavenUrls": [
+        "https://www.revrobotics.com/content/sw/max/sdk/maven/"
+    ],
+    "jsonUrl": "https://www.revrobotics.com/content/sw/max/sdk/Rev2mDistanceSensor.json",
+    "javaDependencies": [
+        {
+            "groupId": "com.revrobotics.frc",
+            "artifactId": "DistanceSensor-java",
+            "version": "0.4.0"
+        }
+    ],
+    "jniDependencies": [
+        {
+            "groupId": "com.revrobotics.frc",
+            "artifactId": "DistanceSensor-driver",
+            "version": "0.4.0",
+            "skipInvalidPlatforms": true,
+            "isJar": false,
+            "validPlatforms": [
+                "linuxathena"
+            ]
+        }
+    ],
+    "cppDependencies": [
+        {
+            "groupId": "com.revrobotics.frc",
+            "artifactId": "DistanceSensor-cpp",
+            "version": "0.4.0",
+            "libName": "libDistanceSensor",
+            "headerClassifier": "headers",
+            "sharedLibrary": true,
+            "skipInvalidPlatforms": true,
+            "binaryPlatforms": [
+                "linuxathena"
+            ]
+        },
+        {
+            "groupId": "com.revrobotics.frc",
+            "artifactId": "DistanceSensor-driver",
+            "version": "0.4.0",
+            "libName": "libDistanceSensorDriver",
+            "headerClassifier": "headers",
+            "sharedLibrary": false,
+            "skipInvalidPlatforms": true,
+            "binaryPlatforms": [
+                "linuxathena"
+            ]
+        }
+    ]
+}

@@ -1,0 +1,298 @@
+<!-- 5516 -->
+<robotConfig>
+    <hardware>
+        <chassisOnCanivore>0</chassisOnCanivore>
+        <frontLeftWheelDriveMotor type="int">8</frontLeftWheelDriveMotor>
+        <frontLeftWheelSteerMotor type="int">7</frontLeftWheelSteerMotor>
+        <frontLeftWheelSteerMotorReversed type="int">1</frontLeftWheelSteerMotorReversed>
+        <frontLeftWheelEncoder type="int">12</frontLeftWheelEncoder>
+        <frontLeftWheelSteerEncoderReversed type="int">0</frontLeftWheelSteerEncoderReversed>
+
+        <frontRightWheelDriveMotor type="int">1</frontRightWheelDriveMotor>
+        <frontRightWheelSteerMotor type="int">2</frontRightWheelSteerMotor>
+        <frontRightWheelSteerMotorReversed type="int">1</frontRightWheelSteerMotorReversed>
+        <frontRightWheelEncoder type="int">9</frontRightWheelEncoder>
+        <frontRightWheelSteerEncoderReversed type="int">0</frontRightWheelSteerEncoderReversed>
+
+        <backLeftWheelDriveMotor type="int">6</backLeftWheelDriveMotor>
+        <backLeftWheelSteerMotor type="int">5</backLeftWheelSteerMotor>
+        <backLeftWheelSteerMotorReversed type="int">1</backLeftWheelSteerMotorReversed>
+        <backLeftWheelEncoder type="int">11</backLeftWheelEncoder>
+        <backLeftWheelSteerEncoderReversed type="int">0</backLeftWheelSteerEncoderReversed>
+
+        <backRightWheelDriveMotor type="int">3</backRightWheelDriveMotor>
+        <backRightWheelSteerMotor type="int">4</backRightWheelSteerMotor>
+        <backRightWheelSteerMotorReversed type="int">1</backRightWheelSteerMotorReversed>
+        <backRightWheelEncoder type="int">10</backRightWheelEncoder>
+        <backRightWheelSteerEncoderReversed type="int">0</backRightWheelSteerEncoderReversed>
+
+        <gyroPort type="int">15</gyroPort>
+
+        <!-- the zero position of encoders, to measure this value, turn the wheel to the direct front, and see the value of encoder.getRawSensorReading() -->
+        <frontLeftWheelZeroPosition type = "double">0.711</frontLeftWheelZeroPosition>
+        <frontRightWheelZeroPosition type = "double">1.90</frontRightWheelZeroPosition>
+        <backLeftWheelZeroPosition type = "double">3.48</backLeftWheelZeroPosition>
+        <backRightWheelZeroPosition type = "double">0.09</backRightWheelZeroPosition>
+    </hardware>
+    <chassis>
+        <!-- all units are in meters -->
+        <wheelDiameter type="double">0.1016</wheelDiameter>
+        <wheelGearRatio type="double">6.12</wheelGearRatio>
+        <encoderValuePerMotorRevolution type="double">2048</encoderValuePerMotorRevolution>
+
+        <!-- PID coefficients for steer wheels -->
+        <steerWheelErrorTolerance type = "double">1</steerWheelErrorTolerance> <!-- the amount of error to ignore, in degrees -->
+        <steerWheelErrorStartDecelerate type = "double">60</steerWheelErrorStartDecelerate> <!-- the amount of error where the motors should try to correct using full motor speed, in degrees -->
+        <steerWheelMaximumPower type = "double">0.85</steerWheelMaximumPower> <!-- use this value as the full speed -->
+        <steerWheelMinimumPower type = "double">0.03</steerWheelMinimumPower> <!-- this is the minimum amount of motor speed needed to turn the steer, in percentage of the full speed -->
+        <steerWheelFeedForwardTime type = "double">0</steerWheelFeedForwardTime>
+<!--        <steerCorrectionPowerRateAtZeroWheelSpeed type="double">0.4</steerCorrectionPowerRateAtZeroWheelSpeed>-->
+<!--        <steerCorrectionPowerFullWheelSpeed type="'double">0.4</steerCorrectionPowerFullWheelSpeed>-->
+        <!-- here we disable smart steer PID -->
+        <steerCorrectionPowerRateAtZeroWheelSpeed type="double">1</steerCorrectionPowerRateAtZeroWheelSpeed>
+        <steerCorrectionPowerFullWheelSpeed type="'double">1</steerCorrectionPowerFullWheelSpeed>
+
+        <!-- low speed mode -->
+        <lowSpeedModeTranslationalCommandScale>0.75</lowSpeedModeTranslationalCommandScale>
+
+        <!-- the configuration for wheel speed control system -->
+        <maxDrivingEncoderVelocity type="double">220000</maxDrivingEncoderVelocity> <!-- the encoder velocity read from the wheel when the robot is motioning at full speed -->
+        <driveWheelFrictionIntegrationWeight type="double">0</driveWheelFrictionIntegrationWeight> <!-- how fast the robot is adjusting itself according to the sensed friction -->
+        <driveWheelVelocityTolerance type="double">0.28</driveWheelVelocityTolerance> <!-- the amount of error in speed tolerated by the system, in percentage TO THE DESIRED -->
+
+        <driveWheelProportionGain type="double">0.7</driveWheelProportionGain>
+        <driveWheelFrictionDefaultValue type="double">0.08</driveWheelFrictionDefaultValue> <!-- the preset friction value for the robot, the robot adjusts itself based on this initial value -->
+        <driveWheelFeedForwardRate type="double">0.3</driveWheelFeedForwardRate> <!-- the proportional term, the amount of feed forward power when there is a 100% speed error -->
+        <driveWheelFeedForwardDelay type="double">0</driveWheelFeedForwardDelay> <!-- the amount of delay of the speed-controlling system, in ms, which is the amount of time that the system will "think forward" -->
+
+
+        <!-- profiled translational velocity controller -->
+        <translationalTaskUpdatableRange type="double">0.1</translationalTaskUpdatableRange>
+        <ignoredAccelerateTime type="double">0.08</ignoredAccelerateTime>
+        <robotMaximumSpeed type="double">4.5</robotMaximumSpeed>
+        <timeNeededToFullyAccelerate type="double">0.5</timeNeededToFullyAccelerate>
+        <robotSpeedActivateSpeedControl type="double">1.01</robotSpeedActivateSpeedControl>
+
+        <!-- smart wheel speed control -->
+        <wheelsPowerConstrain type="double">1</wheelsPowerConstrain>
+        <wheelsPowerConstrainAtLowSpeedMode>0.4</wheelsPowerConstrainAtLowSpeedMode>
+        <rotationalSpeedMaxSacrifice type="double">0.25</rotationalSpeedMaxSacrifice>
+
+        <!-- the configuration for rotation controller -->
+        <timeLockRotationAfterRotationalInputStops>0.45</timeLockRotationAfterRotationalInputStops>
+        <robotRotationalErrorTolerance type="double">0</robotRotationalErrorTolerance> <!-- in degrees -->
+        <robotRotationalErrorStartDecelerate type="double">60</robotRotationalErrorStartDecelerate> <!-- in degrees -->
+        <robotRotationMaximumCorrectionPower type="double">0.6</robotRotationMaximumCorrectionPower>
+        <robotRotationMinimumCorrectionPower type="double">0</robotRotationMinimumCorrectionPower>
+        <robotRotationFeedForwardTime type="double">0.4</robotRotationFeedForwardTime> <!-- in seconds -->
+        <rotationalErrorAsCommandFinished>3</rotationalErrorAsCommandFinished>
+
+        <!-- position controller(auto stage) -->
+        <robotPositionErrorTolerance type="double">0.02</robotPositionErrorTolerance> <!-- in meters -->
+        <robotPositionErrorStartDecelerate type="double">0.9</robotPositionErrorStartDecelerate> <!-- in meters -->
+        <robotPositionMaximumCorrectionPower type="double">1.05</robotPositionMaximumCorrectionPower>
+        <robotPositionMinimumCorrectionPower type="double">0.03</robotPositionMinimumCorrectionPower>
+        <robotPositionFeedForwardTime type="double">0.08</robotPositionFeedForwardTime> <!-- in seconds -->
+        <translationalErrorAsCommandFinished>0.06</translationalErrorAsCommandFinished>
+
+        <!-- the configuration of steer wheels -->
+        <maxUnusedTime type="double">1</maxUnusedTime> <!-- the amount of time that the steer wheel will wait when not used until they go back to default position -->
+        <defaultPosition type="double">90</defaultPosition> <!--to straight forward-->
+        <minUsageSpeed type="double">0.025</minUsageSpeed>
+    </chassis>
+
+    <!-- robot module configs goes here -->
+    <shooter>
+        <shooterMotorEncoderTicksPerRevolution>2048</shooterMotorEncoderTicksPerRevolution>
+        <speedControllerProportionGain>1</speedControllerProportionGain>
+        <speedControllerFeedForwardGain>2</speedControllerFeedForwardGain>
+        <speedControllerFrictionGain>0</speedControllerFrictionGain>
+        <speedControllerFeedForwardDelay>0</speedControllerFeedForwardDelay>
+        <speedControllerMaximumSpeed>6000</speedControllerMaximumSpeed>
+        <speedControllerTimeNeededToAccelerateToMaxSpeed>0.7</speedControllerTimeNeededToAccelerateToMaxSpeed>
+        <flyWheelSpeedErrorTolerance>0.06</flyWheelSpeedErrorTolerance>
+
+        <additionalInAdvanceTime>0.3</additionalInAdvanceTime>
+
+        <defaultShootingRPM>5200</defaultShootingRPM>
+        <amplifyRPM>3000</amplifyRPM>
+        <idleRPM>0</idleRPM>
+        <preparingForShootRPM>2000</preparingForShootRPM>
+        <projectileSpeed>16</projectileSpeed>
+        <shootingRange>4</shootingRange>
+
+        <!-- shooting lookup table -->
+        <targetDistance0>1.3</targetDistance0>
+        <shooterRPM0>3400</shooterRPM0>
+        <armAngle0>12</armAngle0>
+
+        <targetDistance1>1.6</targetDistance1>
+        <shooterRPM1>3800</shooterRPM1>
+        <armAngle1>7</armAngle1>
+
+        <targetDistance2>2.1</targetDistance2>
+        <shooterRPM2>4600</shooterRPM2>
+        <armAngle2>-3</armAngle2>
+
+        <targetDistance3>2.6</targetDistance3>
+        <shooterRPM3>5400</shooterRPM3>
+        <armAngle3>-6</armAngle3>
+
+        <targetDistance4>3.1</targetDistance4>
+        <shooterRPM4>6000</shooterRPM4>
+        <armAngle4>-12</armAngle4>
+
+        <targetDistance5>3.6</targetDistance5>
+        <shooterRPM5>6000</shooterRPM5>
+        <armAngle5>-26</armAngle5>
+
+        <targetDistance6>4.1</targetDistance6>
+        <shooterRPM6>6000</shooterRPM6>
+        <armAngle6>-21</armAngle6>
+    </shooter>
+    <intake>
+        <intakeMotorPort>-1</intakeMotorPort>
+        <intakeMotorReversed>0</intakeMotorReversed>
+        <intakeAidMotorPort>-1</intakeAidMotorPort>
+        <intakeAidMotorReversed>0</intakeAidMotorReversed>
+        <distanceSensorThreshold>30</distanceSensorThreshold>
+<!--        <moveBackToPositionTime>0.15</moveBackToPositionTime>-->
+
+        <moveNoteUpInsideIntakePower>0.35</moveNoteUpInsideIntakePower>
+        <moveNoteDownInsideIntakePower>0.1</moveNoteDownInsideIntakePower>
+
+        <launchPower>0.45</launchPower>
+        <intakePower>0.18</intakePower>
+        <intakeAidPower>0.4</intakeAidPower>
+        <revertPower>-0.3</revertPower>
+
+        <splitTime>0.3</splitTime>
+        <launchTime>0.5</launchTime>
+    </intake>
+    <arm>
+        <!-- arm PID -->
+        <maximumPower>0.65</maximumPower>
+        <errorStartDecelerate>35</errorStartDecelerate>
+        <minPowerToMove>0</minPowerToMove>
+        <errorTolerance>1</errorTolerance>
+        <feedForwardTime>0.06</feedForwardTime>
+        <errorAccumulationProportion>0</errorAccumulationProportion>
+        <errorAccumulationLimit>0</errorAccumulationLimit>
+        <maxAcceleration>180</maxAcceleration>
+        <maxVelocity>120</maxVelocity>
+        <inAdvanceTime>0.25</inAdvanceTime>
+        <errorToleranceAsInPosition>4.5</errorToleranceAsInPosition>
+    </arm>
+
+    <vision-autopilot>
+        <autoFaceTargetTimeUnseenToleranceMS>5000</autoFaceTargetTimeUnseenToleranceMS>
+        <aimingTimeUnseenToleranceMS>2000</aimingTimeUnseenToleranceMS>
+
+        <updateTargetPositionTolerance>0.2</updateTargetPositionTolerance>
+
+        <defaultShootingPositionDistance>1.8</defaultShootingPositionDistance>
+    </vision-autopilot>
+
+    <auto>
+        <autoStageMaxAcceleration type="double">12</autoStageMaxAcceleration>
+        <autoStageMaxVelocity type="double">4.8</autoStageMaxVelocity>
+        <autoStageMaxAngularVelocity type="double">160</autoStageMaxAngularVelocity> <!-- in deg/s -->
+
+        <inAdvanceTime>0.4</inAdvanceTime>
+
+        <shootingSegmentSpeedFactor>0.3</shootingSegmentSpeedFactor>
+        <additionalRotationInAdvanceTime>0.3</additionalRotationInAdvanceTime>
+    </auto>
+
+    <climb>
+        <leftClimbMotorPort>-1</leftClimbMotorPort>
+        <leftClimbMotorReversed>0</leftClimbMotorReversed>
+        <rightClimbMotorPort>-1</rightClimbMotorPort>
+        <rightClimbMotorReversed>0</rightClimbMotorReversed>
+
+        <movingPower>-0.4</movingPower>
+        <tolerance>5000</tolerance>
+        <upMostPointEncoderPosition>420000</upMostPointEncoderPosition>
+    </climb>
+
+    <!-- the config for xbox controller, currently using radio master in replace -->
+    <control-RM_POCKET>
+        <controllerPort type="int">0</controllerPort>
+        <xAxisPort type="int">0</xAxisPort>
+        <yAxisPort type="int">1</yAxisPort>
+        <zAxisPort type="int">3</zAxisPort>
+
+        <pilotControllerXAxisSensitivity type="int">95</pilotControllerXAxisSensitivity>
+        <pilotControllerYAxisSensitivity type="int">95</pilotControllerYAxisSensitivity>
+        <pilotControllerZAxisSensitivity type="int">-60</pilotControllerZAxisSensitivity>
+        <!-- the minimum amount of stick input to respond to, in percentage -->
+        <pilotStickThresholdWhenOtherAxisUnused>5</pilotStickThresholdWhenOtherAxisUnused>
+        <pilotStickThresholdWhenOtherAxisFull>8</pilotStickThresholdWhenOtherAxisFull>
+        <pilotTranslationalAxisExponent>1.6</pilotTranslationalAxisExponent>
+        <pilotRotationalAxisExponent>2</pilotRotationalAxisExponent>
+
+        <!-- key bindings -->
+        <translationAutoPilotButton type="int">2</translationAutoPilotButton>
+        <rotationAutoPilotButton type="int">1</rotationAutoPilotButton>
+        <lockChassisButtonPort type="int">3</lockChassisButtonPort>
+    </control-RM_POCKET>
+    <control-RM_BOXER>
+        <controllerPort type="int">0</controllerPort>
+        <xAxisPort type="int">0</xAxisPort>
+        <yAxisPort type="int">1</yAxisPort>
+        <zAxisPort type="int">3</zAxisPort>
+
+        <pilotControllerXAxisSensitivity type="int">100</pilotControllerXAxisSensitivity>
+        <pilotControllerYAxisSensitivity type="int">120</pilotControllerYAxisSensitivity>
+        <pilotControllerZAxisSensitivity type="int">-65</pilotControllerZAxisSensitivity>
+        <!-- the minimum amount of stick input to respond to, in percentage -->
+        <pilotStickThresholdWhenOtherAxisUnused>5</pilotStickThresholdWhenOtherAxisUnused>
+        <pilotStickThresholdWhenOtherAxisFull>8</pilotStickThresholdWhenOtherAxisFull>
+        <pilotTranslationalAxisExponent>1.6</pilotTranslationalAxisExponent>
+        <pilotRotationalAxisExponent>2</pilotRotationalAxisExponent>
+
+        <!-- key bindings -->
+        <translationAutoPilotButton type="int">5</translationAutoPilotButton>
+        <lockChassisButtonPort type="int">3</lockChassisButtonPort>
+        <rotationAutoPilotButton type="int">4</rotationAutoPilotButton>
+    </control-RM_BOXER>
+    <control-JOYSTICK>
+        <controllerPort type="int">1</controllerPort>
+        <xAxisPort type="int">0</xAxisPort>
+        <yAxisPort type="nt">1</yAxisPort>
+        <zAxisPort type="int">2</zAxisPort>
+
+        <pilotControllerXAxisSensitivity>80</pilotControllerXAxisSensitivity>
+        <pilotControllerYAxisSensitivity>-100</pilotControllerYAxisSensitivity>
+        <pilotControllerZAxisSensitivity>-40</pilotControllerZAxisSensitivity>
+        <!-- the minimum amount of stick input to respond to, in percentage -->
+        <pilotStickThresholdWhenOtherAxisUnused>8</pilotStickThresholdWhenOtherAxisUnused>
+        <pilotStickThresholdWhenOtherAxisFull>12</pilotStickThresholdWhenOtherAxisFull>
+        <pilotTranslationalAxisExponent>1.8</pilotTranslationalAxisExponent>
+        <pilotRotationalAxisExponent>2</pilotRotationalAxisExponent>
+
+        <translationAutoPilotButton type="int">11</translationAutoPilotButton>
+        <lockChassisButtonPort type="int">4</lockChassisButtonPort>
+        <rotationAutoPilotButton type="int">3</rotationAutoPilotButton>
+    </control-JOYSTICK>
+
+    <control-XBOX>
+        <controllerPort type="int">1</controllerPort>
+        <xAxisPort type="int">4</xAxisPort>
+        <yAxisPort type="int">5</yAxisPort>
+        <zAxisPort type="int">0</zAxisPort>
+
+        <pilotControllerXAxisSensitivity>40</pilotControllerXAxisSensitivity>
+        <pilotControllerYAxisSensitivity>-40</pilotControllerYAxisSensitivity>
+        <pilotControllerZAxisSensitivity>-35</pilotControllerZAxisSensitivity>
+        <!-- the minimum amount of stick input to respond to, in percentage -->
+        <pilotStickThresholdWhenOtherAxisUnused>5</pilotStickThresholdWhenOtherAxisUnused>
+        <pilotStickThresholdWhenOtherAxisFull>10</pilotStickThresholdWhenOtherAxisFull>
+        <pilotTranslationalAxisExponent>1.6</pilotTranslationalAxisExponent>
+        <pilotRotationalAxisExponent>1.8</pilotRotationalAxisExponent>
+
+        <translationAutoPilotButton type="int">6</translationAutoPilotButton>
+        <lockChassisButtonPort type="int">10</lockChassisButtonPort>
+        <rotationAutoPilotButton type="int">5</rotationAutoPilotButton>
+    </control-XBOX>
+</robotConfig>

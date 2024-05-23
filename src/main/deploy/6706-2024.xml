@@ -1,0 +1,184 @@
+<robotConfig>
+    <hardware>
+        <chassisOnCanivore>1</chassisOnCanivore>
+        <frontLeftWheelDriveMotor type="int">2</frontLeftWheelDriveMotor>
+        <frontLeftWheelSteerMotor type="int">1</frontLeftWheelSteerMotor>
+        <frontLeftWheelSteerMotorReversed type="int">1</frontLeftWheelSteerMotorReversed>
+        <frontLeftWheelEncoder type="int">9</frontLeftWheelEncoder>
+        <frontLeftWheelSteerEncoderReversed type="int">0</frontLeftWheelSteerEncoderReversed>
+
+        <frontRightWheelDriveMotor type="int">4</frontRightWheelDriveMotor>
+        <frontRightWheelSteerMotor type="int">3</frontRightWheelSteerMotor>
+        <frontRightWheelSteerMotorReversed type="int">1</frontRightWheelSteerMotorReversed>
+        <frontRightWheelEncoder type="int">10</frontRightWheelEncoder>
+        <frontRightWheelSteerEncoderReversed type="int">0</frontRightWheelSteerEncoderReversed>
+
+        <backLeftWheelDriveMotor type="int">8</backLeftWheelDriveMotor>
+        <backLeftWheelSteerMotor type="int">7</backLeftWheelSteerMotor>
+        <backLeftWheelSteerMotorReversed type="int">1</backLeftWheelSteerMotorReversed>
+        <backLeftWheelEncoder type="int">12</backLeftWheelEncoder>
+        <backLeftWheelSteerEncoderReversed type="int">0</backLeftWheelSteerEncoderReversed>
+
+        <backRightWheelDriveMotor type="int">6</backRightWheelDriveMotor>
+        <backRightWheelSteerMotor type="int">5</backRightWheelSteerMotor>
+        <backRightWheelSteerMotorReversed type="int">1</backRightWheelSteerMotorReversed>
+        <backRightWheelEncoder type="int">11</backRightWheelEncoder>
+        <backRightWheelSteerEncoderReversed type="int">0</backRightWheelSteerEncoderReversed>
+
+        <gyroPort type="int">15</gyroPort>
+
+         <!-- the zero position of encoders, to measure this value, turn the wheel to the direct front, and see the value of encoder.getRawSensorReading() -->
+        <frontLeftWheelZeroPosition type = "double">-2.023</frontLeftWheelZeroPosition>
+        <frontRightWheelZeroPosition type = "double">-0.472</frontRightWheelZeroPosition>
+        <backLeftWheelZeroPosition type = "double">-2.942</backLeftWheelZeroPosition>
+        <backRightWheelZeroPosition type = "double">0.760</backRightWheelZeroPosition>
+    </hardware>
+
+
+    <chassis>
+        <wheelGearRatio type="double">8.14</wheelGearRatio>
+        <wheelsPowerConstrain type="double">1</wheelsPowerConstrain>
+        <wheelsPowerConstrainAtLowSpeedMode>0.5</wheelsPowerConstrainAtLowSpeedMode>
+<!--        <wheelsPowerConstrain type="double">0.5</wheelsPowerConstrain>-->
+<!--        <wheelsPowerConstrainAtLowSpeedMode>0.5</wheelsPowerConstrainAtLowSpeedMode>-->
+        <rotationalSpeedMaxSacrifice type="double">0.4</rotationalSpeedMaxSacrifice>
+
+        <robotPositionFeedForwardTime type="double">0.05</robotPositionFeedForwardTime>
+        <translationalTaskUpdatableRange type="double">0.1</translationalTaskUpdatableRange>
+        <ignoredAccelerateTime type="double">0.05</ignoredAccelerateTime>
+        <robotMaximumSpeed type="double">4.5</robotMaximumSpeed>
+        <timeNeededToFullyAccelerate type="double">0.3</timeNeededToFullyAccelerate>
+        <robotSpeedActivateSpeedControl type="double">0.1</robotSpeedActivateSpeedControl>
+
+        <rotationalErrorAsCommandFinished>3</rotationalErrorAsCommandFinished>
+    </chassis>
+    <shooter>
+        <shooter1Port>12</shooter1Port>
+        <shooter2Port>13</shooter2Port>
+        <shooter1Reversed>0</shooter1Reversed>
+        <shooter2Reversed>0</shooter2Reversed>
+
+        <preparingForShootRPM>2000</preparingForShootRPM>
+        <projectileSpeed>8</projectileSpeed>
+        <shootingRange>3.6</shootingRange>
+
+        <!-- shooting lookup table -->
+        <targetDistance0>1.6</targetDistance0>
+        <shooterRPM0>4000</shooterRPM0>
+        <armAngle0>16</armAngle0>
+
+        <targetDistance1>2.1</targetDistance1>
+        <shooterRPM1>4200</shooterRPM1>
+        <armAngle1>5</armAngle1>
+
+        <targetDistance2>2.6</targetDistance2>
+        <shooterRPM2>4600</shooterRPM2>
+        <armAngle2>-4</armAngle2>
+
+        <targetDistance3>3.1</targetDistance3>
+        <shooterRPM3>5600</shooterRPM3>
+        <armAngle3>-10</armAngle3>
+
+        <targetDistance4>3.6</targetDistance4>
+        <shooterRPM4>6000</shooterRPM4>
+        <armAngle4>-15</armAngle4>
+
+        <targetDistance4>4.1</targetDistance4>
+        <shooterRPM4>6000</shooterRPM4>
+        <armAngle4>-20</armAngle4>
+    </shooter>
+
+    <intake>
+        <intakeMotorPort>11</intakeMotorPort>
+        <intakeMotorReversed>1</intakeMotorReversed>
+        <intakeAidMotorPort>9</intakeAidMotorPort>
+        <intakeAidMotorReversed>1</intakeAidMotorReversed>
+        <distanceSensorThreshold>24</distanceSensorThreshold>
+
+        <launchPower>0.45</launchPower>
+        <intakePower>0.18</intakePower>
+        <intakeAidPower>0.4</intakeAidPower>
+        <revertPower>-0.3</revertPower>
+        <splitTime>0.3</splitTime>
+        <launchTime>0.5</launchTime>
+    </intake>
+
+    <arm>
+        <armMotorPort>14</armMotorPort>
+        <!-- positive should be towards lower point -->
+        <armMotor2Port>14</armMotor2Port>
+        <!-- positive should be towards lower point -->
+        <armMotorReversed>1</armMotorReversed>
+        <armMotor2Reversed>1</armMotor2Reversed>
+        <armEncoderReversed>0</armEncoderReversed>
+
+        <!-- calibrate by DCEncoderCalibration.java, the reading of: absolute position(radian), when arm is placed vertically -->
+        <encoderZeroPositionRadians>4.544</encoderZeroPositionRadians>
+
+        <position-DEFAULT>102</position-DEFAULT>
+        <position-INTAKE>102</position-INTAKE>
+        <position-SPLIT>80</position-SPLIT>
+        <position-SHOOT_NOTE>71</position-SHOOT_NOTE>
+        <position-SCORE_AMPLIFIER>2</position-SCORE_AMPLIFIER>
+
+        <!-- software limit -->
+        <lowerPositionLimit>-21</lowerPositionLimit>
+        <upperPositionLimit>104</upperPositionLimit>
+
+        <!-- lookup table -->
+        <encoderPosition0>0</encoderPosition0>
+        <gravityTorque0>0</gravityTorque0>
+        <!-- the upper balanced point -->
+        <encoderPosition1>25</encoderPosition1>
+        <gravityTorque1>0</gravityTorque1>
+        <!-- midway between the upper balance point and the lower balance point  -->
+        <encoderPosition2>50</encoderPosition2>
+        <gravityTorque2>-0.02</gravityTorque2>
+        <!-- lower balance point (aka. default position) -->
+        <encoderPosition3>75</encoderPosition3>
+        <gravityTorque3>-0.03</gravityTorque3>
+        <!-- lowest position -->
+        <encoderPosition4>98</encoderPosition4>
+        <gravityTorque4>-0.05</gravityTorque4>
+
+        <!-- arm PID (Override robotConfig) -->
+        <maximumPower>0.85</maximumPower>
+        <errorStartDecelerate>25</errorStartDecelerate>
+        <minPowerToMove>0.04</minPowerToMove>
+        <errorTolerance>2</errorTolerance>
+        <feedForwardTime>0</feedForwardTime>
+        <errorAccumulationProportion>0</errorAccumulationProportion>
+        <errorAccumulationLimit>10</errorAccumulationLimit>
+        <maxAcceleration>180</maxAcceleration>
+        <maxVelocity>120</maxVelocity>
+        <inAdvanceTime>0.25</inAdvanceTime>
+        <errorToleranceAsInPosition>2</errorToleranceAsInPosition>
+
+        <!-- simple arm controller -->
+        <maxPowerWhenMovingUp>0.45</maxPowerWhenMovingUp>
+        <maxPowerWhenMovingDown>0.24</maxPowerWhenMovingDown>
+        <errorStartDecelerate>40</errorStartDecelerate>
+        <powerNeededToMoveUp>0.26</powerNeededToMoveUp>
+        <powerNeededToMoveDown>0.16</powerNeededToMoveDown>
+        <errorTolerance>2</errorTolerance>
+    </arm>
+    <auto>
+        <autoStageMaxAcceleration type="double">5</autoStageMaxAcceleration>
+        <autoStageMaxVelocity type="double">2.5</autoStageMaxVelocity>
+        <autoStageMaxAngularVelocity type="double">150</autoStageMaxAngularVelocity> <!-- in deg/s -->
+        <inAdvanceTime>0.3</inAdvanceTime>
+<!--        <autoStageMaxAcceleration type="double">2</autoStageMaxAcceleration>-->
+<!--        <autoStageMaxVelocity type="double">1</autoStageMaxVelocity>-->
+<!--        <autoStageMaxAngularVelocity type="double">45</autoStageMaxAngularVelocity> &lt;!&ndash; in deg/s &ndash;&gt;-->
+<!--        <inAdvanceTime>0.1</inAdvanceTime>-->
+    </auto>
+
+    <climb>
+        <leftClimbMotorPort>16</leftClimbMotorPort>
+        <!-- positive is up -->
+        <leftClimbMotorReversed>0</leftClimbMotorReversed>
+        <rightClimbMotorPort>15</rightClimbMotorPort>
+        <!-- positive is up -->
+        <rightClimbMotorReversed>1</rightClimbMotorReversed>
+    </climb>
+</robotConfig>
