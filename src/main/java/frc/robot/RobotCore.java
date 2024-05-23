@@ -1,9 +1,7 @@
 package frc.robot;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.hardware.CANcoder;
@@ -15,11 +13,15 @@ import frc.robot.Drivers.Encoders.CanCoder;
 import frc.robot.Drivers.IMUs.PigeonsIMU;
 import frc.robot.Drivers.IMUs.SimpleGyro;
 import frc.robot.Drivers.Motors.TalonFXMotor;
-import frc.robot.Modules.LEDStatusLights;
-import frc.robot.Modules.PositionReader.SwerveWheelPositionEstimator;
-import frc.robot.Modules.PositionReader.SwerveWheelPositionEstimatorCurveOptimized;
+import frc.robot.Drivers.Visions.PhantomClient;
+import frc.robot.Modules.Chassis.HolonomicChassis;
+import frc.robot.Modules.LEDStatusLights.AddressableLEDStatusLight;
+import frc.robot.Modules.PositionReader.PositionEstimator;
+import frc.robot.Modules.PositionReader.SwerveDriveOdometer;
+import frc.robot.Modules.PositionReader.SwerveDriveOdometerCurveOptimized;
+import frc.robot.Modules.PositionReader.VisionSupportedOdometer;
 import frc.robot.Modules.RobotModuleBase;
-import frc.robot.Modules.Chassis.SwerveBasedChassis;
+import frc.robot.Modules.Chassis.SwerveDriveChassis;
 import frc.robot.Modules.Chassis.SwerveWheel;
 import frc.robot.Services.RobotServiceBase;
 import frc.robot.Utils.MathUtils.Vector2D;
@@ -34,11 +36,10 @@ public class RobotCore {
         private static final long printTimeIfTimeMillisExceeds = 20;
 
         public RobotConfigReader robotConfig;
-        public final SwerveWheel frontLeftWheel, backLeftWheel, frontRightWheel, backRightWheel;
-        public final SimpleGyro gyro;
-        public final SwerveWheelPositionEstimator positionReader;
-        public final SwerveBasedChassis chassisModule;
-        public final LEDStatusLights statusLight;
+        public SimpleGyro gyro;
+        public PositionEstimator positionEstimator;
+        public HolonomicChassis chassis;
+        public AddressableLEDStatusLight statusLight;
 
         private final List<String> configsToTune = new ArrayList<>(1);
         private final List<RobotModuleBase> modules;
@@ -49,11 +50,7 @@ public class RobotCore {
          * creates a robot core
          * creates the instances of all the modules, but do not call init functions yet
          * */
-        public RobotCore(String configName) {
-                System.out.println("<-- Robot Core | creating robot... -->");
-                modules = new ArrayList<>();
-                services = new ArrayList<>();
-
+        public RobotCore(String configName, boolean isSimulation) {
                 try {
                         robotConfig = new RobotConfigReader(configName);
                 } catch (RuntimeException e) {
@@ -61,42 +58,44 @@ public class RobotCore {
                         robotConfig = new RobotConfigReader(configName);
                 }
 
-                frontLeftWheel = createSwerveWheel("frontLeft", 1, new Vector2D(new double[] { -0.6, 0.6 }));
+                modules = new ArrayList<>();
+                services = new ArrayList<>();
+                if (isSimulation)
+                        createRobotReal(configName);
+        }
+
+        private void createRobotSim(String configName) {
+                System.out.println("<-- Robot Core | creating robot in simulation... -->");
+                // TODO: create the chassis in simulation
+        }
+
+        private void createRobotReal(String configName) {
+                System.out.println("<-- Robot Core | creating real robot... -->");
+
+
+                final SwerveWheel
+                        frontLeftWheel = createSwerveWheel("frontLeft", 1, new Vector2D(new double[] { -0.6, 0.6 })),
+                        backLeftWheel = createSwerveWheel("backLeft", 2, new Vector2D(new double[] { -0.6, -0.6 })),
+                        frontRightWheel = createSwerveWheel("frontRight", 3, new Vector2D(new double[] { 0.6, 0.6 })),
+                        backRightWheel = createSwerveWheel("backRight", 4, new Vector2D(new double[] { 0.6, -0.6 }));
                 modules.add(frontLeftWheel);
-
-                backLeftWheel = createSwerveWheel("backLeft", 2, new Vector2D(new double[] { -0.6, -0.6 }));
                 modules.add(backLeftWheel);
-
-                frontRightWheel = createSwerveWheel("frontRight", 3, new Vector2D(new double[] { 0.6, 0.6 }));
                 modules.add(frontRightWheel);
-
-                backRightWheel = createSwerveWheel("backRight", 4, new Vector2D(new double[] { 0.6, -0.6 }));
                 modules.add(backRightWheel);
 
                 this.gyro = new SimpleGyro(0, false, new PigeonsIMU((int) robotConfig.getConfig("hardware/gyroPort")));
 
                 final SwerveWheel[] swerveWheels = new SwerveWheel[] {frontLeftWheel, frontRightWheel, backLeftWheel, backRightWheel};
-                positionReader = new SwerveWheelPositionEstimator(swerveWheels, gyro);
-                modules.add(positionReader);
 
-                SwerveWheelPositionEstimatorCurveOptimized testPositionEstimator = new SwerveWheelPositionEstimatorCurveOptimized(swerveWheels, gyro);
-                modules.add(testPositionEstimator);
+                final SwerveDriveOdometer swerveOdometer = new VisionSupportedOdometer(swerveWheels, gyro, new PhantomClient()); // TODO create phantom client
+                this.positionEstimator = swerveOdometer;
+                modules.add(swerveOdometer);
 
-                this.chassisModule = new SwerveBasedChassis(swerveWheels, gyro, robotConfig, positionReader);
-                modules.add(chassisModule);
+                final SwerveDriveChassis swerveDriveChassis = new SwerveDriveChassis(swerveWheels, gyro, robotConfig, positionEstimator);
+                this.chassis = swerveDriveChassis;
+                modules.add(swerveDriveChassis);
 
-                final Map<Integer, Vector2D> speakerTargetAprilTagReferences = new HashMap<>(), amplifierTargetAprilTagReferences = new HashMap<>(), noteTargetReferences = new HashMap<>();
-                speakerTargetAprilTagReferences.put(4, new Vector2D(new double[] {0, -0.2}));
-                // speakerTargetAprilTagReferences.put(3, new Vector2D(new double[] {-0.5,0}));
-                // amplifierTargetAprilTagReferences.put(5, new Vector2D(new double[] {0, 0}));
-                speakerTargetAprilTagReferences.put(7, new Vector2D(new double[] {0, -0.2}));
-                // speakerTargetAprilTagReferences.put(8, new Vector2D(new double[] {-0.5,0}));
-                // amplifierTargetAprilTagReferences.put(6, new Vector2D(new double[] {0, 0}));
-
-                noteTargetReferences.put(1, new Vector2D()); // the id of note is always 0, and the note is itself the reference so the relative position is (0,0)
-
-                this.statusLight = new LEDStatusLights(new AddressableLED(0), new AddressableLEDBuffer(155)); modules.add(statusLight);
-                // this.statusLight = null;
+                this.statusLight = new AddressableLEDStatusLight(new AddressableLED(0), new AddressableLEDBuffer(155)); modules.add(statusLight);
         }
 
         private SwerveWheel createSwerveWheel(String name, int id, Vector2D wheelInstallationPosition) {

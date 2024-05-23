@@ -1,7 +1,9 @@
 package frc.robot.Services;
 
 import edu.wpi.first.wpilibj.Timer;
-import frc.robot.Modules.Chassis.SwerveBasedChassis;
+import frc.robot.Modules.Chassis.HolonomicChassis;
+import frc.robot.Modules.Chassis.SwerveDriveChassis;
+import frc.robot.Modules.RobotModuleBase;
 import frc.robot.Utils.DashboardImpl;
 import frc.robot.Utils.MathUtils.BezierCurveSchedule;
 import frc.robot.Utils.MathUtils.BezierCurveScheduleGenerator;
@@ -19,7 +21,7 @@ import java.util.List;
 public class AutoProgramRunner extends RobotServiceBase {
     private List<SequentialCommandSegment> commandSegments;
 
-    private final SwerveBasedChassis robotChassis;
+    private final HolonomicChassis chassis;
     private final BezierCurveScheduleGenerator scheduleGenerator;
     private final RobotConfigReader robotConfig;
     private int currentSegmentID;
@@ -28,9 +30,9 @@ public class AutoProgramRunner extends RobotServiceBase {
     private final Timer dt = new Timer();
     private double currentSegmentRotationScheduleETA, rotationT, inAdvanceTime;
 
-    public AutoProgramRunner(SwerveBasedChassis chassis, RobotConfigReader robotConfig) {
+    public AutoProgramRunner(HolonomicChassis chassis, RobotConfigReader robotConfig) {
         super("Auto-Program-Runner");
-        this.robotChassis = chassis;
+        this.chassis = chassis;
         this.robotConfig = robotConfig;
         this.scheduleGenerator = new BezierCurveScheduleGenerator(robotConfig);
 
@@ -52,7 +54,7 @@ public class AutoProgramRunner extends RobotServiceBase {
         if (currentSegmentID == -1)
             initiateSegment(0);
         updateConfigs();
-        robotChassis.setOrientationMode(SwerveBasedChassis.OrientationMode.FIELD, this);
+        chassis.setOrientationMode(SwerveDriveChassis.OrientationMode.FIELD, this);
 
 
         if (currentPathSchedule != null) {
@@ -60,8 +62,8 @@ public class AutoProgramRunner extends RobotServiceBase {
             final Vector2D inAdvanceSpaceWithoutConstrain =  currentPathSchedule.getVelocityWithLERP().multiplyBy(inAdvanceTime),
                     distanceLeft = Vector2D.displacementToTarget(currentPathSchedule.getPositionWithLERP(), currentPathSchedule.getPositionWithLERP(1)),
                     inAdvanceSpaceWithConstrain = new Vector2D(inAdvanceSpaceWithoutConstrain.getHeading(), Math.min(inAdvanceSpaceWithoutConstrain.getMagnitude(), distanceLeft.getMagnitude()));
-            robotChassis.setTranslationalTask(new SwerveBasedChassis.ChassisTaskTranslation(
-                            SwerveBasedChassis.ChassisTaskTranslation.TaskType.GO_TO_POSITION,
+            chassis.setTranslationalTask(new SwerveDriveChassis.ChassisTaskTranslation(
+                            SwerveDriveChassis.ChassisTaskTranslation.TaskType.GO_TO_POSITION,
                             currentPathSchedule.getPositionWithLERP().addBy(
                                     currentSegmentID == commandSegments.size()-1 ?
                                             inAdvanceSpaceWithConstrain : inAdvanceSpaceWithoutConstrain)),
@@ -77,8 +79,8 @@ public class AutoProgramRunner extends RobotServiceBase {
             double rotationTSyncedToTranslationT = rotationT;
             if (currentPathSchedule != null)
                 rotationTSyncedToTranslationT = Math.min(currentPathSchedule.getT(), rotationTSyncedToTranslationT);
-            robotChassis.setRotationalTask(new SwerveBasedChassis.ChassisTaskRotation(
-                            SwerveBasedChassis.ChassisTaskRotation.TaskType.FACE_DIRECTION,
+            chassis.setRotationalTask(new SwerveDriveChassis.ChassisTaskRotation(
+                            SwerveDriveChassis.ChassisTaskRotation.TaskType.FACE_DIRECTION,
                             currentCommandSegment.getCurrentRotationWithLERP(rotationTSyncedToTranslationT)),
                     this);
             DashboardImpl.putNumber("auto", "rotation T", rotationT);
@@ -100,7 +102,7 @@ public class AutoProgramRunner extends RobotServiceBase {
     @Override
     public void reset() {
         this.currentSegmentID = -1;
-        robotChassis.gainOwnerShip(this);
+        chassis.gainOwnerShip(this);
         updateConfigs();
         commandSegments = new ArrayList<>();
     }
@@ -131,7 +133,7 @@ public class AutoProgramRunner extends RobotServiceBase {
 
         if (currentCommandSegment.chassisMovementPath == null) return;
         this.currentPathSchedule = scheduleGenerator.generateTranslationalSchedule(currentCommandSegment.chassisMovementPath);
-        robotChassis.gainOwnerShip(this);
+        chassis.gainOwnerShip(this);
     }
 
     public void scheduleCommandSegments(List<SequentialCommandSegment> commandSegments) {

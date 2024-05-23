@@ -31,7 +31,7 @@ public class RobotShell extends TimedRobot {
     @Override
     public void robotInit() {
         // System.out.println("<-- Robot Shell | robot init -->");
-        robotCore = new RobotCore("fasterChassis");
+        robotCore = new RobotCore("fasterChassis", isSimulation());
     }
 
     /** called once when the driver station first connects to the robot */
@@ -40,7 +40,7 @@ public class RobotShell extends TimedRobot {
         // System.out.println("<-- Robot Shell | driver station connected -->");
         robotCore.initializeRobot();
 
-        autoProgramRunner = new AutoProgramRunner(robotCore.chassisModule, robotCore.robotConfig);
+        autoProgramRunner = new AutoProgramRunner(robotCore.chassis, robotCore.robotConfig);
 
         addAutoStagePrograms();
         scheduleAutoCommands(autoStageChooser.getSelected());
@@ -130,6 +130,8 @@ public class RobotShell extends TimedRobot {
     private void startManualStage() {
         final List<RobotServiceBase> services = new ArrayList<>();
 
+        final PilotChassis pilotChassisService = new PilotChassis(robotCore.chassis, robotCore.robotConfig);
+        services.add(pilotChassisService);
 
         robotCore.startStage(services);
     }

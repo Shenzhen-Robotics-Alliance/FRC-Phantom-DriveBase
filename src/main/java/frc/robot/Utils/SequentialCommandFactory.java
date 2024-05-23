@@ -4,8 +4,9 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.AutoStagePrograms.FieldPositions;
+import frc.robot.Modules.Chassis.HolonomicChassis;
 import frc.robot.Modules.PositionReader.PositionEstimator;
-import frc.robot.Modules.Chassis.SwerveBasedChassis;
+import frc.robot.Modules.Chassis.SwerveDriveChassis;
 import frc.robot.RobotCore;
 import frc.robot.Utils.MathUtils.BezierCurve;
 import frc.robot.Utils.MathUtils.Rotation2D;
@@ -22,7 +23,7 @@ import java.util.Arrays;
 import java.util.List;
 
 public class SequentialCommandFactory {
-    private final SwerveBasedChassis chassis;
+    private final HolonomicChassis chassis;
     private final PositionEstimator positionEstimator;
     private final Vector2D robotStartingPosition;
     private final Rotation2D robotStartingRotation2D;
@@ -36,8 +37,8 @@ public class SequentialCommandFactory {
     }
 
     public SequentialCommandFactory(RobotCore robotCore, Vector2D robotStartingPosition, Rotation2D robotStartingRotation2D) {
-        this.chassis = robotCore.chassisModule;
-        this.positionEstimator = robotCore.positionReader;
+        this.chassis = robotCore.chassis;
+        this.positionEstimator = robotCore.positionEstimator;
         this.maintainCurrentRotation = () -> new Rotation2D(positionEstimator.getRobotRotation());
         this.robotStartingPosition = robotStartingPosition;
         this.robotStartingRotation2D = robotStartingRotation2D;

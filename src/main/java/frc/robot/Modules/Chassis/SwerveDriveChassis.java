@@ -14,10 +14,8 @@ import frc.robot.Utils.MechanismControllers.EnhancedPIDController;
 /**
  * the module that controls the chassis with its four swerves
  */
-public class SwerveBasedChassis extends RobotModuleBase {
+public class SwerveDriveChassis extends HolonomicChassis {
     private final boolean useProfiledSpeedControl = true;
-    /** the amount of changes updatable for the old task before initiating a new task */
-    private double translationalTaskUpdatableRange;
     private double robotMaximumSpeed;
     private double timeNeededToFullyAccelerate;
     private double robotSpeedActivateSpeedControl;
@@ -37,20 +35,6 @@ public class SwerveBasedChassis extends RobotModuleBase {
     /** the current rotational task  */
     private ChassisTaskRotation rotationalTask;
 
-    public enum OrientationMode {
-        FIELD,
-        ROBOT
-    }
-
-    /**
-     * the speed controlling mode of each of the independent wheels
-     * this is NOT the control mode of the whole chassis
-     */
-    public enum WheelOutputMode {
-        PERCENT_POWER,
-        SPEED_CONTROL
-    }
-
     private OrientationMode orientationMode;
 
 
@@ -59,8 +43,7 @@ public class SwerveBasedChassis extends RobotModuleBase {
     public final PositionEstimator positionEstimator;
     private final SimpleGyro gyro;
     private final RobotConfigReader robotConfig;
-    public SwerveBasedChassis(SwerveWheel[] swerveWheels, SimpleGyro gyro, RobotConfigReader robotConfig, PositionEstimator positionEstimator) {
-        super("SwerveBasedChassis");
+    public SwerveDriveChassis(SwerveWheel[] swerveWheels, SimpleGyro gyro, RobotConfigReader robotConfig, PositionEstimator positionEstimator) {
         this.swerveWheels = swerveWheels;
         this.positionEstimator = positionEstimator;
         this.gyro = gyro;
@@ -126,14 +109,8 @@ public class SwerveBasedChassis extends RobotModuleBase {
         return highestWheelSpeed;
     }
 
-    public void setLowSpeedModeEnabled(boolean enabled, RobotModuleOperatorMarker operator) {
-        if (isOwner(operator))
-            this.lowSpeedModeEnabled = enabled;
-    }
-
     @Override
     public void updateConfigs() {
-        this.translationalTaskUpdatableRange = robotConfig.getConfig("chassis/translationalTaskUpdatableRange");
         this.robotMaximumSpeed = robotConfig.getConfig("chassis/robotMaximumSpeed");
         this.timeNeededToFullyAccelerate = robotConfig.getConfig("chassis/timeNeededToFullyAccelerate");
         this.robotSpeedActivateSpeedControl = robotConfig.getConfig("chassis/robotSpeedActivateSpeedControl");
@@ -194,7 +171,6 @@ public class SwerveBasedChassis extends RobotModuleBase {
         this.rotationalTask = new ChassisTaskRotation(ChassisTaskRotation.TaskType.SET_VELOCITY, 0);
 
         this.translationalTask = new ChassisTaskTranslation(ChassisTaskTranslation.TaskType.SET_VELOCITY,new Vector2D());
-        this.translationalTask.initiate(new Vector2D());
 
         this.decidedVelocity = new Vector2D();
         this.lowSpeedModeEnabled = false;
@@ -285,31 +261,26 @@ public class SwerveBasedChassis extends RobotModuleBase {
         return goToRotationController.getMotorPower(AngleUtils.simplifyAngle(gyro.getYaw()), gyro.getYawVelocity(), dt);
     }
 
+    @Override
+    public void setLowSpeedModeEnabled(boolean enabled, RobotModuleOperatorMarker operator) {
+        if (isOwner(operator))
+            this.lowSpeedModeEnabled = enabled;
+    }
+
     /**
      * set the translational task of the chassis
      * @param translationalTask the desired task for rotation
      * @param operator the module or service that is calling for the task
      * */
+    @Override
     public void setTranslationalTask(ChassisTaskTranslation translationalTask, RobotModuleOperatorMarker operator) {
         if (!this.isOwner(operator))
                 return;
 
         this.translationalTask = translationalTask;
-        this.translationalTask.initiate(
-                translationalTask.taskType == ChassisTaskTranslation.TaskType.SET_VELOCITY ?
-                        this.positionEstimator.getRobotVelocity2D().multiplyBy(1 / robotMaximumSpeed) : this.positionEstimator.getRobotPosition2D()
-        );
     }
 
-    public void setWheelOutputMode(WheelOutputMode selectedMode, RobotModuleOperatorMarker operator) {
-        if (!this.isOwner(operator))
-            return;
-        for(SwerveWheel wheel: swerveWheels)
-            wheel.setSpeedControl(
-                    selectedMode == WheelOutputMode.SPEED_CONTROL
-            );
-    }
-
+    @Override
     public void setOrientationMode(OrientationMode mode, RobotModuleOperatorMarker operator) {
         if (!this.isOwner(operator))
             return;
@@ -321,12 +292,14 @@ public class SwerveBasedChassis extends RobotModuleBase {
      * @param rotationalTask the desired task for rotation
      * @param operator the module or service that is calling for the task
      */
+    @Override
     public void setRotationalTask(ChassisTaskRotation rotationalTask, RobotModuleOperatorMarker operator) {
         if (!this.isOwner(operator))
             return;
         this.rotationalTask = rotationalTask;
     }
 
+    @Override
     public void setChassisLocked(boolean locked, RobotModuleOperatorMarker operator) {
         if (!this.isOwner(operator))
             return;
@@ -334,10 +307,22 @@ public class SwerveBasedChassis extends RobotModuleBase {
             swerveWheel.setWheelLocked(locked, this);
     }
 
+    @Override
     public double getChassisHeading() {
         return gyro.getYaw();
     }
 
+    @Override
+    public ChassisTaskTranslation getCurrentTranslationalTask() {
+        return translationalTask;
+    }
+
+    @Override
+    public ChassisTaskRotation getCurrentRotationalTask() {
+        return rotationalTask;
+    }
+
+    @Override
     public boolean isCurrentTranslationalTaskFinished() {
         System.out.println("<-- waiting for chassis to finish movement -->");
         System.out.println("Task Type: " + translationalTask.taskType);
@@ -351,69 +336,12 @@ public class SwerveBasedChassis extends RobotModuleBase {
         };
     }
 
+    @Override
     public boolean isCurrentRotationalTaskFinished() {
         System.out.println("rotational error: " + Math.toDegrees(Math.abs(AngleUtils.getActualDifference(getChassisHeading(), rotationalTask.rotationalValue))) + ", tolerance: " + Math.toDegrees(rotationDifferenceAsTaskFinished));
         return switch (rotationalTask.taskType) {
             case SET_VELOCITY -> rotationalTask.rotationalValue == 0;
             case FACE_DIRECTION -> Math.abs(AngleUtils.getActualDifference(getChassisHeading(), rotationalTask.rotationalValue)) < rotationDifferenceAsTaskFinished;
         };
-    }
-
-    public ChassisTaskTranslation getCurrentTranslationalTask() {
-        return translationalTask;
-    }
-
-    public ChassisTaskRotation getCurrentRotationalTask() {
-        return rotationalTask;
-    }
-
-    public static class ChassisTaskTranslation {
-        public enum TaskType {
-            SET_VELOCITY,
-            GO_TO_POSITION
-        }
-        public final TaskType taskType;
-        public final Vector2D translationValue;
-        public Vector2D initialState;
-        public final Timer taskTimer;
-
-        public ChassisTaskTranslation(TaskType type, Vector2D value) {
-            this.taskType = type;
-            this.translationValue = value;
-            this.taskTimer = new Timer();
-        }
-
-        /**
-         * initiates the translation with initial state
-         * @param initialState note it is in PERCENT OUT OF FULL-SPEED, NOT meters/second
-         */
-        public void initiate(Vector2D initialState) {
-            this.taskTimer.start();
-            this.initialState = initialState;
-        }
-    }
-
-    public static class ChassisTaskRotation {
-        public enum TaskType {
-            SET_VELOCITY,
-            FACE_DIRECTION
-        }
-        public final TaskType taskType;
-        public double rotationalValue;
-        public final Timer taskTimer;
-
-        /** creates a rotational task
-         * @param type choose from this.TaskType
-         * @param value in radians, counter-clockwise is positive
-         */
-        public ChassisTaskRotation(TaskType type, double value) {
-            this.taskType = type;
-            this.rotationalValue = value;
-            this.taskTimer = new Timer();
-        }
-
-        public void initiate() {
-            taskTimer.start();
-        }
     }
 }

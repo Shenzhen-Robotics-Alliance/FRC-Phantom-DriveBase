@@ -1,18 +1,18 @@
-package frc.robot.Modules;
+package frc.robot.Modules.LEDStatusLights;
 
 import edu.wpi.first.wpilibj.*;
 import frc.robot.Modules.RobotModuleBase;
 import frc.robot.Utils.LEDAnimation;
 import frc.robot.Utils.RobotModuleOperatorMarker;
 
-public class LEDStatusLights extends RobotModuleBase {
+public class AddressableLEDStatusLight extends RobotModuleBase implements LEDStatusLight {
     final Timer t = new Timer();
     final AddressableLED led;
     final AddressableLEDBuffer buffer;
 
     LEDAnimation animation;
     double hz;
-    public LEDStatusLights(AddressableLED led, AddressableLEDBuffer buffer) {
+    public AddressableLEDStatusLight(AddressableLED led, AddressableLEDBuffer buffer) {
         super("LED-Status-Lights", true);
         this.led = led;
         this.buffer = buffer;

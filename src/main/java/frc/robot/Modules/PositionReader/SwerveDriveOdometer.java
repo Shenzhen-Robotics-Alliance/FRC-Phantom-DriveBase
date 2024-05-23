@@ -9,7 +9,7 @@ import frc.robot.Utils.DashboardImpl;
 import frc.robot.Utils.MathUtils.Rotation2D;
 import frc.robot.Utils.MathUtils.Vector2D;
 
-public class SwerveWheelPositionEstimator extends RobotModuleBase implements PositionEstimator {
+public class SwerveDriveOdometer extends PositionEstimator {
     protected final SwerveWheel[] swerveWheels;
     protected final SimpleGyro gyro;
 
@@ -23,8 +23,8 @@ public class SwerveWheelPositionEstimator extends RobotModuleBase implements Pos
      * public RobotModule(HashMap<String, RobotModule> dependenciesModules,
      * dependency object 1, dependency object 2, ...)
      */
-    public SwerveWheelPositionEstimator(SwerveWheel[] swerveWheels, SimpleGyro gyro) {
-        super("Position-Estimator");
+    public SwerveDriveOdometer(SwerveWheel[] swerveWheels, SimpleGyro gyro) {
+        super();
         this.swerveWheels = swerveWheels;
         this.wheelAccelerations = new Vector2D[swerveWheels.length];
         this.wheelVelocities = new Vector2D[swerveWheels.length];
@@ -144,5 +144,10 @@ public class SwerveWheelPositionEstimator extends RobotModuleBase implements Pos
     @Override
     public boolean isResultReliable() {
         return true; // TODO determine whether it is reliable or not
+    }
+
+    @Override
+    public void reset() {
+
     }
 }

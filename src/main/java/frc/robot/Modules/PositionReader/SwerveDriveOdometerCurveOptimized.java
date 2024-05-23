@@ -7,14 +7,15 @@ import frc.robot.Utils.MathUtils.AngleUtils;
 import frc.robot.Utils.MathUtils.Rotation2D;
 import frc.robot.Utils.MathUtils.Vector2D;
 
-public class SwerveWheelPositionEstimatorCurveOptimized extends SwerveWheelPositionEstimator {
+@Deprecated
+public class SwerveDriveOdometerCurveOptimized extends SwerveDriveOdometer {
     /**
      * swerve wheel position reader,
      *
      * @param swerveWheels
      * @param gyro
      */
-    public SwerveWheelPositionEstimatorCurveOptimized(SwerveWheel[] swerveWheels, SimpleGyro gyro) {
+    public SwerveDriveOdometerCurveOptimized(SwerveWheel[] swerveWheels, SimpleGyro gyro) {
         super(swerveWheels, gyro);
     }
 
