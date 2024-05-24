@@ -132,7 +132,7 @@ public class RobotShell extends TimedRobot {
     private void startManualStage() {
         final List<RobotServiceBase> services = new ArrayList<>();
 
-        final PilotChassis pilotChassisService = new PilotChassis(robotCore.chassis, robotCore.robotConfig);
+        final PilotChassis pilotChassisService = new PilotChassis(robotCore.chassis, robotCore.robotConfig, copilotGamePad);
         services.add(pilotChassisService);
 
         robotCore.startStage(services);

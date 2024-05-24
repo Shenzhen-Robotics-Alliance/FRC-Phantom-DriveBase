@@ -37,7 +37,7 @@ public class RobotCore {
 
         public RobotConfigReader robotConfig;
         public SimpleGyro gyro;
-        public PositionEstimator positionEstimator;
+        public RobotFieldPositionEstimator positionEstimator;
         public HolonomicChassis chassis;
         public LEDStatusLight statusLight;
 

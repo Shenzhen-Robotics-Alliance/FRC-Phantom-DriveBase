@@ -1,13 +1,12 @@
 package frc.robot.Modules.PositionReader;
 
-import frc.robot.Modules.RobotModuleBase;
 import frc.robot.Utils.MathUtils.Vector2D;
 
 
 /**
  * TODO: the simulated position estimator for robot simulations
  * */
-public class SimulationPositionsEstimator extends PositionEstimator {
+public class SimulationPositionsEstimator extends RobotFieldPositionEstimator {
     public SimulationPositionsEstimator() {
         super();
     }
@@ -55,11 +54,6 @@ public class SimulationPositionsEstimator extends PositionEstimator {
     @Override
     public void setRobotRotation(double rotation) {
 
-    }
-
-    @Override
-    public boolean isResultReliable() {
-        return false;
     }
 
     @Override

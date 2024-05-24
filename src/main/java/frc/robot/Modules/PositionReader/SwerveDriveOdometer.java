@@ -2,14 +2,13 @@ package frc.robot.Modules.PositionReader;
 
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.Drivers.IMUs.SimpleGyro;
-import frc.robot.Modules.RobotModuleBase;
 import frc.robot.Modules.Chassis.SwerveWheel;
 import frc.robot.Utils.ChassisUnit;
 import frc.robot.Utils.DashboardImpl;
 import frc.robot.Utils.MathUtils.Rotation2D;
 import frc.robot.Utils.MathUtils.Vector2D;
 
-public class SwerveDriveOdometer extends PositionEstimator {
+public class SwerveDriveOdometer extends RobotFieldPositionEstimator {
     protected final SwerveWheel[] swerveWheels;
     protected final SimpleGyro gyro;
 
@@ -121,16 +120,6 @@ public class SwerveDriveOdometer extends PositionEstimator {
     }
 
     @Override
-    public void resetRobotPosition() {
-        setRobotPosition(new Vector2D());
-    }
-
-    @Override
-    public void resetRobotRotation() {
-        gyro.reset();
-    }
-
-    @Override
     public void setRobotPosition(Vector2D robotPosition) {
         for (int wheelID = 0; wheelID < swerveWheels.length; wheelID++)
             wheelPositions[wheelID] = robotPosition.addBy(swerveWheels[wheelID].getWheelInstalledLocationVector());
@@ -139,11 +128,6 @@ public class SwerveDriveOdometer extends PositionEstimator {
     @Override
     public void setRobotRotation(double rotation) {
         gyro.calibrate(rotation);
-    }
-
-    @Override
-    public boolean isResultReliable() {
-        return true; // TODO determine whether it is reliable or not
     }
 
     @Override

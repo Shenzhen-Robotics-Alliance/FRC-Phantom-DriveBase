@@ -32,6 +32,8 @@ public abstract class HolonomicChassis extends RobotModuleBase {
 
     public abstract boolean isCurrentRotationalTaskFinished();
 
+    public abstract void resetChassisPositionAndRotation();
+
     public static final class ChassisTaskTranslation {
         public enum TaskType {
             SET_VELOCITY,

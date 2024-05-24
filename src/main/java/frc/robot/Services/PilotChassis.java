@@ -1,5 +1,7 @@
 package frc.robot.Services;
 
+import edu.wpi.first.wpilibj.GenericHID;
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -27,22 +29,23 @@ public class PilotChassis extends RobotServiceBase {
     }
     private SendableChooser<ControllerType> controllerTypeSendableChooser = new SendableChooser<>();
     private static final ControllerType defaultControllerType = ControllerType.RM_POCKET;
+    private final XboxController copilotGamePad;
 
     /**
      * creates a pilot chassis
      * @param chassis
      * @param robotConfig
      * */
-    public PilotChassis(HolonomicChassis chassis, RobotConfigReader robotConfig) {
+    public PilotChassis(HolonomicChassis chassis, RobotConfigReader robotConfig, XboxController copilotGamePad) {
         super("pilotChassisService");
         this.chassis = chassis;
         this.robotConfig = robotConfig;
+        this.copilotGamePad = copilotGamePad;
     }
 
     @Override
     public void init() {
         reset();
-
     }
 
     @Override
@@ -61,17 +64,6 @@ public class PilotChassis extends RobotServiceBase {
         this.chassis.gainOwnerShip(this);
 
         lastRotationalInputTimeMillis = System.currentTimeMillis();
-    }
-
-    private void addResetChassisCommandButtonToDashboard() {
-        SmartDashboard.putData("Reset Chassis", new InstantCommand(() -> {
-            chassis.reset();
-            /* make rotation maintenance target zero */
-            smartRotationControlDesiredHeading = 0;
-            /* start rotation maintenance immediately */
-            lastRotationalInputTimeMillis = System.currentTimeMillis() - (long)(robotConfig.getConfig("chassis", "timeLockRotationAfterRotationalInputStops") * 1000);
-            addResetChassisCommandButtonToDashboard();
-        }));
     }
 
     private ControllerType previousSelectedController = null;
@@ -94,7 +86,7 @@ public class PilotChassis extends RobotServiceBase {
         chassis.setOrientationMode(orientationModeChooser.getSelected(), this);
 
         /* read and process pilot's translation input */
-        final int translationAutoPilotButton = (int)robotConfig.getConfig(controllerName, "translationAutoPilotButton");
+        final int translationAutoPilotButton = (int) robotConfig.getConfig(controllerName, "translationAutoPilotButton");
         final int smartRotationControlButton = (int) robotConfig.getConfig(controllerName, "rotationAutoPilotButton");
         HolonomicChassis.ChassisTaskTranslation chassisTranslationalTask = new HolonomicChassis.ChassisTaskTranslation(
                 HolonomicChassis.ChassisTaskTranslation.TaskType.SET_VELOCITY,
@@ -130,6 +122,11 @@ public class PilotChassis extends RobotServiceBase {
         /* lock the chassis if needed */
         final int lockChassisButtonPort = (int) robotConfig.getConfig(controllerName, "lockChassisButtonPort");
         chassis.setChassisLocked(pilotController.keyOnHold(lockChassisButtonPort), this);
+
+        if (copilotGamePad.getLeftStickButton() && copilotGamePad.getRightStickButton()) {
+            copilotGamePad.setRumble(GenericHID.RumbleType.kBothRumble, 1);
+            chassis.resetChassisPositionAndRotation();
+        } else copilotGamePad.setRumble(GenericHID.RumbleType.kBothRumble, 0);
 
         SmartDashboard.putNumber("rotation maintenance heading", Math.toDegrees(smartRotationControlDesiredHeading));
     }

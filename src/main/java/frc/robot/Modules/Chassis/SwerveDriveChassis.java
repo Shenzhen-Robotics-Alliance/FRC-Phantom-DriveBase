@@ -1,10 +1,8 @@
 package frc.robot.Modules.Chassis;
 
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Drivers.IMUs.SimpleGyro;
-import frc.robot.Modules.PositionReader.PositionEstimator;
-import frc.robot.Modules.RobotModuleBase;
+import frc.robot.Modules.PositionReader.RobotFieldPositionEstimator;
 import frc.robot.Utils.*;
 import frc.robot.Utils.MathUtils.AngleUtils;
 import frc.robot.Utils.MathUtils.Rotation2D;
@@ -40,10 +38,10 @@ public class SwerveDriveChassis extends HolonomicChassis {
 
     /** the four wheels of the robot */
     private final SwerveWheel[] swerveWheels;
-    public final PositionEstimator positionEstimator;
+    public final RobotFieldPositionEstimator positionEstimator;
     private final SimpleGyro gyro;
     private final RobotConfigReader robotConfig;
-    public SwerveDriveChassis(SwerveWheel[] swerveWheels, SimpleGyro gyro, RobotConfigReader robotConfig, PositionEstimator positionEstimator) {
+    public SwerveDriveChassis(SwerveWheel[] swerveWheels, SimpleGyro gyro, RobotConfigReader robotConfig, RobotFieldPositionEstimator positionEstimator) {
         this.swerveWheels = swerveWheels;
         this.positionEstimator = positionEstimator;
         this.gyro = gyro;
@@ -343,5 +341,10 @@ public class SwerveDriveChassis extends HolonomicChassis {
             case SET_VELOCITY -> rotationalTask.rotationalValue == 0;
             case FACE_DIRECTION -> Math.abs(AngleUtils.getActualDifference(getChassisHeading(), rotationalTask.rotationalValue)) < rotationDifferenceAsTaskFinished;
         };
+    }
+
+    @Override
+    public void resetChassisPositionAndRotation() {
+        positionEstimator.resetRobot();
     }
 }

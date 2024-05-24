@@ -5,8 +5,7 @@ import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.AutoStagePrograms.FieldPositions;
 import frc.robot.Modules.Chassis.HolonomicChassis;
-import frc.robot.Modules.PositionReader.PositionEstimator;
-import frc.robot.Modules.Chassis.SwerveDriveChassis;
+import frc.robot.Modules.PositionReader.RobotFieldPositionEstimator;
 import frc.robot.RobotCore;
 import frc.robot.Utils.MathUtils.BezierCurve;
 import frc.robot.Utils.MathUtils.Rotation2D;
@@ -24,7 +23,7 @@ import java.util.List;
 
 public class SequentialCommandFactory {
     private final HolonomicChassis chassis;
-    private final PositionEstimator positionEstimator;
+    private final RobotFieldPositionEstimator positionEstimator;
     private final Vector2D robotStartingPosition;
     private final Rotation2D robotStartingRotation2D;
 
