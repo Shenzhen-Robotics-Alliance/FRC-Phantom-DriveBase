@@ -5,7 +5,7 @@ import frc.robot.Modules.RobotModuleBase;
 import frc.robot.Utils.LEDAnimation;
 import frc.robot.Utils.RobotModuleOperatorMarker;
 
-public class AddressableLEDStatusLight extends RobotModuleBase implements LEDStatusLight {
+public class AddressableLEDStatusLight extends LEDStatusLight {
     final Timer t = new Timer();
     final AddressableLED led;
     final AddressableLEDBuffer buffer;
@@ -13,7 +13,7 @@ public class AddressableLEDStatusLight extends RobotModuleBase implements LEDSta
     LEDAnimation animation;
     double hz;
     public AddressableLEDStatusLight(AddressableLED led, AddressableLEDBuffer buffer) {
-        super("LED-Status-Lights", true);
+        super();
         this.led = led;
         this.buffer = buffer;
 
@@ -62,7 +62,8 @@ public class AddressableLEDStatusLight extends RobotModuleBase implements LEDSta
         t.reset();
     }
 
-    public AddressableLED getLed() {
+    @Override
+    public AddressableLED getLEDInstance() {
         return this.led;
     }
 }

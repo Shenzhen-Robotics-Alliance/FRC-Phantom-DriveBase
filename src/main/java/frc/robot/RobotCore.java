@@ -15,11 +15,11 @@ import frc.robot.Drivers.IMUs.SimpleGyro;
 import frc.robot.Drivers.Motors.TalonFXMotor;
 import frc.robot.Drivers.Visions.PhantomClient;
 import frc.robot.Modules.Chassis.HolonomicChassis;
+import frc.robot.Modules.Chassis.SwerveDriveChassisSimulation;
 import frc.robot.Modules.LEDStatusLights.AddressableLEDStatusLight;
-import frc.robot.Modules.PositionReader.PositionEstimator;
-import frc.robot.Modules.PositionReader.SwerveDriveOdometer;
-import frc.robot.Modules.PositionReader.SwerveDriveOdometerCurveOptimized;
-import frc.robot.Modules.PositionReader.VisionSupportedOdometer;
+import frc.robot.Modules.LEDStatusLights.LEDStatusLight;
+import frc.robot.Modules.LEDStatusLights.SimulatedLEDStatusLight;
+import frc.robot.Modules.PositionReader.*;
 import frc.robot.Modules.RobotModuleBase;
 import frc.robot.Modules.Chassis.SwerveDriveChassis;
 import frc.robot.Modules.Chassis.SwerveWheel;
@@ -39,7 +39,7 @@ public class RobotCore {
         public SimpleGyro gyro;
         public PositionEstimator positionEstimator;
         public HolonomicChassis chassis;
-        public AddressableLEDStatusLight statusLight;
+        public LEDStatusLight statusLight;
 
         private final List<String> configsToTune = new ArrayList<>(1);
         private final List<RobotModuleBase> modules;
@@ -61,15 +61,20 @@ public class RobotCore {
                 modules = new ArrayList<>();
                 services = new ArrayList<>();
                 if (isSimulation)
-                        createRobotReal(configName);
+                        createRobotReal();
+                else
+                        createRobotSim();
         }
 
-        private void createRobotSim(String configName) {
+        private void createRobotSim() {
                 System.out.println("<-- Robot Core | creating robot in simulation... -->");
-                // TODO: create the chassis in simulation
+
+                this.positionEstimator = new SimulationPositionsEstimator();
+                this.statusLight = new SimulatedLEDStatusLight();
+                this.chassis = new SwerveDriveChassisSimulation();
         }
 
-        private void createRobotReal(String configName) {
+        private void createRobotReal() {
                 System.out.println("<-- Robot Core | creating real robot... -->");
 
 
@@ -87,15 +92,14 @@ public class RobotCore {
 
                 final SwerveWheel[] swerveWheels = new SwerveWheel[] {frontLeftWheel, frontRightWheel, backLeftWheel, backRightWheel};
 
-                final SwerveDriveOdometer swerveOdometer = new VisionSupportedOdometer(swerveWheels, gyro, new PhantomClient()); // TODO create phantom client
-                this.positionEstimator = swerveOdometer;
-                modules.add(swerveOdometer);
+                this.positionEstimator = new VisionSupportedOdometer(swerveWheels, gyro, new PhantomClient()); // TODO create phantom client
+                modules.add(positionEstimator);
 
-                final SwerveDriveChassis swerveDriveChassis = new SwerveDriveChassis(swerveWheels, gyro, robotConfig, positionEstimator);
-                this.chassis = swerveDriveChassis;
-                modules.add(swerveDriveChassis);
+                this.chassis = new SwerveDriveChassis(swerveWheels, gyro, robotConfig, positionEstimator);
+                modules.add(chassis);
 
-                this.statusLight = new AddressableLEDStatusLight(new AddressableLED(0), new AddressableLEDBuffer(155)); modules.add(statusLight);
+                this.statusLight = new AddressableLEDStatusLight(new AddressableLED(0), new AddressableLEDBuffer(155));
+                modules.add(statusLight);
         }
 
         private SwerveWheel createSwerveWheel(String name, int id, Vector2D wheelInstallationPosition) {

@@ -8,7 +8,7 @@ import frc.robot.Utils.MathUtils.Vector2D;
  * TODO: the simulated position estimator for robot simulations
  * */
 public class SimulationPositionsEstimator extends PositionEstimator {
-    protected SimulationPositionsEstimator() {
+    public SimulationPositionsEstimator() {
         super();
     }
 

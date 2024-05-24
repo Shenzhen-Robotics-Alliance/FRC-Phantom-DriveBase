@@ -4,6 +4,8 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.AutoStagePrograms.DoNothingAuto;
+import frc.robot.AutoStagePrograms.LeaveCommunity;
 import frc.robot.Services.*;
 import frc.robot.Utils.CommandSequenceGenerator;
 import frc.robot.Utils.SequentialCommandSegment;
@@ -108,7 +110,7 @@ public class RobotShell extends TimedRobot {
     public void testInit() {
         // System.out.println("<-- Robot Shell | test init -->");
         if (robotTest == null)
-            this.robotTest = new AddressableLEDTest(robotCore.statusLight.getLed());
+            this.robotTest = new AddressableLEDTest(robotCore.statusLight.getLEDInstance());
         robotTest.testStart();
     }
 
@@ -141,6 +143,7 @@ public class RobotShell extends TimedRobot {
     }
 
     public void addAutoStagePrograms() {
-
+        autoStageChooser.setDefaultOption("Leave Community", new LeaveCommunity());
+        autoStageChooser.addOption("Do Nothing", new DoNothingAuto());
     }
 }
