@@ -61,9 +61,9 @@ public class RobotCore {
                 modules = new ArrayList<>();
                 services = new ArrayList<>();
                 if (isSimulation)
-                        createRobotReal();
-                else
                         createRobotSim();
+                else
+                        createRobotReal();
         }
 
         private void createRobotSim() {

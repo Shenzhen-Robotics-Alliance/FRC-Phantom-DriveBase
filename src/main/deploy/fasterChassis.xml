@@ -112,13 +112,13 @@
         <gravityTorque4>-0.05</gravityTorque4>
     </arm>
     <auto>
+        <autoStageMaxAcceleration type="double">3</autoStageMaxAcceleration>
+        <autoStageMaxVelocity type="double">1</autoStageMaxVelocity>
+        <autoStageMaxAngularVelocity type="double">30</autoStageMaxAngularVelocity> <!-- in deg/s -->
+        <inAdvanceTime>0.1</inAdvanceTime>
 <!--        <autoStageMaxAcceleration type="double">10</autoStageMaxAcceleration>-->
 <!--        <autoStageMaxVelocity type="double">4</autoStageMaxVelocity>-->
 <!--        <autoStageMaxAngularVelocity type="double">120</autoStageMaxAngularVelocity> &lt;!&ndash; in deg/s &ndash;&gt;-->
-<!--        <inAdvanceTime>0.3</inAdvanceTime>-->
-        <autoStageMaxAcceleration type="double">10</autoStageMaxAcceleration>
-        <autoStageMaxVelocity type="double">4</autoStageMaxVelocity>
-        <autoStageMaxAngularVelocity type="double">120</autoStageMaxAngularVelocity> <!-- in deg/s -->
-        <inAdvanceTime>0.35</inAdvanceTime>
+<!--        <inAdvanceTime>0.35</inAdvanceTime>-->
     </auto>
 </robotConfig>

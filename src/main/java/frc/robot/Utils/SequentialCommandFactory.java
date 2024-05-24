@@ -1,9 +1,7 @@
 package frc.robot.Utils;
 
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.Timer;
-import frc.robot.AutoStagePrograms.FieldPositions;
 import frc.robot.Modules.Chassis.HolonomicChassis;
 import frc.robot.Modules.PositionReader.RobotFieldPositionEstimator;
 import frc.robot.RobotCore;
@@ -21,6 +19,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static frc.robot.Modules.PositionReader.RobotFieldPositionEstimator.toActualPositionOnField;
+import static frc.robot.Modules.PositionReader.RobotFieldPositionEstimator.toActualRobotRotation;
+
 public class SequentialCommandFactory {
     private final HolonomicChassis chassis;
     private final RobotFieldPositionEstimator positionEstimator;
@@ -31,16 +32,16 @@ public class SequentialCommandFactory {
         this(robotCore, new Vector2D(), new Rotation2D(0));
     }
 
-    public SequentialCommandFactory(RobotCore robotCore, String firstPathName, Rotation2D robotStartingRotation2D) {
-        this(robotCore, getRobotStartingPosition(firstPathName), robotStartingRotation2D);
+    public SequentialCommandFactory(RobotCore robotCore, String firstPathName, Rotation2D robotStartingRotation2DBlueSide) {
+        this(robotCore, getRobotStartingPosition(firstPathName), robotStartingRotation2DBlueSide);
     }
 
-    public SequentialCommandFactory(RobotCore robotCore, Vector2D robotStartingPosition, Rotation2D robotStartingRotation2D) {
+    public SequentialCommandFactory(RobotCore robotCore, Vector2D robotStartingPosition, Rotation2D robotStartingRotation2DBlueSide) {
         this.chassis = robotCore.chassis;
         this.positionEstimator = robotCore.positionEstimator;
         this.maintainCurrentRotation = () -> new Rotation2D(positionEstimator.getRobotRotation());
         this.robotStartingPosition = robotStartingPosition;
-        this.robotStartingRotation2D = robotStartingRotation2D;
+        this.robotStartingRotation2D = toActualRobotRotation(robotStartingRotation2DBlueSide);
     }
 
     private static final SequentialCommandSegment.InitiateCondition justGo = () -> true;
@@ -252,27 +253,7 @@ public class SequentialCommandFactory {
     }
 
     public static Vector2D getRobotStartingPosition(String firstPathName) {
-        try (BufferedReader br = new BufferedReader(new FileReader(new File(
-                Filesystem.getDeployDirectory(), "pathplanner/paths/" + firstPathName + ".path")))) {
-            StringBuilder fileContentBuilder = new StringBuilder();
-            String line;
-            while ((line = br.readLine()) != null) {
-                fileContentBuilder.append(line);
-            }
-            String fileContent = fileContentBuilder.toString();
-            JSONObject pathJson = (JSONObject) new JSONParser().parse(fileContent);
-            JSONArray waypointsJson = (JSONArray) pathJson.get("waypoints");
-
-            JSONObject firstPoint = (JSONObject) waypointsJson.get(0);
-
-            return pointFromJson((JSONObject) firstPoint.get("anchor"));
-        } catch (FileNotFoundException e) {
-            throw new RuntimeException("Cannot Find Path File: " + firstPathName + " From Deploy Directory: " + Filesystem.getDeployDirectory());
-        } catch (IOException e) {
-            throw new RuntimeException("IO Error While Reading File: " + firstPathName);
-        } catch (ParseException e) {
-            throw new RuntimeException("Error Occurred While Processing JSON Path File: " + firstPathName);
-        }
+        return getBezierCurvesFromPathFile(firstPathName).get(0).getPositionWithLERP(0);
     }
 
     public SequentialCommandSegment followSingleCurve(String pathName, int index, Rotation2D facingRotation) {
@@ -286,7 +267,7 @@ public class SequentialCommandFactory {
                 () -> curves.get(index),
                 beginning, periodic, ending,
                 () -> true,
-                positionEstimator::getRobotRotation2D, () -> FieldPositions.toActualRotation(facingRotation),
+                positionEstimator::getRobotRotation2D, () -> toActualRobotRotation(facingRotation),
                 SpeedCurves.originalSpeed,1
         );
     }
@@ -325,7 +306,7 @@ public class SequentialCommandFactory {
                             () -> curves.get(0),
                             beginning, periodic, ending,
                             chassis::isCurrentTranslationalTaskFinished,
-                            positionEstimator::getRobotRotation2D, () -> FieldPositions.toActualRotation(robotRotationTargets[0]),
+                            positionEstimator::getRobotRotation2D, () -> toActualRobotRotation(robotRotationTargets[0]),
                             SpeedCurves.easeInOut,1
                     )
             };
@@ -335,7 +316,7 @@ public class SequentialCommandFactory {
                 () -> curves.get(0),
                 beginning, periodic, doNothing,
                 () -> true,
-                positionEstimator::getRobotRotation2D, () -> FieldPositions.toActualRotation(robotRotationTargets[0]),
+                positionEstimator::getRobotRotation2D, () -> toActualRobotRotation(robotRotationTargets[0]),
                 SpeedCurves.easeIn,1
         );
 
@@ -347,7 +328,7 @@ public class SequentialCommandFactory {
                     () -> curve,
                     doNothing, periodic, doNothing,
                     () -> true,
-                    () -> FieldPositions.toActualRotation(startingRotation), () -> FieldPositions.toActualRotation(endingRotation),
+                    () -> toActualRobotRotation(startingRotation), () -> toActualRobotRotation(endingRotation),
                     SpeedCurves.originalSpeed,1
             );
         }
@@ -357,7 +338,7 @@ public class SequentialCommandFactory {
                 () -> curves.get(curves.size()-1),
                 doNothing, periodic, ending,
                 chassis::isCurrentTranslationalTaskFinished,
-                () -> FieldPositions.toActualRotation(robotRotationTargets[robotRotationTargets.length-2]), () -> FieldPositions.toActualRotation(robotRotationTargets[robotRotationTargets.length-1]),
+                () -> toActualRobotRotation(robotRotationTargets[robotRotationTargets.length-2]), () -> toActualRobotRotation(robotRotationTargets[robotRotationTargets.length-1]),
                 SpeedCurves.originalSpeed,1
         );
 
@@ -388,6 +369,7 @@ public class SequentialCommandFactory {
             }
             return curves;
         } catch (FileNotFoundException e) {
+            e.printStackTrace();
             throw new RuntimeException("Cannot Find Path File: " + pathName + " From Deploy Directory: " + Filesystem.getDeployDirectory());
         } catch (IOException e) {
             throw new RuntimeException("IO Error While Reading File: " + pathName);
@@ -405,16 +387,6 @@ public class SequentialCommandFactory {
         final double x = ((Number) pointJson.get("x")).doubleValue();
         final double y = ((Number) pointJson.get("y")).doubleValue();
 
-        DriverStation.Alliance alliance = DriverStation.getAlliance().orElse(DriverStation.Alliance.Red);
-
-        final double fieldHeight = 8.21, fieldWidth = 16.54;
-//        return switch (alliance) {
-//            case Red -> new Vector2D(new double[]{y - fieldHeight / 2, fieldWidth - x});
-//            case Blue -> new Vector2D(new double[]{fieldHeight / 2 - y, x});
-//        };
-        return new Vector2D(new double[] {
-                (alliance == DriverStation.Alliance.Blue ? -1:1) * (y - fieldHeight / 2),
-                fieldWidth - x
-        });
+        return toActualPositionOnField(new Vector2D(new double[] {x, y}));
     }
 }

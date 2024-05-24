@@ -11,11 +11,11 @@ import frc.robot.Utils.MathUtils.Vector2D;
  *  the position of the robot is defined in meter and in an X-Y plane where the origin is in the BOTTOM-LEFT corner of the field
  *  positive-x is rightwards and positive-y is upwards
  * rotation:
- *  the rotation is defined in radian, POSITIVE is COUNTER-CLOCKWISE and zero is pointing RIGHT
+ *  the rotation is defined in radian, POSITIVE is COUNTER-CLOCKWISE and zero is pointing upwards in the field
  * */
 public abstract class RobotFieldPositionEstimator extends RobotModuleBase {
     public static final Vector2D robotDefaultStartingPositionBlue = new Vector2D(new double[] {0.5, 4.1});
-    public static final Rotation2D robotDefaultStartingRotationBlue = new Rotation2D(0);
+    public static final Rotation2D pilotFacingBlue = new Rotation2D(Math.toRadians(270));
 
     protected RobotFieldPositionEstimator() {
         super("Position-Estimator");
@@ -46,7 +46,7 @@ public abstract class RobotFieldPositionEstimator extends RobotModuleBase {
 
     /** reset the rotation of the robot */
     public void resetRobotRotation() {
-        setRobotRotation(toActualRobotRotation(robotDefaultStartingRotationBlue).getRadian());
+        setRobotRotation(toActualRobotRotation(pilotFacingBlue).getRadian());
     }
 
     /** reset the robot status (both position and rotation) */

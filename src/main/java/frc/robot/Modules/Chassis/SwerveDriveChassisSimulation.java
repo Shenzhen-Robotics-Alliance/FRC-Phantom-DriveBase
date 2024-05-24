@@ -54,6 +54,11 @@ public class SwerveDriveChassisSimulation extends HolonomicChassis {
     }
 
     @Override
+    public void resetChassisPositionAndRotation() {
+
+    }
+
+    @Override
     public void init() {
 
     }

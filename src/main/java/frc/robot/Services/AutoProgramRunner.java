@@ -51,8 +51,11 @@ public class AutoProgramRunner extends RobotServiceBase {
 
     @Override
     public void periodic() {
-        if (currentSegmentID == -1)
+        if (currentSegmentID == -1) {
+            if (commandSegments.isEmpty())
+                return;
             initiateSegment(0);
+        }
         updateConfigs();
         chassis.setOrientationMode(SwerveDriveChassis.OrientationMode.FIELD, this);
 

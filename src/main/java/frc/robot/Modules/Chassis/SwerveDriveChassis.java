@@ -58,7 +58,6 @@ public class SwerveDriveChassis extends HolonomicChassis {
         DashboardImpl.putNumber("chassis", "chassis task (x)", translationalTask.translationValue.getX());
         DashboardImpl.putNumber("chassis", "chassis task (y)", translationalTask.translationValue.getY());
         Vector2D processedTranslationalSpeed = processTranslationalMotion(dt);
-        // SmartDashboard.putNumber("decided vel(x)", processedTranslationalSpeed.getValue()[0]);
         double rotationalSpeed = processRotationalMotion(dt);
 
 
@@ -177,7 +176,11 @@ public class SwerveDriveChassis extends HolonomicChassis {
     private Vector2D processTranslationalMotion(double dt) {
         return switch (translationalTask.taskType) {
             case SET_VELOCITY -> processTranslationalVelocityControl( // process the speed control after
-                    orientationMode == OrientationMode.FIELD ? processOrientation(translationalTask.translationValue) : translationalTask.translationValue, dt
+                    orientationMode == OrientationMode.FIELD ?
+                            processOrientation(
+                                    translationalTask.translationValue.multiplyBy(RobotFieldPositionEstimator.toActualRobotRotation(RobotFieldPositionEstimator.pilotFacingBlue))
+                            )
+                            : translationalTask.translationValue, dt
             );
             case GO_TO_POSITION -> processOrientation(
                     processTranslationalPositionControl(this.translationalTask.translationValue)
@@ -215,9 +218,10 @@ public class SwerveDriveChassis extends HolonomicChassis {
     }
 
     private Vector2D processOrientation(Vector2D desiredVelocity) {
-        return desiredVelocity.multiplyBy(
-                new Rotation2D(gyro.getYaw())
-                        .getReversal());
+        return desiredVelocity
+                .multiplyBy(
+                        new Rotation2D(gyro.getYaw()).getReversal()
+                );
     }
 
     /**
