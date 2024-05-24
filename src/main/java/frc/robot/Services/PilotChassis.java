@@ -25,7 +25,9 @@ public class PilotChassis extends RobotServiceBase {
         RM_BOXER,
         RM_POCKET,
         JOYSTICK,
-        XBOX
+        XBOX,
+        XBOX_LEFT_HANDED
+
     }
     private SendableChooser<ControllerType> controllerTypeSendableChooser = new SendableChooser<>();
     private static final ControllerType defaultControllerType = ControllerType.RM_POCKET;

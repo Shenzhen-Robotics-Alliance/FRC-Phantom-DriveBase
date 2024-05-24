@@ -222,9 +222,9 @@
         <yAxisPort type="int">1</yAxisPort>
         <zAxisPort type="int">3</zAxisPort>
 
-        <pilotControllerXAxisSensitivity type="int">95</pilotControllerXAxisSensitivity>
-        <pilotControllerYAxisSensitivity type="int">95</pilotControllerYAxisSensitivity>
-        <pilotControllerZAxisSensitivity type="int">-60</pilotControllerZAxisSensitivity>
+        <pilotControllerXAxisSensitivity type="int">100</pilotControllerXAxisSensitivity>
+        <pilotControllerYAxisSensitivity type="int">100</pilotControllerYAxisSensitivity>
+        <pilotControllerZAxisSensitivity type="int">-65</pilotControllerZAxisSensitivity>
         <!-- the minimum amount of stick input to respond to, in percentage -->
         <pilotStickThresholdWhenOtherAxisUnused>5</pilotStickThresholdWhenOtherAxisUnused>
         <pilotStickThresholdWhenOtherAxisFull>8</pilotStickThresholdWhenOtherAxisFull>
@@ -282,17 +282,37 @@
         <yAxisPort type="int">5</yAxisPort>
         <zAxisPort type="int">0</zAxisPort>
 
-        <pilotControllerXAxisSensitivity>40</pilotControllerXAxisSensitivity>
-        <pilotControllerYAxisSensitivity>-40</pilotControllerYAxisSensitivity>
-        <pilotControllerZAxisSensitivity>-35</pilotControllerZAxisSensitivity>
+        <pilotControllerXAxisSensitivity>80</pilotControllerXAxisSensitivity>
+        <pilotControllerYAxisSensitivity>-80</pilotControllerYAxisSensitivity>
+        <pilotControllerZAxisSensitivity>-55</pilotControllerZAxisSensitivity>
         <!-- the minimum amount of stick input to respond to, in percentage -->
         <pilotStickThresholdWhenOtherAxisUnused>5</pilotStickThresholdWhenOtherAxisUnused>
         <pilotStickThresholdWhenOtherAxisFull>10</pilotStickThresholdWhenOtherAxisFull>
-        <pilotTranslationalAxisExponent>1.6</pilotTranslationalAxisExponent>
-        <pilotRotationalAxisExponent>1.8</pilotRotationalAxisExponent>
+        <pilotTranslationalAxisExponent>1</pilotTranslationalAxisExponent>
+        <pilotRotationalAxisExponent>2</pilotRotationalAxisExponent>
 
         <translationAutoPilotButton type="int">6</translationAutoPilotButton>
         <lockChassisButtonPort type="int">10</lockChassisButtonPort>
-        <rotationAutoPilotButton type="int">5</rotationAutoPilotButton>
+        <rotationAutoPilotButton type="int">9</rotationAutoPilotButton>
     </control-XBOX>
+
+    <control-XBOX_LEFT_HANDED>
+        <controllerPort type="int">1</controllerPort>
+        <xAxisPort type="int">0</xAxisPort>
+        <yAxisPort type="int">1</yAxisPort>
+        <zAxisPort type="int">4</zAxisPort>
+
+        <pilotControllerXAxisSensitivity>80</pilotControllerXAxisSensitivity>
+        <pilotControllerYAxisSensitivity>-80</pilotControllerYAxisSensitivity>
+        <pilotControllerZAxisSensitivity>-55</pilotControllerZAxisSensitivity>
+        <!-- the minimum amount of stick input to respond to, in percentage -->
+        <pilotStickThresholdWhenOtherAxisUnused>2</pilotStickThresholdWhenOtherAxisUnused>
+        <pilotStickThresholdWhenOtherAxisFull>5</pilotStickThresholdWhenOtherAxisFull>
+        <pilotTranslationalAxisExponent>1</pilotTranslationalAxisExponent>
+        <pilotRotationalAxisExponent>2</pilotRotationalAxisExponent>
+
+        <translationAutoPilotButton type="int">6</translationAutoPilotButton>
+        <lockChassisButtonPort type="int">9</lockChassisButtonPort>
+        <rotationAutoPilotButton type="int">10</rotationAutoPilotButton>
+    </control-XBOX_LEFT_HANDED>
 </robotConfig>

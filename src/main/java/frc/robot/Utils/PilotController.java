@@ -53,9 +53,9 @@ public class PilotController {
         this.translationalAxisExponent = translationalAxisExponent;
         this.rotationalAxisExponent = rotationalAxisExponent;
 
-        this.buttonsOnHold = new boolean[rawController.getButtonCount()];
-        this.buttonsOnPress = new boolean[rawController.getButtonCount()];
-        this.buttonsOnRelease = new boolean[rawController.getButtonCount()];
+        this.buttonsOnHold = new boolean[rawController.getButtonCount()+1];
+        this.buttonsOnPress = new boolean[rawController.getButtonCount()+1];
+        this.buttonsOnRelease = new boolean[rawController.getButtonCount()+1];
     }
 
     public PilotController(RobotConfigReader robotConfig, String configDomainName) {
