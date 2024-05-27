@@ -3,8 +3,7 @@ package frc.robot.Services;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.Modules.Chassis.HolonomicChassis;
 import frc.robot.Modules.Chassis.SwerveDriveChassis;
-import frc.robot.Modules.RobotModuleBase;
-import frc.robot.Utils.DashboardImpl;
+import frc.robot.Utils.EasyDataFlow;
 import frc.robot.Utils.MathUtils.BezierCurveSchedule;
 import frc.robot.Utils.MathUtils.BezierCurveScheduleGenerator;
 import frc.robot.Utils.MathUtils.Vector2D;
@@ -71,10 +70,10 @@ public class AutoProgramRunner extends RobotServiceBase {
                                     currentSegmentID == commandSegments.size()-1 ?
                                             inAdvanceSpaceWithConstrain : inAdvanceSpaceWithoutConstrain)),
                     this);
-            DashboardImpl.putNumber("auto", "segment ID", currentSegmentID);
-            DashboardImpl.putNumber("auto", "translational scaled T", translationalT);
-            DashboardImpl.putNumber("auto", "position (x)", currentPathSchedule.getPositionWithLERP().getX());
-            DashboardImpl.putNumber("auto", "position (y)", currentPathSchedule.getPositionWithLERP().getY());
+            EasyDataFlow.putNumber("auto", "segment ID", currentSegmentID);
+            EasyDataFlow.putNumber("auto", "translational scaled T", translationalT);
+            EasyDataFlow.putNumber("auto", "position (x)", currentPathSchedule.getPositionWithLERP().getX());
+            EasyDataFlow.putNumber("auto", "position (y)", currentPathSchedule.getPositionWithLERP().getY());
         }
 
         if (currentSegmentRotationScheduleETA != -1) {
@@ -86,8 +85,8 @@ public class AutoProgramRunner extends RobotServiceBase {
                             SwerveDriveChassis.ChassisTaskRotation.TaskType.FACE_DIRECTION,
                             currentCommandSegment.getCurrentRotationWithLERP(rotationTSyncedToTranslationT)),
                     this);
-            DashboardImpl.putNumber("auto", "rotation T", rotationT);
-            DashboardImpl.putNumber("auto", "rotation (deg)", Math.toDegrees(currentCommandSegment.getCurrentRotationWithLERP(rotationTSyncedToTranslationT)));
+            EasyDataFlow.putNumber("auto", "rotation T", rotationT);
+            EasyDataFlow.putNumber("auto", "rotation (deg)", Math.toDegrees(currentCommandSegment.getCurrentRotationWithLERP(rotationTSyncedToTranslationT)));
         }
         currentCommandSegment.periodic.run();
 

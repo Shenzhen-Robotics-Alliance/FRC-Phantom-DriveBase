@@ -55,8 +55,8 @@ public class SwerveDriveChassis extends HolonomicChassis {
 
     @Override
     protected void periodic(double dt) {
-        DashboardImpl.putNumber("chassis", "chassis task (x)", translationalTask.translationValue.getX());
-        DashboardImpl.putNumber("chassis", "chassis task (y)", translationalTask.translationValue.getY());
+        EasyDataFlow.putNumber("chassis", "chassis task (x)", translationalTask.translationValue.getX());
+        EasyDataFlow.putNumber("chassis", "chassis task (y)", translationalTask.translationValue.getY());
         Vector2D processedTranslationalSpeed = processTranslationalMotion(dt);
         double rotationalSpeed = processRotationalMotion(dt);
 
@@ -80,15 +80,15 @@ public class SwerveDriveChassis extends HolonomicChassis {
         }
 
         /* then we slow it down to max rotationalSpeedMaxSacrifice */
-        DashboardImpl.putNumber("chassis", "highest wheel speed:", highestWheelSpeed);
-        DashboardImpl.putNumber("chassis", "sacrificing rotational part by scale: ", rotationMinScale);
+        EasyDataFlow.putNumber("chassis", "highest wheel speed:", highestWheelSpeed);
+        EasyDataFlow.putNumber("chassis", "sacrificing rotational part by scale: ", rotationMinScale);
         rotationalSpeed *= Math.sqrt(rotationMinScale);
         highestWheelSpeed = driveWheels(processedTranslationalSpeed, rotationalSpeed);
         if (highestWheelSpeed <= wheelsPowerConstrain) return;
 
         /* finally, we start scaling down the translational part */
-        DashboardImpl.putNumber("chassis", "highest wheel speed:", highestWheelSpeed);
-        DashboardImpl.putNumber("chassis", "scaling down translational speed by factor:", wheelsPowerConstrain/highestWheelSpeed);
+        EasyDataFlow.putNumber("chassis", "highest wheel speed:", highestWheelSpeed);
+        EasyDataFlow.putNumber("chassis", "scaling down translational speed by factor:", wheelsPowerConstrain/highestWheelSpeed);
         processedTranslationalSpeed = processedTranslationalSpeed.multiplyBy(wheelsPowerConstrain/highestWheelSpeed);
         rotationalSpeed *= wheelsPowerConstrain/highestWheelSpeed;
         driveWheels(processedTranslationalSpeed, rotationalSpeed);
@@ -207,7 +207,7 @@ public class SwerveDriveChassis extends HolonomicChassis {
                 decidedVelocity.multiplyBy(-1)
         );
 
-        DashboardImpl.putNumber("chassis", "vel ctrl decided", decidedVelocity.getMagnitude());
+        EasyDataFlow.putNumber("chassis", "vel ctrl decided", decidedVelocity.getMagnitude());
         Vector2D step = new Vector2D(velocityDifference.getHeading(),
                 Math.min(dt * maxAcceleration, velocityDifference.getMagnitude())
         );

@@ -169,9 +169,9 @@ public class SwerveWheel extends RobotModuleBase {
         /** the correction speed obtained from pid controller */
         double correctionMotorSpeed = steerPIDController.getMotorPower(steerEncoderCurrentReading, steerEncoderCurrentVelocity, dt);
 
-        DashboardImpl.putNumber("chassis", "steer " + swerveWheelID + " position", steerEncoderCurrentReading);
-        DashboardImpl.putNumber("chassis", "steer " + swerveWheelID + " velocity", steerEncoderCurrentVelocity);
-        DashboardImpl.putNumber("chassis", "steer " + swerveWheelID + "target", finalTargetedHeading);
+        EasyDataFlow.putNumber("chassis", "steer " + swerveWheelID + " position", steerEncoderCurrentReading);
+        EasyDataFlow.putNumber("chassis", "steer " + swerveWheelID + " velocity", steerEncoderCurrentVelocity);
+        EasyDataFlow.putNumber("chassis", "steer " + swerveWheelID + "target", finalTargetedHeading);
 
         /* given the power ratio of the steer, pass the PID feedback to the motor */
         final double steerPowerRate = locked ? 1: getSteerPowerRate(targetedSpeed);

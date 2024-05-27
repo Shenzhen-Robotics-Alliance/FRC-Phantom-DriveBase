@@ -1,6 +1,6 @@
 package frc.robot.Utils.MechanismControllers;
 
-import frc.robot.Utils.DashboardImpl;
+import frc.robot.Utils.EasyDataFlow;
 
 /**
  * controls the speed of fly wheel
@@ -44,7 +44,7 @@ public class FlyWheelSpeedController implements MechanismController {
                 currentSpeed / profile.maximumSpeed,
                 getCurrentTargetSpeedWithLERP() / profile.maximumSpeed
         );
-        DashboardImpl.putNumber("shooter", "flywheel controller current target speed", getCurrentTargetSpeedWithLERP());
+        EasyDataFlow.putNumber("shooter", "flywheel controller current target speed", getCurrentTargetSpeedWithLERP());
         return correctionSpeed; // do not go negative power
     }
 

@@ -72,8 +72,8 @@ public interface LEDAnimation {
             final double
                     lowerEdge = LookUpTable.linearInterpretation(0, -slideLength, 1, 1, t),
                     upperEdge = lowerEdge + slideLength;
-            DashboardImpl.putNumber("led", "lowerEdge", lowerEdge);
-            DashboardImpl.putNumber("led", "upperEdge", upperEdge);
+            EasyDataFlow.putNumber("led", "lowerEdge", lowerEdge);
+            EasyDataFlow.putNumber("led", "upperEdge", upperEdge);
             for (int i = 0; i < buffer.getLength() / 2; i++) {
                 int r = colorR, g = colorG, b = colorB;
                 if (i > upperEdge * buffer.getLength() || i < lowerEdge * buffer.getLength()) r = g = b = 0;

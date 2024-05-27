@@ -1,6 +1,5 @@
 package frc.robot;
 
-import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -10,11 +9,12 @@ import frc.robot.Services.*;
 import frc.robot.Utils.CommandSequenceGenerator;
 import frc.robot.Utils.SequentialCommandSegment;
 import frc.robot.Utils.Tests.*;
+import org.littletonrobotics.junction.LoggedRobot;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class RobotShell extends TimedRobot {
+public class RobotShell extends LoggedRobot {
     private static final int updateFreq = 100;
 
     private final XboxController copilotGamePad = new XboxController(1);
@@ -110,7 +110,8 @@ public class RobotShell extends TimedRobot {
     public void testInit() {
         // System.out.println("<-- Robot Shell | test init -->");
         if (robotTest == null)
-            this.robotTest = new AddressableLEDTest(robotCore.statusLight.getLEDInstance());
+            this.robotTest = new DataFlowTest();
+            // this.robotTest = new AddressableLEDTest(robotCore.statusLight.getLEDInstance());
         robotTest.testStart();
     }
 

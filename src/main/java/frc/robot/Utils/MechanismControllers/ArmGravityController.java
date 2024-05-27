@@ -1,6 +1,6 @@
 package frc.robot.Utils.MechanismControllers;
 
-import frc.robot.Utils.DashboardImpl;
+import frc.robot.Utils.EasyDataFlow;
 import frc.robot.Utils.MathUtils.LookUpTable;
 
 /**
@@ -92,16 +92,16 @@ public class ArmGravityController implements MechanismController {
                         dt),
                 overallCorrectionPower = gravityCorrectionPower + pidCorrectionPower;
 
-        DashboardImpl.putNumber("arm", "mechanism actual position", Math.toDegrees(mechanismPosition));
-        DashboardImpl.putNumber("arm", "mechanism actual velocity", Math.toDegrees(mechanismVelocity));
-        DashboardImpl.putNumber("arm", "current desired position (with schedule)", Math.toDegrees(currentDesiredPositionAccordingToSchedule));
-        DashboardImpl.putNumber("arm", "current desired position (with compensation", Math.toDegrees(currentSchedule.getCurrentPathPosition(scheduleTimer)
+        EasyDataFlow.putNumber("arm", "mechanism actual position", Math.toDegrees(mechanismPosition));
+        EasyDataFlow.putNumber("arm", "mechanism actual velocity", Math.toDegrees(mechanismVelocity));
+        EasyDataFlow.putNumber("arm", "current desired position (with schedule)", Math.toDegrees(currentDesiredPositionAccordingToSchedule));
+        EasyDataFlow.putNumber("arm", "current desired position (with compensation", Math.toDegrees(currentSchedule.getCurrentPathPosition(scheduleTimer)
                 + Math.copySign(currentSchedule.getCurrentSpeed(scheduleTimer), currentSchedule.getCurrentPathPosition(1) - currentSchedule.getCurrentPathPosition(0)) * profile.inAdvanceTime));
-        DashboardImpl.putNumber("arm", "current desired velocity with schedule",  Math.toDegrees(currentSchedule.getCurrentSpeed(scheduleTimer)));
-        DashboardImpl.putNumber("arm", "gravity correction power", gravityCorrectionPower);
-        DashboardImpl.putNumber("arm", "pid correction power", pidCorrectionPower);
-        DashboardImpl.putNumber("arm", "overall correction power: ", overallCorrectionPower);
-        DashboardImpl.putNumber("arm", "error accumulation", Math.toDegrees(enhancedPIDController.getErrorAccumulation()));
+        EasyDataFlow.putNumber("arm", "current desired velocity with schedule",  Math.toDegrees(currentSchedule.getCurrentSpeed(scheduleTimer)));
+        EasyDataFlow.putNumber("arm", "gravity correction power", gravityCorrectionPower);
+        EasyDataFlow.putNumber("arm", "pid correction power", pidCorrectionPower);
+        EasyDataFlow.putNumber("arm", "overall correction power: ", overallCorrectionPower);
+        EasyDataFlow.putNumber("arm", "error accumulation", Math.toDegrees(enhancedPIDController.getErrorAccumulation()));
 
         previousTimeMillis = System.currentTimeMillis();
         if (Math.abs(overallCorrectionPower) > profile.staticPIDProfile.getMaxPowerAllowed())
