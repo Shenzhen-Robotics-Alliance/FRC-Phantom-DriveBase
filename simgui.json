@@ -2,7 +2,9 @@
   "NTProvider": {
     "types": {
       "/FMSInfo": "FMSInfo",
-      "/SmartDashboard/Select Auto": "String Chooser"
+      "/SmartDashboard/Select Auto": "String Chooser",
+      "/SmartDashboard/orientation mode": "String Chooser",
+      "/SmartDashboard/pilot controller type": "String Chooser"
     }
   },
   "NetworkTables Info": {

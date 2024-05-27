@@ -8,6 +8,8 @@ import com.ctre.phoenix6.hardware.CANcoder;
 
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
+import edu.wpi.first.wpilibj.DataLogManager;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Drivers.Encoders.CanCoder;
 import frc.robot.Drivers.IMUs.PigeonsIMU;
@@ -78,6 +80,8 @@ public class RobotCore {
         private void createRobotReal() {
                 System.out.println("<-- Robot Core | creating real robot... -->");
 
+                DataLogManager.start();
+                DriverStation.startDataLog(DataLogManager.getLog());
 
                 final SwerveWheel
                         frontLeftWheel = createSwerveWheel("frontLeft", 1, new Vector2D(new double[] { -0.6, 0.6 })),
