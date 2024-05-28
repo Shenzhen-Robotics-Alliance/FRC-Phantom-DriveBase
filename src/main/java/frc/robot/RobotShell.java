@@ -110,7 +110,7 @@ public class RobotShell extends LoggedRobot {
     public void testInit() {
         // System.out.println("<-- Robot Shell | test init -->");
         if (robotTest == null)
-            this.robotTest = new DataFlowTest();
+            this.robotTest = new DataFlowTest(robotCore.robotConfig);
             // this.robotTest = new AddressableLEDTest(robotCore.statusLight.getLEDInstance());
         robotTest.testStart();
     }

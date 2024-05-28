@@ -1,14 +1,20 @@
 package frc.robot.Utils.Tests;
 
-import edu.wpi.first.units.Angle;
-import edu.wpi.first.wpilibj.XboxController;
 import frc.robot.Utils.EasyDataFlow;
 import frc.robot.Utils.MathUtils.AngleUtils;
 import frc.robot.Utils.MathUtils.LookUpTable;
 import frc.robot.Utils.MathUtils.Rotation2D;
 import frc.robot.Utils.MathUtils.Vector2D;
+import frc.robot.Utils.PilotController;
+import frc.robot.Utils.RobotConfigReader;
 
 public class DataFlowTest implements SimpleRobotTest {
+    final PilotController pilotController;
+
+    public DataFlowTest(RobotConfigReader robotConfig) {
+        this.pilotController = new PilotController(robotConfig, "control-XBOX");
+    }
+
     @Override
     public void testStart() {
         previousTimeMillis = System.currentTimeMillis();
@@ -18,30 +24,42 @@ public class DataFlowTest implements SimpleRobotTest {
 
     Vector2D pos, vel;
     double rotation = 0;
-    final double maxVelocity = 5, maxAcceleration = 10, maxAccelerationAtFullSpeed = 4, friction = 8, maxAngularVelocity = Math.toRadians(180);
+    final double maxChassisSpeed = 4.5, maxLinearAcceleration = 8, maxCentripetalAcceleration = 10, friction = 8, maxAngularVelocity = Math.toRadians(180);
     long previousTimeMillis;
     @Override
     public void testPeriodic() {
-        final XboxController xboxController = new XboxController(0);
         final double dt = (System.currentTimeMillis() - previousTimeMillis) / 1000.0f;
-        final double oldSpeed = vel.getMagnitude();
-        final Vector2D desiredMotion = new Vector2D(new double[] {xboxController.getLeftX(), -xboxController.getLeftY()}),
-                accByMotor = desiredMotion.multiplyBy(LookUpTable.linearInterpretation(0, maxAcceleration, maxVelocity, maxAccelerationAtFullSpeed, oldSpeed) + friction);
+        pilotController.update();
+        final Vector2D desiredVelocity = pilotController.getTranslationalStickValue().multiplyBy(maxChassisSpeed); // TODO here, rotated the desired velocity
 
-        vel = vel.addBy(accByMotor.multiplyBy(dt));
-        final Vector2D centripetalForce = new Vector2D()
-        final double velChangeDueToFriction = friction * dt;
-        if (vel.getMagnitude() < velChangeDueToFriction)
+        final double speedDifference = desiredVelocity.getMagnitude() - vel.getMagnitude(),
+                linearAccelerationConstrain = speedDifference > 0 ?
+                        LookUpTable.linearInterpretation(0, maxLinearAcceleration, maxChassisSpeed, 0, vel.getMagnitude())
+                        : -LookUpTable.linearInterpretation(0, friction, maxChassisSpeed, 0, desiredVelocity.getMagnitude()),
+                speedChange = linearAccelerationConstrain * dt,
+                minStep = Math.abs(linearAccelerationConstrain) * 0.1,
+                newSpeed = Math.abs(speedDifference) < minStep ?
+                        desiredVelocity.getMagnitude() : vel.getMagnitude() + speedChange,
+
+                desiredMotionDirection = desiredVelocity.getMagnitude() == 0 ? vel.getHeading() : desiredVelocity.getHeading(),
+                headingDifference = AngleUtils.getActualDifference(vel.getHeading(), desiredMotionDirection),
+                angularVelocityConstrain = maxCentripetalAcceleration / (1+vel.getMagnitude()),
+                headingChange = Math.copySign(angularVelocityConstrain * dt, headingDifference),
+                headingMinStep = angularVelocityConstrain * 0.1,
+                newHeading = Math.abs(headingDifference) < headingMinStep ||
+                        (vel.getMagnitude() / maxChassisSpeed < 0.1) ?
+                        desiredMotionDirection : AngleUtils.simplifyAngle(vel.getHeading() + headingChange); // TODO test this
+
+        vel = new Vector2D(newHeading, Math.min(maxChassisSpeed, newSpeed));
+        if (desiredVelocity.getMagnitude() == 0 && vel.getMagnitude() / maxChassisSpeed < 0.1)
             vel = new Vector2D();
-        else
-            vel = new Vector2D(vel.getHeading(), vel.getMagnitude() - velChangeDueToFriction);
-
-        final double linearAccConstrain = LookUpTable.linearInterpretation(0, maxAcceleration, maxVelocity, 0, oldSpeed),
-                newSpeedConstrain = Math.min(maxVelocity, oldSpeed + linearAccConstrain * dt);
-        vel = new Vector2D(vel.getHeading(), Math.min(newSpeedConstrain, vel.getMagnitude()));
-
+        EasyDataFlow.putNumber("test", "dt", dt);
+        EasyDataFlow.putNumber("test", "speed difference", speedDifference);
+        EasyDataFlow.putNumber("test", "speed change", speedChange);
+        EasyDataFlow.putNumber("test", "pilot input mag", desiredVelocity.getMagnitude());
+        EasyDataFlow.putNumber("test",  "new speed", newSpeed);
         pos = pos.addBy(vel.multiplyBy(dt));
-        rotation += xboxController.getRightX() * dt * maxAngularVelocity;
+        rotation += pilotController.getRotationalStickValue() * dt * maxAngularVelocity;
         EasyDataFlow.putPosition("robot pos", pos, new Rotation2D(rotation));
 
 //        EasyDataFlow.putSwerveState(
