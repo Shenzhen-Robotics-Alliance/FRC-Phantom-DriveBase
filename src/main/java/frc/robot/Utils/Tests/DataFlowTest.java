@@ -24,7 +24,7 @@ public class DataFlowTest implements SimpleRobotTest {
 
     Vector2D pos, vel;
     double rotation = 0;
-    final double maxChassisSpeed = 4.5, maxLinearAcceleration = 8, maxCentripetalAcceleration = 10, friction = 8, maxAngularVelocity = Math.toRadians(180);
+    final double maxChassisSpeed = 5.2, maxLinearAcceleration = 8, maxCentripetalAcceleration = 10, friction = 8, maxAngularVelocity = Math.toRadians(180);
     long previousTimeMillis;
     @Override
     public void testPeriodic() {
@@ -32,23 +32,29 @@ public class DataFlowTest implements SimpleRobotTest {
         pilotController.update();
         final Vector2D desiredVelocity = pilotController.getTranslationalStickValue().multiplyBy(maxChassisSpeed); // TODO here, rotated the desired velocity
 
-        final double speedDifference = desiredVelocity.getMagnitude() - vel.getMagnitude(),
+        double desiredSpeed = desiredVelocity.getMagnitude(),
+                desiredMovingDirection = desiredVelocity.getHeading();
+        if (Math.abs(AngleUtils.getActualDifference(vel.getHeading(), desiredMovingDirection)) > Math.toRadians(90)) {
+            desiredMovingDirection = AngleUtils.simplifyAngle(desiredMovingDirection + Math.PI);
+            desiredSpeed *= -1;
+        }
+        final double speedDifference = desiredSpeed - vel.getMagnitude(),
                 linearAccelerationConstrain = speedDifference > 0 ?
                         LookUpTable.linearInterpretation(0, maxLinearAcceleration, maxChassisSpeed, 0, vel.getMagnitude())
-                        : -LookUpTable.linearInterpretation(0, friction, maxChassisSpeed, 0, desiredVelocity.getMagnitude()),
+                        : -LookUpTable.linearInterpretation(0, friction, maxChassisSpeed, 0, desiredSpeed),
                 speedChange = linearAccelerationConstrain * dt,
                 minStep = Math.abs(linearAccelerationConstrain) * 0.1,
                 newSpeed = Math.abs(speedDifference) < minStep ?
-                        desiredVelocity.getMagnitude() : vel.getMagnitude() + speedChange,
+                        desiredSpeed : vel.getMagnitude() + speedChange,
 
-                desiredMotionDirection = desiredVelocity.getMagnitude() == 0 ? vel.getHeading() : desiredVelocity.getHeading(),
+                desiredMotionDirection = desiredVelocity.getMagnitude() / maxChassisSpeed < 0.03 ? vel.getHeading() : desiredMovingDirection,
                 headingDifference = AngleUtils.getActualDifference(vel.getHeading(), desiredMotionDirection),
                 angularVelocityConstrain = maxCentripetalAcceleration / (1+vel.getMagnitude()),
                 headingChange = Math.copySign(angularVelocityConstrain * dt, headingDifference),
                 headingMinStep = angularVelocityConstrain * 0.1,
-                newHeading = Math.abs(headingDifference) < headingMinStep ||
-                        (vel.getMagnitude() / maxChassisSpeed < 0.1) ?
-                        desiredMotionDirection : AngleUtils.simplifyAngle(vel.getHeading() + headingChange); // TODO test this
+                newHeading =
+                        Math.abs(headingDifference) < headingMinStep || (vel.getMagnitude() / maxChassisSpeed < 0.1) ?
+                                desiredMotionDirection : AngleUtils.simplifyAngle(vel.getHeading() + headingChange);
 
         vel = new Vector2D(newHeading, Math.min(maxChassisSpeed, newSpeed));
         if (desiredVelocity.getMagnitude() == 0 && vel.getMagnitude() / maxChassisSpeed < 0.1)

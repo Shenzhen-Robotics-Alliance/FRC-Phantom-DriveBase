@@ -1,8 +1,13 @@
 package frc.robot.Modules.Chassis;
 
+import frc.robot.Utils.EasyDataFlow;
+import frc.robot.Utils.MathUtils.Rotation2D;
+import frc.robot.Utils.MathUtils.Vector2D;
 import frc.robot.Utils.RobotModuleOperatorMarker;
 
 public class SwerveDriveChassisSimulation extends HolonomicChassis {
+    private Vector2D desiredChassisPosition = new Vector2D();
+    private Rotation2D desiredChassisHeading = new Rotation2D(0);
     @Override
     public double getChassisHeading() {
         return 0;

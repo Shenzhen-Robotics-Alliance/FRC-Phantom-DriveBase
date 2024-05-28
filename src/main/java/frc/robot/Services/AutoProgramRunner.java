@@ -88,6 +88,8 @@ public class AutoProgramRunner extends RobotServiceBase {
             EasyDataFlow.putNumber("auto", "rotation T", rotationT);
             EasyDataFlow.putNumber("auto", "rotation (deg)", Math.toDegrees(currentCommandSegment.getCurrentRotationWithLERP(rotationTSyncedToTranslationT)));
         }
+
+
         currentCommandSegment.periodic.run();
 
         if (isCurrentSegmentComplete())
