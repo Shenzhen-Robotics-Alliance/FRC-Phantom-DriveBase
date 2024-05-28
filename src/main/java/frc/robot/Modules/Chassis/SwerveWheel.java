@@ -24,9 +24,6 @@ public class SwerveWheel extends RobotModuleBase {
     private SimpleFeedForwardSpeedController wheelSpeedController;
     private double maxDrivingEncoderVelocity;
     private boolean driveSpeedControlEnabled;
-    /** the friction of the driving wheel estimated by an integral algorithm, in percent motor power */
-    private double estimatedFrictionPower;
-    private double lastRecordedDriveSpeed;
 
     private double wheelEncoderValuePerMeter;
 
@@ -250,7 +247,6 @@ public class SwerveWheel extends RobotModuleBase {
     @Override
     public void onReset() {
         lastOperationTimer.start();
-        lastRecordedDriveSpeed = 0;
         this.targetedSpeed = 0;
         this.commandedHeading = defaultPosition;
         this.driveSpeedControlEnabled = false;

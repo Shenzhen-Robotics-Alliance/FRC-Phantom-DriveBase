@@ -2,6 +2,7 @@ package frc.robot.Utils.Tests;
 
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.Modules.PositionReader.RobotFieldPositionEstimator;
+import frc.robot.Utils.CollisionDetectionGrid;
 import frc.robot.Utils.EasyDataFlow;
 import frc.robot.Utils.MathUtils.AngleUtils;
 import frc.robot.Utils.MathUtils.LookUpTable;
@@ -12,6 +13,7 @@ import frc.robot.Utils.RobotConfigReader;
 
 public class DataFlowTest implements SimpleRobotTest {
     final PilotController pilotController;
+    final CollisionDetectionGrid collisionDetectionGrid = new CollisionDetectionGrid();
 
     public DataFlowTest(RobotConfigReader robotConfig) {
         this.pilotController = new PilotController(robotConfig, "control-XBOX");
@@ -115,5 +117,7 @@ public class DataFlowTest implements SimpleRobotTest {
 //                new Rotation2D[] {new Rotation2D(0), new Rotation2D(Math.PI)});
 
         previousTime = Timer.getFPGATimestamp();
+
+        EasyDataFlow.putNumber("test", "is in collision grid", collisionDetectionGrid.isInObstacle(pos.getX(), pos.getY()) ? 1 : 0);
     }
 }
