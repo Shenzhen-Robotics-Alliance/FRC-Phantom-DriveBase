@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class RobotShell extends LoggedRobot {
-    private static final int updateFreq = 100;
+    private static final int updateFreq = 50;
 
     private final XboxController copilotGamePad = new XboxController(1);
 

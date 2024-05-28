@@ -1,5 +1,7 @@
 package frc.robot.Utils.Tests;
 
+import edu.wpi.first.wpilibj.Timer;
+import frc.robot.Modules.PositionReader.RobotFieldPositionEstimator;
 import frc.robot.Utils.EasyDataFlow;
 import frc.robot.Utils.MathUtils.AngleUtils;
 import frc.robot.Utils.MathUtils.LookUpTable;
@@ -17,53 +19,83 @@ public class DataFlowTest implements SimpleRobotTest {
 
     @Override
     public void testStart() {
-        previousTimeMillis = System.currentTimeMillis();
+        previousTime = Timer.getFPGATimestamp();
         pos = new Vector2D();
         vel = new Vector2D();
     }
 
     Vector2D pos, vel;
     double rotation = 0;
-    final double maxChassisSpeed = 5.2, maxLinearAcceleration = 8, maxCentripetalAcceleration = 10, friction = 8, maxAngularVelocity = Math.toRadians(180);
-    long previousTimeMillis;
+    final double
+            /* the maximum chassis speed when the chassis is moving in a straight line */
+            maxChassisSpeed = 4.6,
+            /* the maximum chassis speed when the chassis is doing sharp turn */
+            maxChassisSpeedAtSharpTurn = 2.4,
+            /*  */
+            maxLinearAcceleration = 8,
+            maxCentripetalAcceleration = 12,
+            friction = 16,
+            maxAngularVelocity = Math.toRadians(270);
+    double previousTime = Timer.getFPGATimestamp();
     @Override
     public void testPeriodic() {
-        final double dt = (System.currentTimeMillis() - previousTimeMillis) / 1000.0f;
+        final double dt = (Timer.getFPGATimestamp() - previousTime);
         pilotController.update();
-        final Vector2D desiredVelocity = pilotController.getTranslationalStickValue().multiplyBy(maxChassisSpeed); // TODO here, rotated the desired velocity
+        final Rotation2D pilotFacing = RobotFieldPositionEstimator.toActualRobotRotation(new Rotation2D(Math.toRadians(270)));
+        final Vector2D desiredVelocity = pilotController.getTranslationalStickValue().multiplyBy(maxChassisSpeed).multiplyBy(pilotFacing);
 
         double desiredSpeed = desiredVelocity.getMagnitude(),
-                desiredMovingDirection = desiredVelocity.getHeading();
-        if (Math.abs(AngleUtils.getActualDifference(vel.getHeading(), desiredMovingDirection)) > Math.toRadians(90)) {
-            desiredMovingDirection = AngleUtils.simplifyAngle(desiredMovingDirection + Math.PI);
+                pilotStickDirection = desiredVelocity.getHeading();
+        final boolean turnAround =
+                Math.abs(AngleUtils.getActualDifference(vel.getHeading(), pilotStickDirection)) > Math.toRadians(120)
+                && vel.getMagnitude() != 0
+                && desiredSpeed != 0;
+        if (turnAround) {
+            pilotStickDirection = AngleUtils.simplifyAngle(pilotStickDirection + Math.PI);
             desiredSpeed *= -1;
         }
-        final double speedDifference = desiredSpeed - vel.getMagnitude(),
+        final double
+                minStepTime = 0.05,
+                speedDifference = desiredSpeed - vel.getMagnitude(),
                 linearAccelerationConstrain = speedDifference > 0 ?
-                        LookUpTable.linearInterpretation(0, maxLinearAcceleration, maxChassisSpeed, 0, vel.getMagnitude())
-                        : -LookUpTable.linearInterpretation(0, friction, maxChassisSpeed, 0, desiredSpeed),
+                        LookUpTable.linearInterpretationWithBounding(0, maxLinearAcceleration, maxChassisSpeed, 0, vel.getMagnitude())
+                        : -LookUpTable.linearInterpretationWithBounding(0, friction, maxChassisSpeed, 0, desiredSpeed),
                 speedChange = linearAccelerationConstrain * dt,
-                minStep = Math.abs(linearAccelerationConstrain) * 0.1,
-                newSpeed = Math.abs(speedDifference) < minStep ?
-                        desiredSpeed : vel.getMagnitude() + speedChange,
+                linearSpeedMinStep = Math.abs(linearAccelerationConstrain) * minStepTime,
+                newSpeed = Math.abs(speedDifference) < linearSpeedMinStep ?
+                        Math.abs(desiredSpeed) : vel.getMagnitude() + speedChange,
 
-                desiredMotionDirection = desiredVelocity.getMagnitude() / maxChassisSpeed < 0.03 ? vel.getHeading() : desiredMovingDirection,
+                desiredMotionDirection = desiredVelocity.getMagnitude() / maxChassisSpeed < 0.03 ? vel.getHeading() : pilotStickDirection,
                 headingDifference = AngleUtils.getActualDifference(vel.getHeading(), desiredMotionDirection),
                 angularVelocityConstrain = maxCentripetalAcceleration / (1+vel.getMagnitude()),
                 headingChange = Math.copySign(angularVelocityConstrain * dt, headingDifference),
-                headingMinStep = angularVelocityConstrain * 0.1,
+                headingMinStep = angularVelocityConstrain * minStepTime,
                 newHeading =
                         Math.abs(headingDifference) < headingMinStep || (vel.getMagnitude() / maxChassisSpeed < 0.1) ?
                                 desiredMotionDirection : AngleUtils.simplifyAngle(vel.getHeading() + headingChange);
+        vel = new Vector2D(newHeading, newSpeed);
 
-        vel = new Vector2D(newHeading, Math.min(maxChassisSpeed, newSpeed));
-        if (desiredVelocity.getMagnitude() == 0 && vel.getMagnitude() / maxChassisSpeed < 0.1)
+        final double currentMaxChassisSpeed =
+                LookUpTable.linearInterpretationWithBounding(
+                        0,
+                        maxChassisSpeed,
+                        Math.toRadians(90),
+                        maxChassisSpeedAtSharpTurn,
+                        Math.abs(AngleUtils.getActualDifference(vel.getHeading(), desiredVelocity.getHeading()))
+                );
+        vel = new Vector2D(newHeading, Math.min(currentMaxChassisSpeed, vel.getMagnitude()));
+
+        if ((desiredVelocity.getMagnitude() == 0 || turnAround)
+                && vel.getMagnitude() / maxChassisSpeed < 0.1)
             vel = new Vector2D();
         EasyDataFlow.putNumber("test", "dt", dt);
         EasyDataFlow.putNumber("test", "speed difference", speedDifference);
         EasyDataFlow.putNumber("test", "speed change", speedChange);
         EasyDataFlow.putNumber("test", "pilot input mag", desiredVelocity.getMagnitude());
         EasyDataFlow.putNumber("test",  "new speed", newSpeed);
+        EasyDataFlow.putNumber("test", "chassis max spd", currentMaxChassisSpeed);
+        EasyDataFlow.putNumber("test", "pilot stick dir", Math.toDegrees(pilotStickDirection));
+        EasyDataFlow.putNumber("test", "pilot stick dir", Math.toDegrees(pilotStickDirection));
         pos = pos.addBy(vel.multiplyBy(dt));
         rotation += pilotController.getRotationalStickValue() * dt * maxAngularVelocity;
         EasyDataFlow.putPosition("robot pos", pos, new Rotation2D(rotation));
@@ -82,6 +114,6 @@ public class DataFlowTest implements SimpleRobotTest {
 //                new Vector2D[] {new Vector2D(new double[] {3, 3}), new Vector2D(new double[] {2.5, 2.5})},
 //                new Rotation2D[] {new Rotation2D(0), new Rotation2D(Math.PI)});
 
-        previousTimeMillis = System.currentTimeMillis();
+        previousTime = Timer.getFPGATimestamp();
     }
 }
