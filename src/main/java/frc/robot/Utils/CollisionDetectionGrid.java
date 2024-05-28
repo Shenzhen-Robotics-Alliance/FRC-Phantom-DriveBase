@@ -1,6 +1,7 @@
 package frc.robot.Utils;
 
 import edu.wpi.first.wpilibj.Filesystem;
+import frc.robot.Utils.MathUtils.Vector2D;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -42,8 +43,39 @@ public class CollisionDetectionGrid {
         } catch (Exception ignored) {}
     }
 
-    public boolean isInObstacle(double x, double y) {
+    public boolean isInObstacle(Vector2D position) {
+        final double x = Math.min(fieldLength, Math.max(0, position.getX())),
+                y = Math.min(fieldWidth, Math.max(0, position.getY()));
         final int col = (int)(x / cellSize), row = (int) (y / cellSize);
-        return 0 <= col && col < grid.length && 0 <= row && row < grid[0].length && grid[col][row];
+        return grid[col][row];
+    }
+
+    /**
+     * @return {boundedPosition, boundedVelocity}
+     */
+    public Vector2D[] applyCollisionDetection(Vector2D originalPosition, Vector2D originalVelocity) {
+        // TODO finish this method
+        if (!isInObstacle(originalPosition))
+            return new Vector2D[] {originalPosition, originalVelocity};
+        if (originalVelocity.getX() > 0) {
+            if (originalPosition.getY() > 0) // particle moving up-right
+                return null;
+            if (originalPosition.getY() < 0) // particle moving down-right
+                return null;
+            return new Vector2D[] {originalPosition, originalVelocity}; // particle moving right
+        }
+        if (originalVelocity.getX() < 0) {
+            if (originalPosition.getY() > 0) // particle moving up-left
+                return null;
+            if (originalPosition.getY() < 0) // particle moving down-left
+                return null;
+            return null; // particle moving left
+        }
+
+        if (originalPosition.getY() > 0) // particle moving up
+            return null;
+        if (originalPosition.getY() < 0) // particle moving down
+            return null;
+        return new Vector2D[] {originalPosition, originalVelocity}; // particle still
     }
 }

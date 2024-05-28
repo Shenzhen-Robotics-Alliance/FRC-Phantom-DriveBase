@@ -118,6 +118,6 @@ public class DataFlowTest implements SimpleRobotTest {
 
         previousTime = Timer.getFPGATimestamp();
 
-        EasyDataFlow.putNumber("test", "is in collision grid", collisionDetectionGrid.isInObstacle(pos.getX(), pos.getY()) ? 1 : 0);
+        EasyDataFlow.putNumber("test", "is in collision grid", collisionDetectionGrid.isInObstacle(pos) ? 1 : 0);
     }
 }
