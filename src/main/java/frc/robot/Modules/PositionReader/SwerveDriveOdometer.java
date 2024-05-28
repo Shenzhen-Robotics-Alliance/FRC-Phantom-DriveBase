@@ -56,6 +56,8 @@ public class SwerveDriveOdometer extends RobotFieldPositionEstimator {
 
         EasyDataFlow.putNumber("chassis", "old position estimator (x)", getRobotPosition2D().getX());
         EasyDataFlow.putNumber("chassis", "old position estimator (y)", getRobotPosition2D().getY());
+
+        EasyDataFlow.putPosition("chassis position", getRobotPosition2D(), getRobotRotation2D());
     }
 
     @Override

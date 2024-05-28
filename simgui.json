@@ -7,6 +7,13 @@
       "/SmartDashboard/pilot controller type": "String Chooser"
     }
   },
+  "NetworkTables": {
+    "transitory": {
+      "Pose2d[]##v_position 1": {
+        "open": true
+      }
+    }
+  },
   "NetworkTables Info": {
     "visible": true
   }
