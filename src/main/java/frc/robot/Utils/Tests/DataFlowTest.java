@@ -110,7 +110,7 @@ public class DataFlowTest implements SimpleRobotTest {
 
         EasyDataFlow.putNumber("test", "robot vel x", vel.getX());
         EasyDataFlow.putNumber("test", "robot vel y", vel.getY());
-        EasyDataFlow.putPosition("robot pos", pos, new Rotation2D(rotation));
+        EasyDataFlow.putRobot(pos, new Rotation2D(rotation));
 
 //        EasyDataFlow.putSwerveState(
 //                "chassis",

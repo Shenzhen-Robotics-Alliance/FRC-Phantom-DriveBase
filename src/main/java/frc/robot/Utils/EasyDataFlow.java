@@ -11,12 +11,16 @@ import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.util.datalog.DoubleLogEntry;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.smartdashboard.FieldObject2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Utils.MathUtils.Rotation2D;
 import frc.robot.Utils.MathUtils.Vector2D;
 import org.littletonrobotics.junction.Logger;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Vector;
 
 /**
  * a simple tool that deals with logs and dashboards
@@ -28,6 +32,11 @@ public class EasyDataFlow {
     private static final Map<String, EasyPoseArrayPublisher> positionArrayEntries = new HashMap<>();
     private static final Map<String, EasySwerveStatesPositionPublisher> swerveStatesPublisher = new HashMap<>();
     private static final DataLog log = DataLogManager.getLog();
+    private static final Field2d field = new Field2d();
+
+    public static void matchStart() {
+        SmartDashboard.putData("field", field);
+    }
 
     public static void log(String message) {
         DataLogManager.log(message);
@@ -48,10 +57,15 @@ public class EasyDataFlow {
             Pose2d pose2d;
             if (position == null) pose2d = null;
             else
-                pose2d = new Pose2d(position.getX(), position.getY(), Rotation2d.fromRadians(rotation == null ? 0 : rotation.getRadian()));
+                pose2d = getPose(position, rotation);
             if (publisher != null) this.publisher.set(pose2d);
             Logger.recordOutput(name, Pose2d.struct, pose2d);
         }
+    }
+
+    public static void putRobot(Vector2D position, Rotation2D rotation) {
+        putPosition("/chassis/robotPosition", position, rotation);
+        field.setRobotPose(getPose(position, rotation));
     }
 
     public static void putPosition(String name, Vector2D position, Rotation2D rotation) {
@@ -78,7 +92,7 @@ public class EasyDataFlow {
             }
             final Pose2d[] pose2ds = new Pose2d[positions.length];
             for (int i = 0; i < pose2ds.length; i++)
-                pose2ds[i] = new Pose2d(positions[i].getX(), positions[i].getY(), Rotation2d.fromRadians(rotations[i].getRadian()));
+                pose2ds[i] = getPose(positions[i], rotations[i]);
             this.publisher.set(pose2ds);
             Logger.recordOutput(name, Pose2d.struct, pose2ds);
         }
@@ -88,6 +102,10 @@ public class EasyDataFlow {
         if (!positionArrayEntries.containsKey(name))
             positionArrayEntries.put(name, new EasyPoseArrayPublisher(name));
         positionArrayEntries.get(name).setPositions(positions, rotations);
+    }
+
+    private static Pose2d getPose(Vector2D position, Rotation2D rotation) {
+        return new Pose2d(position.getX(), position.getY(), Rotation2d.fromRadians(rotation == null ? 0 : rotation.getRadian()));
     }
 
     private static final class EasySwerveStatesPositionPublisher {

@@ -60,6 +60,7 @@ public class RobotShell extends LoggedRobot {
         scheduleAutoCommands(autoStageChooser.getSelected());
         autoStageChooser.onChange(this::scheduleAutoCommands);
         SmartDashboard.putData("Select Auto", autoStageChooser);
+        EasyDataFlow.matchStart();
     }
 
     private void scheduleAutoCommands(CommandSequenceGenerator commandSequenceGenerator) {
@@ -77,7 +78,6 @@ public class RobotShell extends LoggedRobot {
         EasyDataFlow.putNumber("other", "Voltage (V)", robotCore.powerDistributionPanel.getVoltage());
         EasyDataFlow.putNumber("other", "Current (A)", robotCore.powerDistributionPanel.getTotalCurrent());
 
-        SmartDashboard.putData("field", new Field2d());
         SmartDashboard.putData("PDP", robotCore.powerDistributionPanel);
     }
 
