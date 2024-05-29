@@ -11,6 +11,7 @@ import java.io.File;
 import java.io.FileReader;
 
 public class CollisionDetectionGrid {
+    private static final double bounceCoefficient = -0.3, bounceBackDistance = 0.03, maxImpactVelocity = 5;
     private boolean[][] grid = null;
     private double cellSize = 0, fieldLength = 0, fieldWidth = 0;
 
@@ -29,12 +30,12 @@ public class CollisionDetectionGrid {
 
             cellSize = ((Number) json.get("nodeSizeMeters")).doubleValue();
             JSONArray grid = (JSONArray) json.get("grid");
-            this.grid = new boolean[((JSONArray) grid.get(0)).size()][grid.size()];
+            this.grid = new boolean[grid.size()][((JSONArray) grid.get(0)).size()];
 
             for (int row = 0; row < grid.size(); row++) {
                 JSONArray rowArray = (JSONArray) grid.get(row);
                 for (int col = 0; col < rowArray.size(); col++)
-                    this.grid[col][row] = (boolean) rowArray.get(col);
+                    this.grid[row][col] = (boolean) rowArray.get(col);
             }
 
             JSONObject fieldSize = (JSONObject) json.get("field_size");
@@ -44,38 +45,168 @@ public class CollisionDetectionGrid {
     }
 
     public boolean isInObstacle(Vector2D position) {
+        final int[] gridPos = getGridPos(position);
+        return grid[gridPos[0]][gridPos[1]];
+    }
+
+    /**
+     * @returns {row, col}
+     * */
+    public int[] getGridPos(Vector2D position) {
         final double x = Math.min(fieldLength, Math.max(0, position.getX())),
-                y = Math.min(fieldWidth, Math.max(0, position.getY()));
-        final int col = (int)(x / cellSize), row = (int) (y / cellSize);
-        return grid[col][row];
+            y = Math.min(fieldWidth, Math.max(0, position.getY()));
+        return new int[]{(int) (y / cellSize), (int) (x / cellSize)};
+    }
+
+    public Vector2D getGridLowerLeftCornerPosition(int[] gridPos) {
+        return getGridLowerLeftCornerPosition(gridPos[0], gridPos[1]);
+    }
+
+    public Vector2D getGridLowerLeftCornerPosition(int row, int col) {
+        return new Vector2D(new double[] {col * cellSize, row * cellSize});
     }
 
     /**
      * @return {boundedPosition, boundedVelocity}
      */
     public Vector2D[] applyCollisionDetection(Vector2D originalPosition, Vector2D originalVelocity) {
-        // TODO finish this method
-        if (!isInObstacle(originalPosition))
+        if (!isInObstacle(originalPosition)) {
+            EasyDataFlow.putNumber("test", "collision dir", -1);
             return new Vector2D[] {originalPosition, originalVelocity};
-        if (originalVelocity.getX() > 0) {
-            if (originalPosition.getY() > 0) // particle moving up-right
-                return null;
-            if (originalPosition.getY() < 0) // particle moving down-right
-                return null;
-            return new Vector2D[] {originalPosition, originalVelocity}; // particle moving right
-        }
-        if (originalVelocity.getX() < 0) {
-            if (originalPosition.getY() > 0) // particle moving up-left
-                return null;
-            if (originalPosition.getY() < 0) // particle moving down-left
-                return null;
-            return null; // particle moving left
         }
 
+        // TODO: this is a very complicated program, write the explanations as fast as possible
+        if (originalVelocity.getX() > 0) { // horizontal velocity is to the right
+            if (isInObstacle(originalPosition.addBy(new Vector2D(new double[] {-cellSize, 0}))))
+                return originalPosition.getY() > 0 ?
+                        applyUpwardsCollisionLimit(originalPosition, originalVelocity)
+                        :applyDownwardsCollisionLimit(originalPosition, originalVelocity);
+
+            if (originalPosition.getY() > 0) // particle moving up-right
+                return linearInterpret(originalPosition, originalVelocity, getGridLowerLeftCornerPosition(getGridPos(originalPosition)).getX())
+                                > getGridLowerLeftCornerPosition(getGridPos(originalPosition)).getY() ?
+                        applyRightwardsCollisionLimit(originalPosition, originalVelocity)
+                        :applyUpwardsCollisionLimit(originalPosition, originalVelocity);
+            if (originalPosition.getY() < 0) // particle moving down-right
+                return linearInterpret(originalPosition, originalVelocity, getGridLowerLeftCornerPosition(getGridPos(originalPosition)).getX())
+                        > getGridLowerLeftCornerPosition(getGridPos(originalPosition)).getY() + cellSize ?
+                        applyRightwardsCollisionLimit(originalPosition, originalVelocity)
+                        :applyDownwardsCollisionLimit(originalPosition, originalVelocity);
+            return applyRightwardsCollisionLimit(originalPosition, originalVelocity); // particle moving right
+        }
+        if (originalVelocity.getX() < 0) { // horizontal velocity is to the left
+            if (isInObstacle(originalPosition.addBy(new Vector2D(new double[] {cellSize, 0}))))
+                return originalPosition.getY() > 0 ?
+                        applyUpwardsCollisionLimit(originalPosition, originalVelocity)
+                        :applyDownwardsCollisionLimit(originalPosition, originalVelocity);
+
+            if (originalPosition.getY() > 0) // particle moving up-left
+                return linearInterpret(originalPosition, originalVelocity, getGridLowerLeftCornerPosition(getGridPos(originalPosition)).getX() + cellSize)
+                        > getGridLowerLeftCornerPosition(getGridPos(originalPosition)).getY() ?
+                        applyLeftwardsCollisionLimit(originalPosition, originalVelocity)
+                        : applyUpwardsCollisionLimit(originalPosition, originalVelocity);
+            if (originalPosition.getY() < 0) // particle moving down-left
+                return linearInterpret(originalPosition, originalVelocity, getGridLowerLeftCornerPosition(getGridPos(originalPosition)).getX() + cellSize)
+                        > getGridLowerLeftCornerPosition(getGridPos(originalPosition)).getY() + cellSize ?
+                        applyLeftwardsCollisionLimit(originalPosition, originalVelocity)
+                        : applyDownwardsCollisionLimit(originalPosition, originalVelocity);
+            return applyLeftwardsCollisionLimit(originalPosition, originalVelocity); // particle moving left
+        }
+
+        // no horizontal velocity
         if (originalPosition.getY() > 0) // particle moving up
-            return null;
+            return applyUpwardsCollisionLimit(originalPosition, originalVelocity);
         if (originalPosition.getY() < 0) // particle moving down
-            return null;
+            return applyDownwardsCollisionLimit(originalPosition, originalVelocity);
         return new Vector2D[] {originalPosition, originalVelocity}; // particle still
+    }
+
+    private double linearInterpret(Vector2D position, Vector2D velocity, double x) {
+        if (velocity.getX() == 0)
+            return Double.POSITIVE_INFINITY;
+        final double slope = velocity.getY() / velocity.getX();
+        return position.getY() + (x - position.getX()) * slope;
+    }
+
+    /**
+     * particle was moving up and hit the lower-edge of its current grid
+     * */
+    private Vector2D[] applyUpwardsCollisionLimit(Vector2D originalPosition, Vector2D originalVelocity) {
+        EasyDataFlow.putNumber("test", "collision dir", 0);
+        if (Math.abs(originalVelocity.getY()) > maxImpactVelocity)
+            throw new RobotDamagedException();
+        return new Vector2D[] {
+                new Vector2D(new double[] {
+                        originalPosition.getX(),
+                        getGridLowerLeftCornerPosition(getGridPos(originalPosition)).getY() - bounceBackDistance
+                }),
+                new Vector2D(new double[] {
+                        originalVelocity.getX(),
+                        originalVelocity.getY() * bounceCoefficient
+                })
+        };
+    }
+
+    /**
+     * particle was moving down and hit the upper-edge of its current grid
+     * */
+    private Vector2D[] applyDownwardsCollisionLimit(Vector2D originalPosition, Vector2D originalVelocity) {
+        EasyDataFlow.putNumber("test", "collision dir", 1);
+        if (Math.abs(originalVelocity.getY()) > maxImpactVelocity)
+            throw new RobotDamagedException();
+        return new Vector2D[] {
+                new Vector2D(new double[] {
+                        originalPosition.getX(),
+                        getGridLowerLeftCornerPosition(getGridPos(originalPosition)).getY() + cellSize + bounceBackDistance
+                }),
+                new Vector2D(new double[] {
+                        originalVelocity.getX(),
+                        originalVelocity.getY() * bounceCoefficient
+                })
+        };
+    }
+
+    /**
+     * particle was moving left and hit the righter-edge of its current grid
+     * */
+    private Vector2D[] applyLeftwardsCollisionLimit(Vector2D originalPosition, Vector2D originalVelocity) {
+        EasyDataFlow.putNumber("test", "collision dir", 2);
+        if (Math.abs(originalVelocity.getX()) > maxImpactVelocity)
+            throw new RobotDamagedException();
+        return new Vector2D[] {
+                new Vector2D(new double[] {
+                        getGridLowerLeftCornerPosition(getGridPos(originalPosition)).getX() + cellSize + bounceBackDistance,
+                        originalPosition.getY()
+                }),
+                new Vector2D(new double[] {
+                        originalPosition.getX() * bounceCoefficient,
+                        originalVelocity.getY()
+                })
+        };
+    }
+
+    /**
+     * particle was moving right and hit the lefter-edge of its current grid
+     * */
+    private Vector2D[] applyRightwardsCollisionLimit(Vector2D originalPosition, Vector2D originalVelocity) {
+        EasyDataFlow.putNumber("test", "collision dir",  3);
+        if (Math.abs(originalVelocity.getX()) > maxImpactVelocity)
+            throw new RobotDamagedException();
+        return new Vector2D[] {
+                new Vector2D(new double[] {
+                        getGridLowerLeftCornerPosition(getGridPos(originalPosition)).getX() - bounceBackDistance,
+                        originalPosition.getY()
+                }),
+                new Vector2D(new double[] {
+                        originalPosition.getX() * bounceCoefficient,
+                        originalVelocity.getY()
+                })
+        };
+    }
+
+    private static final class RobotDamagedException extends RuntimeException {
+        public RobotDamagedException() {
+            super("YOU CRUSHED THE ROBOT!!!!");
+        }
     }
 }

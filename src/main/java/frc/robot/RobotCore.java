@@ -80,9 +80,6 @@ public class RobotCore {
         private void createRobotReal() {
                 System.out.println("<-- Robot Core | creating real robot... -->");
 
-                DataLogManager.start();
-                DriverStation.startDataLog(DataLogManager.getLog());
-
                 final SwerveWheel
                         frontLeftWheel = createSwerveWheel("frontLeft", 1, new Vector2D(new double[] { -0.6, 0.6 })),
                         backLeftWheel = createSwerveWheel("backLeft", 2, new Vector2D(new double[] { -0.6, -0.6 })),

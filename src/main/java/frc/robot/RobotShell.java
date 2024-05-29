@@ -1,5 +1,7 @@
 package frc.robot;
 
+import edu.wpi.first.wpilibj.DataLogManager;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -34,6 +36,8 @@ public class RobotShell extends LoggedRobot {
     public void robotInit() {
         // System.out.println("<-- Robot Shell | robot init -->");
         robotCore = new RobotCore("fasterChassis", isSimulation());
+        DataLogManager.start();
+        DriverStation.startDataLog(DataLogManager.getLog());
     }
 
     /** called once when the driver station first connects to the robot */

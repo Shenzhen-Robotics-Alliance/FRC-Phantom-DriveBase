@@ -22,7 +22,7 @@ public class DataFlowTest implements SimpleRobotTest {
     @Override
     public void testStart() {
         previousTime = Timer.getFPGATimestamp();
-        pos = new Vector2D();
+        pos = new Vector2D(new double[] {1.2, 2.5});
         vel = new Vector2D();
     }
 
@@ -100,6 +100,16 @@ public class DataFlowTest implements SimpleRobotTest {
         EasyDataFlow.putNumber("test", "pilot stick dir", Math.toDegrees(pilotStickDirection));
         pos = pos.addBy(vel.multiplyBy(dt));
         rotation += pilotController.getRotationalStickValue() * dt * maxAngularVelocity;
+
+        // apply two times to prevent the robot from going through walls
+        EasyDataFlow.putNumber("test", "robot vel x unbounded", vel.getX());
+        EasyDataFlow.putNumber("test", "robot vel y unbounded", vel.getY());
+        Vector2D[] pos_vel = collisionDetectionGrid.applyCollisionDetection(pos, vel);
+        pos = pos_vel[0];
+        vel = pos_vel[1];
+
+        EasyDataFlow.putNumber("test", "robot vel x", vel.getX());
+        EasyDataFlow.putNumber("test", "robot vel y", vel.getY());
         EasyDataFlow.putPosition("robot pos", pos, new Rotation2D(rotation));
 
 //        EasyDataFlow.putSwerveState(
