@@ -12,6 +12,12 @@
     "transitory": {
       "Pose2d[]##v_position 1": {
         "open": true
+      },
+      "Shuffleboard": {
+        "open": true
+      },
+      "SmartDashboard": {
+        "open": true
       }
     }
   },

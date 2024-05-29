@@ -50,8 +50,8 @@ public abstract class RobotFieldPositionEstimator extends RobotModuleBase {
         setRobotRotation(toActualRobotRotation(pilotFacingBlue).getRadian());
     }
 
-    /** reset the robot status (both position and rotation) */
-    public void resetRobot() {
+    @Override
+    public void onReset() {
         this.resetRobotPosition();
         this.resetRobotRotation();
     }
@@ -67,8 +67,6 @@ public abstract class RobotFieldPositionEstimator extends RobotModuleBase {
         setRobotPosition(robotPosition);
         setRobotRotation(rotation);
     }
-
-    public abstract void reset();
 
     @Override
     protected void periodic(double dt) {

@@ -1,7 +1,7 @@
 package frc.robot.Services;
 
 import edu.wpi.first.wpilibj.Timer;
-import frc.robot.Modules.Chassis.HolonomicChassis;
+import frc.robot.Modules.Chassis.SwerveDriveChassisLogic;
 import frc.robot.Modules.Chassis.SwerveDriveChassis;
 import frc.robot.Utils.EasyDataFlow;
 import frc.robot.Utils.MathUtils.BezierCurveSchedule;
@@ -21,7 +21,7 @@ import java.util.List;
 public class AutoProgramRunner extends RobotServiceBase {
     private List<SequentialCommandSegment> commandSegments;
 
-    private final HolonomicChassis chassis;
+    private final SwerveDriveChassisLogic chassis;
     private final BezierCurveScheduleGenerator scheduleGenerator;
     private final RobotConfigReader robotConfig;
     private int currentSegmentID;
@@ -30,7 +30,7 @@ public class AutoProgramRunner extends RobotServiceBase {
     private final Timer dt = new Timer();
     private double currentSegmentRotationScheduleETA, rotationT, inAdvanceTime;
 
-    public AutoProgramRunner(HolonomicChassis chassis, RobotConfigReader robotConfig) {
+    public AutoProgramRunner(SwerveDriveChassisLogic chassis, RobotConfigReader robotConfig) {
         super("Auto-Program-Runner");
         this.chassis = chassis;
         this.robotConfig = robotConfig;

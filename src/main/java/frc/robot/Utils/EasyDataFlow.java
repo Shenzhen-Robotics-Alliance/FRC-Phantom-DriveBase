@@ -109,7 +109,7 @@ public class EasyDataFlow {
     }
 
     private static final class EasySwerveStatesPositionPublisher {
-        private final SwerveModuleState[] swerveStates = new SwerveModuleState[4];
+        private SwerveModuleState[] swerveStates = new SwerveModuleState[4];
         private final String name;
         private StructArrayPublisher<SwerveModuleState> swerveStatesPublisher = null;
         private DoublePublisher robotFacingPublisher = null;
@@ -123,32 +123,49 @@ public class EasyDataFlow {
             } catch (Exception ignored) {}
         }
 
-        public void setSwerveStates(Vector2D frontLeftWheelMotionToRobot, Vector2D frontRightWheelMotionToRobot, Vector2D backLeftWheelMotionToRobot, Vector2D backRightWheelMotionToRobot, Rotation2D robotFacing) {
-            swerveStates[0] = getSwerveState(frontLeftWheelMotionToRobot);
-            swerveStates[1] = getSwerveState(frontRightWheelMotionToRobot);
-            swerveStates[2] = getSwerveState(backLeftWheelMotionToRobot);
-            swerveStates[3] = getSwerveState(backRightWheelMotionToRobot);
-
+        public void setSwerveStates(SwerveModuleState[] swerveStates, Rotation2D robotFacing) {
+            this.swerveStates = swerveStates;
             swerveStatesPublisher.set(swerveStates);
             robotFacingPublisher.set(robotFacing.getRadian());
             Logger.recordOutput(name + "/swerveStates", swerveStates);
             Logger.recordOutput(name + "/robotFacing", robotFacing.getRadian());
         }
+    }
 
-        private static SwerveModuleState getSwerveState(Vector2D wheelMotion) {
-            if (wheelMotion.getMagnitude() == 0)
-                return new SwerveModuleState(0, Rotation2d.fromRadians(0));
-            return new SwerveModuleState(
-                    wheelMotion.getMagnitude(),
-                    Rotation2d.fromRadians(wheelMotion.getHeading() - Math.toRadians(90))
-            );
-        }
+
+    public static void putSwerveState(String name, double frontLeftWheelSpeed, double frontLeftWheelFacing, double frontRightWheelSpeed, double frontRightWheelFacing,  double backLeftWheelSpeed, double backLeftWheelFacing,  double backRightWheelSpeed, double backRightWheelFacing,  Rotation2D robotFacing) {
+        final SwerveModuleState[] swerveStates = new SwerveModuleState[4];
+        swerveStates[0] = new SwerveModuleState(frontLeftWheelSpeed, Rotation2d.fromRadians(frontLeftWheelFacing - Math.toRadians(90)));
+        swerveStates[1] = new SwerveModuleState(frontRightWheelSpeed, Rotation2d.fromRadians(frontRightWheelFacing - Math.toRadians(90)));
+        swerveStates[2] = new SwerveModuleState(backLeftWheelSpeed, Rotation2d.fromRadians(backLeftWheelFacing - Math.toRadians(90)));
+        swerveStates[3] = new SwerveModuleState(backRightWheelSpeed, Rotation2d.fromRadians(backRightWheelSpeed - Math.toRadians(90)));
+
+        putSwerveState(name, swerveStates, robotFacing);
     }
 
     public static void putSwerveState(String name, Vector2D frontLeftWheelMotionToRobot, Vector2D frontRightWheelMotionToRobot, Vector2D backLeftWheelMotionToRobot, Vector2D backRightWheelMotionToRobot, Rotation2D robotFacing) {
+        final SwerveModuleState[] swerveStates = new SwerveModuleState[4];
+        swerveStates[0] = getSwerveState(frontLeftWheelMotionToRobot);
+        swerveStates[1] = getSwerveState(frontRightWheelMotionToRobot);
+        swerveStates[2] = getSwerveState(backLeftWheelMotionToRobot);
+        swerveStates[3] = getSwerveState(backRightWheelMotionToRobot);
+
+        putSwerveState(name, swerveStates, robotFacing);
+    }
+
+    private static SwerveModuleState getSwerveState(Vector2D wheelMotion) {
+        if (wheelMotion.getMagnitude() == 0)
+            return new SwerveModuleState(0, Rotation2d.fromRadians(0));
+        return new SwerveModuleState(
+                wheelMotion.getMagnitude(),
+                Rotation2d.fromRadians(wheelMotion.getHeading() - Math.toRadians(90))
+        );
+    }
+
+    public static void putSwerveState(String name, SwerveModuleState[] swerveModuleStates, Rotation2D robotFacing) {
         if (!swerveStatesPublisher.containsKey(name))
             swerveStatesPublisher.put(name, new EasySwerveStatesPositionPublisher(name));
-        swerveStatesPublisher.get(name).setSwerveStates(frontLeftWheelMotionToRobot, frontRightWheelMotionToRobot, backLeftWheelMotionToRobot, backRightWheelMotionToRobot, robotFacing);
+        swerveStatesPublisher.get(name).setSwerveStates(swerveModuleStates, robotFacing);
     }
 
     private static final class EasyDoubleDataEntry {

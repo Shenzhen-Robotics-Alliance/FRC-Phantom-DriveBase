@@ -9,10 +9,11 @@ import frc.robot.Utils.RobotModuleOperatorMarker;
 /**
  * TODO: methods declaration for a holonomic chassis, and implement it using swerve-based chassis
  */
-public abstract class HolonomicChassis extends RobotModuleBase {
+public abstract class SwerveDriveChassisLogic extends RobotModuleBase {
+    // TODO: put swerve drive logic here
     private Vector2D displayedDesiredPosition = null;
     private Rotation2D displayedDesiredRotation = null;
-    protected HolonomicChassis() {
+    protected SwerveDriveChassisLogic() {
         super("chassis");
     }
 
@@ -24,6 +25,8 @@ public abstract class HolonomicChassis extends RobotModuleBase {
     @Override
     protected void periodic(double dt) {
         EasyDataFlow.putPosition("/chassis/desiredPosition", displayedDesiredPosition, displayedDesiredRotation);
+
+        // TODO: display swerve desired and actual positions using decideSwerveFacingDirection() and getDecidedDrivePower()
     }
     public abstract double getChassisHeading();
     public abstract ChassisTaskTranslation getCurrentTranslationalTask();

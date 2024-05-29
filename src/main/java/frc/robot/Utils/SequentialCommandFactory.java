@@ -2,7 +2,7 @@ package frc.robot.Utils;
 
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.Timer;
-import frc.robot.Modules.Chassis.HolonomicChassis;
+import frc.robot.Modules.Chassis.SwerveDriveChassisLogic;
 import frc.robot.Modules.PositionReader.RobotFieldPositionEstimator;
 import frc.robot.RobotCore;
 import frc.robot.Utils.MathUtils.BezierCurve;
@@ -23,7 +23,7 @@ import static frc.robot.Modules.PositionReader.RobotFieldPositionEstimator.toAct
 import static frc.robot.Modules.PositionReader.RobotFieldPositionEstimator.toActualRobotRotation;
 
 public class SequentialCommandFactory {
-    private final HolonomicChassis chassis;
+    private final SwerveDriveChassisLogic chassis;
     private final RobotFieldPositionEstimator positionEstimator;
     private final Vector2D robotStartingPosition;
     private final Rotation2D robotStartingRotation2D;

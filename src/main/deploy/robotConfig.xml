@@ -55,17 +55,6 @@
         <!-- low speed mode -->
         <lowSpeedModeTranslationalCommandScale>0.75</lowSpeedModeTranslationalCommandScale>
 
-        <!-- the configuration for wheel speed control system -->
-        <maxDrivingEncoderVelocity type="double">220000</maxDrivingEncoderVelocity> <!-- the encoder velocity read from the wheel when the robot is motioning at full speed -->
-        <driveWheelFrictionIntegrationWeight type="double">0</driveWheelFrictionIntegrationWeight> <!-- how fast the robot is adjusting itself according to the sensed friction -->
-        <driveWheelVelocityTolerance type="double">0.28</driveWheelVelocityTolerance> <!-- the amount of error in speed tolerated by the system, in percentage TO THE DESIRED -->
-
-        <driveWheelProportionGain type="double">0.7</driveWheelProportionGain>
-        <driveWheelFrictionDefaultValue type="double">0.08</driveWheelFrictionDefaultValue> <!-- the preset friction value for the robot, the robot adjusts itself based on this initial value -->
-        <driveWheelFeedForwardRate type="double">0.3</driveWheelFeedForwardRate> <!-- the proportional term, the amount of feed forward power when there is a 100% speed error -->
-        <driveWheelFeedForwardDelay type="double">0</driveWheelFeedForwardDelay> <!-- the amount of delay of the speed-controlling system, in ms, which is the amount of time that the system will "think forward" -->
-
-
         <!-- profiled translational velocity controller -->
         <translationalTaskUpdatableRange type="double">0.1</translationalTaskUpdatableRange>
         <ignoredAccelerateTime type="double">0.08</ignoredAccelerateTime>

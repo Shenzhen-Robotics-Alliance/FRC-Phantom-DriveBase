@@ -15,7 +15,7 @@ import frc.robot.Drivers.IMUs.PigeonsIMU;
 import frc.robot.Drivers.IMUs.SimpleGyro;
 import frc.robot.Drivers.Motors.TalonFXMotor;
 import frc.robot.Drivers.Visions.PhantomClient;
-import frc.robot.Modules.Chassis.HolonomicChassis;
+import frc.robot.Modules.Chassis.SwerveDriveChassisLogic;
 import frc.robot.Modules.Chassis.SwerveDriveChassisSimulation;
 import frc.robot.Modules.LEDStatusLights.AddressableLEDStatusLight;
 import frc.robot.Modules.LEDStatusLights.LEDStatusLight;
@@ -39,7 +39,7 @@ public class RobotCore {
         public RobotConfigReader robotConfig;
         public SimpleGyro gyro;
         public RobotFieldPositionEstimator positionEstimator;
-        public HolonomicChassis chassis;
+        public SwerveDriveChassisLogic chassis;
         public LEDStatusLight statusLight;
 
         private final List<String> configsToTune = new ArrayList<>(1);
@@ -99,7 +99,7 @@ public class RobotCore {
                 this.positionEstimator = new VisionSupportedOdometer(swerveWheels, gyro, new PhantomClient()); // TODO create phantom client
                 modules.add(positionEstimator);
 
-                this.chassis = new SwerveDriveChassis(swerveWheels, gyro, robotConfig, positionEstimator);
+                this.chassis = new SwerveDriveChassis(swerveWheels, robotConfig, positionEstimator);
                 modules.add(chassis);
 
                 this.statusLight = new AddressableLEDStatusLight(new AddressableLED(0), new AddressableLEDBuffer(155));

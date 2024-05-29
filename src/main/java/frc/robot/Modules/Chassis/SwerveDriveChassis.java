@@ -1,7 +1,6 @@
 package frc.robot.Modules.Chassis;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import frc.robot.Drivers.IMUs.SimpleGyro;
 import frc.robot.Modules.PositionReader.RobotFieldPositionEstimator;
 import frc.robot.Utils.*;
 import frc.robot.Utils.MathUtils.AngleUtils;
@@ -12,7 +11,7 @@ import frc.robot.Utils.MechanismControllers.EnhancedPIDController;
 /**
  * the module that controls the chassis with its four swerves
  */
-public class SwerveDriveChassis extends HolonomicChassis {
+public class SwerveDriveChassis extends SwerveDriveChassisLogic {
     private final boolean useProfiledSpeedControl = true;
     private double robotMaximumSpeed;
     private double timeNeededToFullyAccelerate;
@@ -37,14 +36,12 @@ public class SwerveDriveChassis extends HolonomicChassis {
 
 
     /** the four wheels of the robot */
-    private final SwerveWheel[] swerveWheels;
+    private final SwerveWheelLogic[] swerveWheels;
     public final RobotFieldPositionEstimator positionEstimator;
-    private final SimpleGyro gyro;
     private final RobotConfigReader robotConfig;
-    public SwerveDriveChassis(SwerveWheel[] swerveWheels, SimpleGyro gyro, RobotConfigReader robotConfig, RobotFieldPositionEstimator positionEstimator) {
+    public SwerveDriveChassis(SwerveWheelLogic[] swerveWheels, RobotConfigReader robotConfig, RobotFieldPositionEstimator positionEstimator) {
         this.swerveWheels = swerveWheels;
         this.positionEstimator = positionEstimator;
-        this.gyro = gyro;
         this.robotConfig = robotConfig;
     }
 
@@ -63,7 +60,7 @@ public class SwerveDriveChassis extends HolonomicChassis {
         double rotationalSpeed = processRotationalMotion(dt);
 
 
-        SmartDashboard.putNumber("imu yaw:", Math.toDegrees(gyro.getYaw()));
+        SmartDashboard.putNumber("imu yaw:", Math.toDegrees(positionEstimator.getRobotRotation()));
 
         final double wheelsPowerConstrain = lowSpeedModeEnabled ? this.wheelsPowerConstrainAtLowSpeedMode : this.wheelsPowerConstrain;
         double highestWheelSpeed = driveWheels(processedTranslationalSpeed, rotationalSpeed);
@@ -102,7 +99,7 @@ public class SwerveDriveChassis extends HolonomicChassis {
      * */
     private double driveWheels(Vector2D translationalSpeed, double rotationalSpeed) {
         double highestWheelSpeed = 0;
-        for (SwerveWheel wheel : swerveWheels)
+        for (SwerveWheelLogic wheel : swerveWheels)
             highestWheelSpeed = Math.max(highestWheelSpeed,
                     wheel.drive(translationalSpeed, rotationalSpeed, this));
         return highestWheelSpeed;
@@ -158,18 +155,14 @@ public class SwerveDriveChassis extends HolonomicChassis {
     public void onReset() {
         System.out.println("<-- chassis reset coming through --> ");
         /* reset and recover ownerships to the wheels */
-        for (SwerveWheel swerveWheel: swerveWheels) {
+        for (SwerveWheelLogic swerveWheel: swerveWheels) {
             swerveWheel.reset();
             swerveWheel.gainOwnerShip(this);
         }
-        /* reset the imu module */
-        gyro.reset();
         /* reset the position calculator */
         positionEstimator.reset();
         this.translationalTask = new ChassisTaskTranslation(ChassisTaskTranslation.TaskType.SET_VELOCITY, new Vector2D());
         this.rotationalTask = new ChassisTaskRotation(ChassisTaskRotation.TaskType.SET_VELOCITY, 0);
-
-        this.translationalTask = new ChassisTaskTranslation(ChassisTaskTranslation.TaskType.SET_VELOCITY,new Vector2D());
 
         this.decidedVelocity = new Vector2D();
         this.lowSpeedModeEnabled = false;
@@ -222,7 +215,7 @@ public class SwerveDriveChassis extends HolonomicChassis {
     private Vector2D processOrientation(Vector2D desiredVelocity) {
         return desiredVelocity
                 .multiplyBy(
-                        new Rotation2D(gyro.getYaw()).getReversal()
+                        new Rotation2D(positionEstimator.getRobotRotation()).getReversal()
                 );
     }
 
@@ -262,7 +255,7 @@ public class SwerveDriveChassis extends HolonomicChassis {
                 EnhancedPIDController.Task.TaskType.GO_TO_POSITION,
                 desiredRotation
         ));
-        return goToRotationController.getMotorPower(AngleUtils.simplifyAngle(gyro.getYaw()), gyro.getYawVelocity(), dt);
+        return goToRotationController.getMotorPower(AngleUtils.simplifyAngle(positionEstimator.getRobotRotation()), positionEstimator.getRobotRotationalVelocity(), dt);
     }
 
     @Override
@@ -309,13 +302,13 @@ public class SwerveDriveChassis extends HolonomicChassis {
     public void setChassisLocked(boolean locked, RobotModuleOperatorMarker operator) {
         if (!this.isOwner(operator))
             return;
-        for (SwerveWheel swerveWheel:swerveWheels)
+        for (SwerveWheelLogic swerveWheel:swerveWheels)
             swerveWheel.setWheelLocked(locked, this);
     }
 
     @Override
     public double getChassisHeading() {
-        return gyro.getYaw();
+        return positionEstimator.getRobotRotation();
     }
 
     @Override
@@ -353,6 +346,6 @@ public class SwerveDriveChassis extends HolonomicChassis {
 
     @Override
     public void resetChassisPositionAndRotation() {
-        positionEstimator.resetRobot();
+        positionEstimator.reset();
     }
 }
