@@ -78,36 +78,36 @@ public class CollisionDetectionGrid {
         // TODO: this is a very complicated program, write the explanations as fast as possible
         if (originalVelocity.getX() > 0) { // horizontal velocity is to the right
             if (isInObstacle(originalPosition.addBy(new Vector2D(new double[] {-cellSize, 0}))))
-                return originalPosition.getY() > 0 ?
+                return originalVelocity.getY() > 0 ?
                         applyUpwardsCollisionLimit(originalPosition, originalVelocity)
                         :applyDownwardsCollisionLimit(originalPosition, originalVelocity);
 
-            if (originalPosition.getY() > 0) // particle moving up-right
+            if (originalVelocity.getY() > 0) // particle moving up-right
                 return linearInterpret(originalPosition, originalVelocity, getGridLowerLeftCornerPosition(getGridPos(originalPosition)).getX())
                                 > getGridLowerLeftCornerPosition(getGridPos(originalPosition)).getY() ?
                         applyRightwardsCollisionLimit(originalPosition, originalVelocity)
                         :applyUpwardsCollisionLimit(originalPosition, originalVelocity);
-            if (originalPosition.getY() < 0) // particle moving down-right
+            if (originalVelocity.getY() < 0) // particle moving down-right
                 return linearInterpret(originalPosition, originalVelocity, getGridLowerLeftCornerPosition(getGridPos(originalPosition)).getX())
-                        > getGridLowerLeftCornerPosition(getGridPos(originalPosition)).getY() + cellSize ?
+                        < getGridLowerLeftCornerPosition(getGridPos(originalPosition)).getY() + cellSize ?
                         applyRightwardsCollisionLimit(originalPosition, originalVelocity)
                         :applyDownwardsCollisionLimit(originalPosition, originalVelocity);
             return applyRightwardsCollisionLimit(originalPosition, originalVelocity); // particle moving right
         }
         if (originalVelocity.getX() < 0) { // horizontal velocity is to the left
             if (isInObstacle(originalPosition.addBy(new Vector2D(new double[] {cellSize, 0}))))
-                return originalPosition.getY() > 0 ?
+                return originalVelocity.getY() > 0 ?
                         applyUpwardsCollisionLimit(originalPosition, originalVelocity)
                         :applyDownwardsCollisionLimit(originalPosition, originalVelocity);
 
-            if (originalPosition.getY() > 0) // particle moving up-left
+            if (originalVelocity.getY() > 0) // particle moving up-left
                 return linearInterpret(originalPosition, originalVelocity, getGridLowerLeftCornerPosition(getGridPos(originalPosition)).getX() + cellSize)
                         > getGridLowerLeftCornerPosition(getGridPos(originalPosition)).getY() ?
                         applyLeftwardsCollisionLimit(originalPosition, originalVelocity)
                         : applyUpwardsCollisionLimit(originalPosition, originalVelocity);
-            if (originalPosition.getY() < 0) // particle moving down-left
+            if (originalVelocity.getY() < 0) // particle moving down-left
                 return linearInterpret(originalPosition, originalVelocity, getGridLowerLeftCornerPosition(getGridPos(originalPosition)).getX() + cellSize)
-                        > getGridLowerLeftCornerPosition(getGridPos(originalPosition)).getY() + cellSize ?
+                        < getGridLowerLeftCornerPosition(getGridPos(originalPosition)).getY() + cellSize ?
                         applyLeftwardsCollisionLimit(originalPosition, originalVelocity)
                         : applyDownwardsCollisionLimit(originalPosition, originalVelocity);
             return applyLeftwardsCollisionLimit(originalPosition, originalVelocity); // particle moving left
