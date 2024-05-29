@@ -2,6 +2,7 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -12,6 +13,9 @@ import frc.robot.Utils.CommandSequenceGenerator;
 import frc.robot.Utils.SequentialCommandSegment;
 import frc.robot.Utils.Tests.*;
 import org.littletonrobotics.junction.LoggedRobot;
+import org.littletonrobotics.junction.Logger;
+import org.littletonrobotics.junction.networktables.NT4Publisher;
+import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,16 +38,19 @@ public class RobotShell extends LoggedRobot {
     /** called once when the robot powers on */
     @Override
     public void robotInit() {
-        // System.out.println("<-- Robot Shell | robot init -->");
+        System.out.println("<-- Robot Shell | robot init -->");
         robotCore = new RobotCore("fasterChassis", isSimulation());
+
         DataLogManager.start();
         DriverStation.startDataLog(DataLogManager.getLog());
+        Logger.addDataReceiver(new WPILOGWriter()); // Log to a USB stick ("/U/logs")
+        Logger.addDataReceiver(new NT4Publisher()); // Publish data to NetworkTables
     }
 
     /** called once when the driver station first connects to the robot */
     @Override
     public void driverStationConnected() {
-        // System.out.println("<-- Robot Shell | driver station connected -->");
+        System.out.println("<-- Robot Shell | driver station connected -->");
         robotCore.initializeRobot();
 
         autoProgramRunner = new AutoProgramRunner(robotCore.chassis, robotCore.robotConfig);
@@ -70,13 +77,13 @@ public class RobotShell extends LoggedRobot {
     /** called once when auto is selected and enable button is hit */
     @Override
     public void autonomousInit() {
-        // System.out.println("<-- Robot Shell | autonomous init -->");
+        System.out.println("<-- Robot Shell | autonomous init -->");
         startAutoStage(autoStageChooser.getSelected());
     }
 
     @Override
     public void autonomousPeriodic() {
-        // System.out.println("<-- Robot Shell | auto periodic -->");
+        System.out.println("<-- Robot Shell | auto periodic -->");
         robotCore.updateRobot();
 
 //        if (autoProgramRunner.isAutoStageComplete())
@@ -85,7 +92,7 @@ public class RobotShell extends LoggedRobot {
 
     @Override
     public void teleopInit() {
-        // System.out.println("<-- Robot Shell | teleop init -->");
+        System.out.println("<-- Robot Shell | teleop init -->");
         startManualStage();
     }
 

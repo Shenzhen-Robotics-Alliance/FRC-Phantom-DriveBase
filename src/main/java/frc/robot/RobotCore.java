@@ -8,8 +8,7 @@ import com.ctre.phoenix6.hardware.CANcoder;
 
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
-import edu.wpi.first.wpilibj.DataLogManager;
-import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Drivers.Encoders.CanCoder;
 import frc.robot.Drivers.IMUs.PigeonsIMU;
@@ -28,7 +27,6 @@ import frc.robot.Modules.Chassis.SwerveWheel;
 import frc.robot.Services.RobotServiceBase;
 import frc.robot.Utils.MathUtils.Vector2D;
 import frc.robot.Utils.RobotConfigReader;
-import org.littletonrobotics.junction.Logger;
 
 /**
  *
@@ -48,6 +46,7 @@ public class RobotCore {
         private final List<RobotModuleBase> modules;
         private List<RobotServiceBase> services;
         protected boolean wasEnabled;
+        private final PowerDistribution powerDistribution = new PowerDistribution(1, PowerDistribution.ModuleType.kCTRE);
 
         /**
          * creates a robot core
@@ -73,8 +72,11 @@ public class RobotCore {
                 System.out.println("<-- Robot Core | creating robot in simulation... -->");
 
                 this.positionEstimator = new SimulationPositionsEstimator();
+                modules.add(positionEstimator);
                 this.statusLight = new SimulatedLEDStatusLight();
+                modules.add(statusLight);
                 this.chassis = new SwerveDriveChassisSimulation();
+                modules.add(chassis);
         }
 
         private void createRobotReal() {

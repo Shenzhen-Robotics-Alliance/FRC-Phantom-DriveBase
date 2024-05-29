@@ -9,7 +9,6 @@ import edu.wpi.first.networktables.StructArrayPublisher;
 import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.util.datalog.DoubleLogEntry;
-import edu.wpi.first.util.datalog.StructLogEntry;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import frc.robot.Utils.MathUtils.Rotation2D;
@@ -46,7 +45,10 @@ public class EasyDataFlow {
         }
 
         public void setPosition(Vector2D position, Rotation2D rotation) {
-            Pose2d pose2d = new Pose2d(position.getX(), position.getY(), Rotation2d.fromRadians(rotation.getRadian()));
+            Pose2d pose2d;
+            if (position == null) pose2d = null;
+            else
+                pose2d = new Pose2d(position.getX(), position.getY(), Rotation2d.fromRadians(rotation == null ? 0 : rotation.getRadian()));
             if (publisher != null) this.publisher.set(pose2d);
             Logger.recordOutput(name, Pose2d.struct, pose2d);
         }

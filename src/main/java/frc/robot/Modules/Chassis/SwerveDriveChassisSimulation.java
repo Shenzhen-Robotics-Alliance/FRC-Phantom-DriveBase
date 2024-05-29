@@ -6,8 +6,6 @@ import frc.robot.Utils.MathUtils.Vector2D;
 import frc.robot.Utils.RobotModuleOperatorMarker;
 
 public class SwerveDriveChassisSimulation extends HolonomicChassis {
-    private Vector2D desiredChassisPosition = new Vector2D();
-    private Rotation2D desiredChassisHeading = new Rotation2D(0);
     @Override
     public double getChassisHeading() {
         return 0;
@@ -25,12 +23,12 @@ public class SwerveDriveChassisSimulation extends HolonomicChassis {
 
     @Override
     public void setTranslationalTask(ChassisTaskTranslation translationalTask, RobotModuleOperatorMarker operator) {
-
+        super.setTranslationalTask(translationalTask, operator);
     }
 
     @Override
     public void setRotationalTask(ChassisTaskRotation rotationalTask, RobotModuleOperatorMarker operator) {
-
+        super.setRotationalTask(rotationalTask, operator);
     }
 
     @Override
@@ -70,7 +68,7 @@ public class SwerveDriveChassisSimulation extends HolonomicChassis {
 
     @Override
     protected void periodic(double dt) {
-
+        super.periodic(dt);
     }
 
     @Override

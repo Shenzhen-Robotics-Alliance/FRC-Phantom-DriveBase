@@ -6,6 +6,7 @@ import frc.robot.Modules.Chassis.SwerveDriveChassis;
 import frc.robot.Utils.EasyDataFlow;
 import frc.robot.Utils.MathUtils.BezierCurveSchedule;
 import frc.robot.Utils.MathUtils.BezierCurveScheduleGenerator;
+import frc.robot.Utils.MathUtils.Rotation2D;
 import frc.robot.Utils.MathUtils.Vector2D;
 import frc.robot.Utils.RobotConfigReader;
 import frc.robot.Utils.SequentialCommandSegment;
@@ -48,6 +49,7 @@ public class AutoProgramRunner extends RobotServiceBase {
         inAdvanceTime = robotConfig.getConfig("auto", "inAdvanceTime");
     }
 
+    private Rotation2D previousRotationTask = new Rotation2D(0);
     @Override
     public void periodic() {
         if (currentSegmentID == -1) {
@@ -57,7 +59,6 @@ public class AutoProgramRunner extends RobotServiceBase {
         }
         updateConfigs();
         chassis.setOrientationMode(SwerveDriveChassis.OrientationMode.FIELD, this);
-
 
         if (currentPathSchedule != null) {
             final double translationalT = currentPathSchedule.nextCheckPoint(dt.get() * currentCommandSegment.timeScale);
@@ -87,6 +88,11 @@ public class AutoProgramRunner extends RobotServiceBase {
                     this);
             EasyDataFlow.putNumber("auto", "rotation T", rotationT);
             EasyDataFlow.putNumber("auto", "rotation (deg)", Math.toDegrees(currentCommandSegment.getCurrentRotationWithLERP(rotationTSyncedToTranslationT)));
+            previousRotationTask = new Rotation2D(currentCommandSegment.getCurrentRotationWithLERP(rotationTSyncedToTranslationT));
+        }
+
+        if (currentPathSchedule != null) {
+            EasyDataFlow.putPosition("/auto/currentAutoStagePosition", currentPathSchedule.getPositionWithLERP(), previousRotationTask);
         }
 
 
@@ -145,8 +151,12 @@ public class AutoProgramRunner extends RobotServiceBase {
     }
 
     public boolean isAutoStageComplete() {
-        return this.commandSegments.size() - this.currentSegmentID == 1
-                && this.isCurrentSegmentComplete();
+        if (this.commandSegments.size() - this.currentSegmentID == 1
+                && this.isCurrentSegmentComplete()) {
+            EasyDataFlow.putPosition("/auto/currentAutoStagePosition", null, null); // remove the dashboard data
+            return true;
+        }
+        return false;
     }
 
     public boolean isCurrentSegmentComplete() {

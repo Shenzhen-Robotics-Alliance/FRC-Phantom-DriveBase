@@ -55,6 +55,8 @@ public class SwerveDriveChassis extends HolonomicChassis {
 
     @Override
     protected void periodic(double dt) {
+        super.periodic(dt);
+
         EasyDataFlow.putNumber("chassis", "chassis task (x)", translationalTask.translationValue.getX());
         EasyDataFlow.putNumber("chassis", "chassis task (y)", translationalTask.translationValue.getY());
         Vector2D processedTranslationalSpeed = processTranslationalMotion(dt);
@@ -276,6 +278,7 @@ public class SwerveDriveChassis extends HolonomicChassis {
      * */
     @Override
     public void setTranslationalTask(ChassisTaskTranslation translationalTask, RobotModuleOperatorMarker operator) {
+        super.setTranslationalTask(translationalTask, operator);
         if (!this.isOwner(operator))
                 return;
 
@@ -296,6 +299,7 @@ public class SwerveDriveChassis extends HolonomicChassis {
      */
     @Override
     public void setRotationalTask(ChassisTaskRotation rotationalTask, RobotModuleOperatorMarker operator) {
+        super.setRotationalTask(rotationalTask, operator);
         if (!this.isOwner(operator))
             return;
         this.rotationalTask = rotationalTask;
