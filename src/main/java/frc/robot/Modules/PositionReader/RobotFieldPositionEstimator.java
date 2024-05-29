@@ -2,6 +2,7 @@ package frc.robot.Modules.PositionReader;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import frc.robot.Modules.RobotModuleBase;
+import frc.robot.Utils.EasyDataFlow;
 import frc.robot.Utils.MathUtils.Rotation2D;
 import frc.robot.Utils.MathUtils.Vector2D;
 
@@ -68,6 +69,11 @@ public abstract class RobotFieldPositionEstimator extends RobotModuleBase {
     }
 
     public abstract void reset();
+
+    @Override
+    protected void periodic(double dt) {
+        EasyDataFlow.putRobot(getRobotPosition2D(), getRobotRotation2D());
+    }
 
     public static Rotation2D toActualRobotRotation(Rotation2D robotRotationAtBlueAlliance) {
         return switch (DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue)) {

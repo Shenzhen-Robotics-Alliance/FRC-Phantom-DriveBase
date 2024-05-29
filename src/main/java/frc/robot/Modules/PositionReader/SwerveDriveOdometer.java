@@ -39,6 +39,7 @@ public class SwerveDriveOdometer extends RobotFieldPositionEstimator {
 
     @Override
     protected void periodic(double dt) {
+        super.periodic(dt);
         for (int wheelID = 0; wheelID < swerveWheels.length; wheelID++) {
             Vector2D wheelVelocity = swerveWheels[wheelID].getModuleVelocity2D(); // gain the velocity of each module, in vector
             wheelVelocity = wheelVelocity.multiplyBy(new Rotation2D(gyro.getYaw())); // apply rotation according to the imu
@@ -56,8 +57,6 @@ public class SwerveDriveOdometer extends RobotFieldPositionEstimator {
 
         EasyDataFlow.putNumber("chassis", "old position estimator (x)", getRobotPosition2D().getX());
         EasyDataFlow.putNumber("chassis", "old position estimator (y)", getRobotPosition2D().getY());
-
-        EasyDataFlow.putRobot(getRobotPosition2D(), getRobotRotation2D());
     }
 
     @Override

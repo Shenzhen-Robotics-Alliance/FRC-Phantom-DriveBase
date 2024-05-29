@@ -52,8 +52,11 @@ public abstract class RobotModuleBase extends RobotModuleOperatorMarker {
 
     public abstract void init();
 
-    /** called during every loop */
-    protected abstract void periodic(double dt);
+    /**
+     * called during every loop
+     */
+    protected void periodic(double dt) {
+    }
 
     public void periodic() {
         // System.out.println("<-- base periodic of " + moduleName + ", enabled: " + enabled + "-->");

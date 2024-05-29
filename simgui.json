@@ -3,6 +3,7 @@
     "types": {
       "/FMSInfo": "FMSInfo",
       "/SmartDashboard/Select Auto": "String Chooser",
+      "/SmartDashboard/field": "Field2d",
       "/SmartDashboard/orientation mode": "String Chooser",
       "/SmartDashboard/pilot controller type": "String Chooser"
     }
