@@ -46,7 +46,7 @@ public class RobotCore {
         private final List<RobotModuleBase> modules;
         private List<RobotServiceBase> services;
         protected boolean wasEnabled;
-        private final PowerDistribution powerDistribution = new PowerDistribution(1, PowerDistribution.ModuleType.kCTRE);
+        public final PowerDistribution powerDistributionPanel = new PowerDistribution(1, PowerDistribution.ModuleType.kCTRE);
 
         /**
          * creates a robot core

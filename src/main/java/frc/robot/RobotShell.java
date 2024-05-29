@@ -2,14 +2,15 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.AutoStagePrograms.DoNothingAuto;
 import frc.robot.AutoStagePrograms.LeaveCommunity;
 import frc.robot.Services.*;
 import frc.robot.Utils.CommandSequenceGenerator;
+import frc.robot.Utils.EasyDataFlow;
 import frc.robot.Utils.SequentialCommandSegment;
 import frc.robot.Utils.Tests.*;
 import org.littletonrobotics.junction.LoggedRobot;
@@ -72,6 +73,12 @@ public class RobotShell extends LoggedRobot {
     @Override
     public void robotPeriodic() {
         // System.out.println("<-- Robot Shell | robot periodic -->");
+        EasyDataFlow.putNumber("other", "Match Time (s)", DriverStation.getMatchTime());
+        EasyDataFlow.putNumber("other", "Voltage (V)", robotCore.powerDistributionPanel.getVoltage());
+        EasyDataFlow.putNumber("other", "Current (A)", robotCore.powerDistributionPanel.getTotalCurrent());
+
+        SmartDashboard.putData("field", new Field2d());
+        SmartDashboard.putData("PDP", robotCore.powerDistributionPanel);
     }
 
     /** called once when auto is selected and enable button is hit */
