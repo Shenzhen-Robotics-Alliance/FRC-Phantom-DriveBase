@@ -39,6 +39,12 @@
         <wheelDiameter type="double">0.1016</wheelDiameter>
         <wheelGearRatio type="double">6.12</wheelGearRatio>
         <encoderValuePerMotorRevolution type="double">2048</encoderValuePerMotorRevolution>
+        <robotMaximumSpeed type="double">4.8</robotMaximumSpeed>
+        <motorMaximumLinearAcceleration type="double">8</motorMaximumLinearAcceleration>
+        <robotSpeedConstrainAtSharpTurn type="double">3.2</robotSpeedConstrainAtSharpTurn>
+        <robotMaximumAcceleration type="double">12</robotMaximumAcceleration>
+        <simulationFriction type="double">16</simulationFriction>
+        <robotMaxAngularVelocity>300</robotMaxAngularVelocity>
 
         <!-- PID coefficients for steer wheels -->
         <steerWheelErrorTolerance type = "double">1</steerWheelErrorTolerance> <!-- the amount of error to ignore, in degrees -->
@@ -58,7 +64,6 @@
         <!-- profiled translational velocity controller -->
         <translationalTaskUpdatableRange type="double">0.1</translationalTaskUpdatableRange>
         <ignoredAccelerateTime type="double">0.08</ignoredAccelerateTime>
-        <robotMaximumSpeed type="double">4.5</robotMaximumSpeed>
         <timeNeededToFullyAccelerate type="double">0.5</timeNeededToFullyAccelerate>
         <robotSpeedActivateSpeedControl type="double">1.01</robotSpeedActivateSpeedControl>
 
@@ -87,7 +92,7 @@
         <!-- the configuration of steer wheels -->
         <maxUnusedTime type="double">1</maxUnusedTime> <!-- the amount of time that the steer wheel will wait when not used until they go back to default position -->
         <defaultPosition type="double">90</defaultPosition> <!--to straight forward-->
-        <minUsageSpeed type="double">0.025</minUsageSpeed>
+        <minUsageSpeed type="double">0.05</minUsageSpeed>
     </chassis>
 
     <!-- robot module configs goes here -->

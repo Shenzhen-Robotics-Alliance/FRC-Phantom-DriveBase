@@ -15,15 +15,12 @@ import frc.robot.Drivers.IMUs.PigeonsIMU;
 import frc.robot.Drivers.IMUs.SimpleGyro;
 import frc.robot.Drivers.Motors.TalonFXMotor;
 import frc.robot.Drivers.Visions.PhantomClient;
-import frc.robot.Modules.Chassis.SwerveDriveChassisLogic;
-import frc.robot.Modules.Chassis.SwerveDriveChassisSimulation;
+import frc.robot.Modules.Chassis.*;
 import frc.robot.Modules.LEDStatusLights.AddressableLEDStatusLight;
 import frc.robot.Modules.LEDStatusLights.LEDStatusLight;
 import frc.robot.Modules.LEDStatusLights.SimulatedLEDStatusLight;
 import frc.robot.Modules.PositionReader.*;
 import frc.robot.Modules.RobotModuleBase;
-import frc.robot.Modules.Chassis.SwerveDriveChassis;
-import frc.robot.Modules.Chassis.SwerveWheel;
 import frc.robot.Services.RobotServiceBase;
 import frc.robot.Utils.MathUtils.Vector2D;
 import frc.robot.Utils.RobotConfigReader;
@@ -75,7 +72,17 @@ public class RobotCore {
                 modules.add(positionEstimator);
                 this.statusLight = new SimulatedLEDStatusLight();
                 modules.add(statusLight);
-                this.chassis = new SwerveDriveChassisSimulation();
+
+                final SwerveWheelSimulation
+                        frontLeftWheel = new SwerveWheelSimulation(1, robotConfig, new Vector2D(new double[] { -0.6, 0.6 })),
+                        backLeftWheel = new SwerveWheelSimulation(1, robotConfig, new Vector2D(new double[] { -0.6, -0.6 })),
+                        frontRightWheel = new SwerveWheelSimulation(1, robotConfig, new Vector2D(new double[] { 0.6, 0.6 })),
+                        backRightWheel = new SwerveWheelSimulation(1, robotConfig, new Vector2D(new double[] { 0.6, -0.6 }));
+                modules.add(frontLeftWheel);
+                modules.add(backLeftWheel);
+                modules.add(frontRightWheel);
+                modules.add(backRightWheel);
+                this.chassis = new SwerveDriveChassisSimulation(frontLeftWheel, frontRightWheel, backLeftWheel, backRightWheel, positionEstimator, robotConfig);
                 modules.add(chassis);
         }
 
@@ -94,12 +101,10 @@ public class RobotCore {
 
                 this.gyro = new SimpleGyro(0, false, new PigeonsIMU((int) robotConfig.getConfig("hardware/gyroPort")));
 
-                final SwerveWheel[] swerveWheels = new SwerveWheel[] {frontLeftWheel, frontRightWheel, backLeftWheel, backRightWheel};
-
-                this.positionEstimator = new VisionSupportedOdometer(swerveWheels, gyro, new PhantomClient()); // TODO create phantom client
+                this.positionEstimator = new VisionSupportedOdometer(new SwerveWheel[] {frontLeftWheel, frontRightWheel, backLeftWheel, backRightWheel}, gyro, new PhantomClient()); // TODO create phantom client
                 modules.add(positionEstimator);
 
-                this.chassis = new SwerveDriveChassis(swerveWheels, robotConfig, positionEstimator);
+                this.chassis = new SwerveDriveChassis(frontLeftWheel, frontRightWheel, backLeftWheel, backRightWheel, positionEstimator, robotConfig);
                 modules.add(chassis);
 
                 this.statusLight = new AddressableLEDStatusLight(new AddressableLED(0), new AddressableLEDBuffer(155));

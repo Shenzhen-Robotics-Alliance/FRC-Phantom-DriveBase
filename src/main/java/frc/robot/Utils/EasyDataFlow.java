@@ -105,11 +105,10 @@ public class EasyDataFlow {
     }
 
     private static Pose2d getPose(Vector2D position, Rotation2D rotation) {
-        return new Pose2d(position.getX(), position.getY(), Rotation2d.fromRadians(rotation == null ? 0 : rotation.getRadian()));
+        return new Pose2d(position.getX(), position.getY(), Rotation2d.fromRadians(rotation == null ? 0 : rotation.getRadian() + Math.toRadians(90)));
     }
 
     private static final class EasySwerveStatesPositionPublisher {
-        private SwerveModuleState[] swerveStates = new SwerveModuleState[4];
         private final String name;
         private StructArrayPublisher<SwerveModuleState> swerveStatesPublisher = null;
         private DoublePublisher robotFacingPublisher = null;
@@ -124,7 +123,6 @@ public class EasyDataFlow {
         }
 
         public void setSwerveStates(SwerveModuleState[] swerveStates, Rotation2D robotFacing) {
-            this.swerveStates = swerveStates;
             swerveStatesPublisher.set(swerveStates);
             robotFacingPublisher.set(robotFacing.getRadian());
             Logger.recordOutput(name + "/swerveStates", swerveStates);

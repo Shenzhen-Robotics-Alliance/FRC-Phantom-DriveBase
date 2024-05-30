@@ -67,7 +67,7 @@ public class SwerveWheel extends SwerveWheelLogic {
          * update the desired heading of the steer wheel, given control module's
          * instructions
          */
-        final double decidedTargetedHeading = decideSwerveFacingDirection(), actualSwervePosition;
+        final double decidedTargetedHeading = decideModuleDrivingDirection(), actualSwervePosition;
         /* whenever the reversed way is closer to get to, reverse the motor */
         if (reverseWheel =
                 Math.abs(AngleUtils.getActualDifference(steerEncoderCurrentReading, decidedTargetedHeading)) > Math
@@ -93,13 +93,13 @@ public class SwerveWheel extends SwerveWheelLogic {
         steerMotor.setPower(correctionMotorSpeed * steerPowerRate, this);
 
         /* update the motor power of the driving motor */
-        drivePower = targetedSpeed; // TODO: here, write a speed controller
+        actualDriveMotorPower = targetedSpeed; // TODO: here, write a speed controller
 
         // if (reverseWheel) drivePower *= -1;
-        drivePower *= Math.cos(AngleUtils.getActualDifference(steerEncoderCurrentReading, commandedHeading)); // use cos instead, so that it runs slower when not reached target
-        if (locked) drivePower = 0;
+        actualDriveMotorPower *= Math.cos(AngleUtils.getActualDifference(steerEncoderCurrentReading, commandedHeading)); // use cos instead, so that it runs slower when not reached target
+        if (locked) actualDriveMotorPower = 0;
 
-        drivingMotor.setPower(drivePower, this);
+        drivingMotor.setPower(actualDriveMotorPower, this);
     }
 
     /**

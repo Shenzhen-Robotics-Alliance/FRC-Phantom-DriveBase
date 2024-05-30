@@ -5,7 +5,8 @@
       "/SmartDashboard/Select Auto": "String Chooser",
       "/SmartDashboard/field": "Field2d",
       "/SmartDashboard/orientation mode": "String Chooser",
-      "/SmartDashboard/pilot controller type": "String Chooser"
+      "/SmartDashboard/pilot controller type": "String Chooser",
+      "/SmartDashboard/select wheel to calibrate": "String Chooser"
     }
   },
   "NetworkTables": {

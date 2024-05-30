@@ -10,6 +10,12 @@ public class SwerveWheelSimulation extends SwerveWheelLogic {
     }
 
     @Override
+    protected void periodic(double dt) {
+        super.actualDriveMotorPower = targetedSpeed;
+        super.periodic(dt);
+    }
+
+    @Override
     public double getWheelDrivingEncoderValue(ChassisUnit unit) {
         return 0;
     }

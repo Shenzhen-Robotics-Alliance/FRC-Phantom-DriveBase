@@ -1,8 +1,15 @@
 package frc.robot.Modules.Chassis;
 
+import frc.robot.Modules.PositionReader.RobotFieldPositionEstimator;
+import frc.robot.Utils.RobotConfigReader;
 import frc.robot.Utils.RobotModuleOperatorMarker;
 
 public class SwerveDriveChassisSimulation extends SwerveDriveChassisLogic {
+    public SwerveDriveChassisSimulation(SwerveWheelLogic frontLeft, SwerveWheelLogic frontRight, SwerveWheelLogic backLeft, SwerveWheelLogic backRight, RobotFieldPositionEstimator positionEstimator, RobotConfigReader robotConfig) {
+
+        super(frontLeft, frontRight, backLeft, backRight, positionEstimator, robotConfig);
+    }
+
     @Override
     public double getChassisHeading() {
         return 0;
@@ -65,6 +72,9 @@ public class SwerveDriveChassisSimulation extends SwerveDriveChassisLogic {
 
     @Override
     protected void periodic(double dt) {
+        // TODO: this only works for manual operation, not go-to-position controls
+        driveWheelsSafeLogic(translationalTask.translationValue, rotationalTask.rotationalValue);
+
         super.periodic(dt);
     }
 

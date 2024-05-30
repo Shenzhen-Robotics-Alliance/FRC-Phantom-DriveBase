@@ -20,7 +20,7 @@ public abstract class SwerveWheelLogic extends RobotModuleBase {
     /** the set motor speed to drive */
     protected double targetedSpeed;
     /** the actual, applied drive power */
-    protected double drivePower;
+    protected double actualDriveMotorPower;
     /** the amount of time since last operation */
     private Timer lastOperationTimer = new Timer();
     /** whether to go to default position, or stick the pilot's order */
@@ -53,7 +53,7 @@ public abstract class SwerveWheelLogic extends RobotModuleBase {
 
     }
 
-    public double decideSwerveFacingDirection() {
+    public double decideModuleDrivingDirection() {
         /** whether the robot is asked to move */
         boolean robotRequiredToMove = Math.abs(targetedSpeed) > lowestUsageSpeed;
         /* if there is an action */
@@ -71,8 +71,8 @@ public abstract class SwerveWheelLogic extends RobotModuleBase {
         return commandedHeading;
     }
 
-    public double getDecidedDrivePower() {
-        return drivePower;
+    public double getModuleDecidedDrivingPower() {
+        return actualDriveMotorPower;
     }
 
     /* <-- configurations --> */
@@ -106,7 +106,7 @@ public abstract class SwerveWheelLogic extends RobotModuleBase {
     public void onReset() {
         this.commandedHeading = defaultPosition;
         lastOperationTimer.start();
-        this.commandedHeading = this.targetedSpeed = this.drivePower = 0;
+        this.commandedHeading = this.targetedSpeed = this.actualDriveMotorPower = 0;
     }
 
     /**

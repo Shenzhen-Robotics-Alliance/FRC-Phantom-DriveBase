@@ -1,10 +1,8 @@
 package frc.robot.Modules.Chassis;
 
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Modules.PositionReader.RobotFieldPositionEstimator;
 import frc.robot.Utils.*;
 import frc.robot.Utils.MathUtils.AngleUtils;
-import frc.robot.Utils.MathUtils.Rotation2D;
 import frc.robot.Utils.MathUtils.Vector2D;
 import frc.robot.Utils.MechanismControllers.EnhancedPIDController;
 
@@ -13,36 +11,19 @@ import frc.robot.Utils.MechanismControllers.EnhancedPIDController;
  */
 public class SwerveDriveChassis extends SwerveDriveChassisLogic {
     private final boolean useProfiledSpeedControl = true;
-    private double robotMaximumSpeed;
-    private double timeNeededToFullyAccelerate;
+    private double speedControlAccelerateTime;
     private double robotSpeedActivateSpeedControl;
-    private double wheelsPowerConstrain;
-    private double rotationalSpeedMaxSacrifice;
     /** the pid controller that controls the rotation of the robot when needed */
     private EnhancedPIDController goToRotationController;
     private ChassisPositionController chassisPIDController;
 
-    private double positionDifferenceAsTaskFinished, rotationDifferenceAsTaskFinished, wheelsPowerConstrainAtLowSpeedMode;
-    private boolean lowSpeedModeEnabled;
+    private double positionDifferenceAsTaskFinished, rotationDifferenceAsTaskFinished;
 
 
 
-    /** the current translational task */
-    private ChassisTaskTranslation translationalTask;
-    /** the current rotational task  */
-    private ChassisTaskRotation rotationalTask;
+    public SwerveDriveChassis(SwerveWheelLogic frontLeft, SwerveWheelLogic frontRight, SwerveWheelLogic backLeft, SwerveWheelLogic backRight, RobotFieldPositionEstimator positionEstimator, RobotConfigReader robotConfig) {
 
-    private OrientationMode orientationMode;
-
-
-    /** the four wheels of the robot */
-    private final SwerveWheelLogic[] swerveWheels;
-    public final RobotFieldPositionEstimator positionEstimator;
-    private final RobotConfigReader robotConfig;
-    public SwerveDriveChassis(SwerveWheelLogic[] swerveWheels, RobotConfigReader robotConfig, RobotFieldPositionEstimator positionEstimator) {
-        this.swerveWheels = swerveWheels;
-        this.positionEstimator = positionEstimator;
-        this.robotConfig = robotConfig;
+        super(frontLeft, frontRight, backLeft, backRight, positionEstimator, robotConfig);
     }
 
     @Override
@@ -52,67 +33,32 @@ public class SwerveDriveChassis extends SwerveDriveChassisLogic {
 
     @Override
     protected void periodic(double dt) {
-        super.periodic(dt);
+        EasyDataFlow.putSwerveState(
+                "actual swerve state",
+                frontLeft.getModuleVelocity2D(ChassisUnit.METER).getMagnitude(),
+                frontLeft.getWheelDrivingEncoderValue(),
+                frontRight.getModuleVelocity2D(ChassisUnit.METER).getMagnitude(),
+                frontRight.getWheelDrivingEncoderValue(),
+                backLeft.getModuleVelocity2D(ChassisUnit.METER).getMagnitude(),
+                backLeft.getWheelDrivingEncoderValue(),
+                backRight.getModuleVelocity2D(ChassisUnit.METER).getMagnitude(),
+                backRight.getWheelDrivingEncoderValue(),
+                positionEstimator.getRobotRotation2D()
+        );
 
-        EasyDataFlow.putNumber("chassis", "chassis task (x)", translationalTask.translationValue.getX());
-        EasyDataFlow.putNumber("chassis", "chassis task (y)", translationalTask.translationValue.getY());
         Vector2D processedTranslationalSpeed = processTranslationalMotion(dt);
         double rotationalSpeed = processRotationalMotion(dt);
 
+        driveWheelsSafeLogic(processedTranslationalSpeed, rotationalSpeed);
 
-        SmartDashboard.putNumber("imu yaw:", Math.toDegrees(positionEstimator.getRobotRotation()));
-
-        final double wheelsPowerConstrain = lowSpeedModeEnabled ? this.wheelsPowerConstrainAtLowSpeedMode : this.wheelsPowerConstrain;
-        double highestWheelSpeed = driveWheels(processedTranslationalSpeed, rotationalSpeed);
-        // System.out.println("highest wheel speed:" + highestWheelSpeed);
-        if (highestWheelSpeed <= wheelsPowerConstrain) return;
-        /* if a wheel is asked to run higher than max power, we need to slow everything down to avoid tearing the robot apart */
-
-        /* first we slow down the rotational part */
-        final double rotationMinScale = (1-rotationalSpeedMaxSacrifice);
-
-        // System.out.println("sacrificing rotational part by scale: " + Math.sqrt(rotationMinScale));
-        rotationalSpeed *= Math.sqrt(rotationMinScale);
-        highestWheelSpeed = driveWheels(processedTranslationalSpeed, rotationalSpeed);
-        if (highestWheelSpeed <= wheelsPowerConstrain) {
-            return;
-        }
-
-        /* then we slow it down to max rotationalSpeedMaxSacrifice */
-        EasyDataFlow.putNumber("chassis", "highest wheel speed:", highestWheelSpeed);
-        EasyDataFlow.putNumber("chassis", "sacrificing rotational part by scale: ", rotationMinScale);
-        rotationalSpeed *= Math.sqrt(rotationMinScale);
-        highestWheelSpeed = driveWheels(processedTranslationalSpeed, rotationalSpeed);
-        if (highestWheelSpeed <= wheelsPowerConstrain) return;
-
-        /* finally, we start scaling down the translational part */
-        EasyDataFlow.putNumber("chassis", "highest wheel speed:", highestWheelSpeed);
-        EasyDataFlow.putNumber("chassis", "scaling down translational speed by factor:", wheelsPowerConstrain/highestWheelSpeed);
-        processedTranslationalSpeed = processedTranslationalSpeed.multiplyBy(wheelsPowerConstrain/highestWheelSpeed);
-        rotationalSpeed *= wheelsPowerConstrain/highestWheelSpeed;
-        driveWheels(processedTranslationalSpeed, rotationalSpeed);
-    }
-
-    /**
-     * pass the robot motion params to each wheels
-     * @return the highest drive speed among the four wheels
-     * */
-    private double driveWheels(Vector2D translationalSpeed, double rotationalSpeed) {
-        double highestWheelSpeed = 0;
-        for (SwerveWheelLogic wheel : swerveWheels)
-            highestWheelSpeed = Math.max(highestWheelSpeed,
-                    wheel.drive(translationalSpeed, rotationalSpeed, this));
-        return highestWheelSpeed;
+        super.periodic(dt);
     }
 
     @Override
     public void updateConfigs() {
-        this.robotMaximumSpeed = robotConfig.getConfig("chassis/robotMaximumSpeed");
-        this.timeNeededToFullyAccelerate = robotConfig.getConfig("chassis/timeNeededToFullyAccelerate");
+        super.updateConfigs();
+        this.speedControlAccelerateTime = robotConfig.getConfig("chassis/timeNeededToFullyAccelerate");
         this.robotSpeedActivateSpeedControl = robotConfig.getConfig("chassis/robotSpeedActivateSpeedControl");
-        this.wheelsPowerConstrain = robotConfig.getConfig("chassis/wheelsPowerConstrain");
-        this.wheelsPowerConstrainAtLowSpeedMode = robotConfig.getConfig("chassis/wheelsPowerConstrainAtLowSpeedMode");
-        this.rotationalSpeedMaxSacrifice = robotConfig.getConfig("chassis/rotationalSpeedMaxSacrifice");
         this.ignoredAccelerateTime = robotConfig.getConfig("chassis/ignoredAccelerateTime");
 
         double robotRotationalErrorTolerance = Math.toRadians(robotConfig.getConfig("chassis/robotRotationalErrorTolerance"));
@@ -154,28 +100,14 @@ public class SwerveDriveChassis extends SwerveDriveChassisLogic {
     @Override
     public void onReset() {
         System.out.println("<-- chassis reset coming through --> ");
-        /* reset and recover ownerships to the wheels */
-        for (SwerveWheelLogic swerveWheel: swerveWheels) {
-            swerveWheel.reset();
-            swerveWheel.gainOwnerShip(this);
-        }
-        /* reset the position calculator */
-        positionEstimator.reset();
-        this.translationalTask = new ChassisTaskTranslation(ChassisTaskTranslation.TaskType.SET_VELOCITY, new Vector2D());
-        this.rotationalTask = new ChassisTaskRotation(ChassisTaskRotation.TaskType.SET_VELOCITY, 0);
+        super.onReset();
 
         this.decidedVelocity = new Vector2D();
-        this.lowSpeedModeEnabled = false;
     }
 
     private Vector2D processTranslationalMotion(double dt) {
         return switch (translationalTask.taskType) {
-            case SET_VELOCITY -> processTranslationalVelocityControl( // process the speed control after
-                    orientationMode == OrientationMode.FIELD ?
-                            processOrientation(
-                                    translationalTask.translationValue.multiplyBy(RobotFieldPositionEstimator.toActualRobotRotation(RobotFieldPositionEstimator.pilotFacingBlue))
-                            )
-                            : translationalTask.translationValue, dt
+            case SET_VELOCITY -> processTranslationalVelocityControl(getPilotDesiredVelocityToRobot(), dt
             );
             case GO_TO_POSITION -> processOrientation(
                     processTranslationalPositionControl(this.translationalTask.translationValue)
@@ -197,7 +129,7 @@ public class SwerveDriveChassis extends SwerveDriveChassisLogic {
                 < robotSpeedActivateSpeedControl) // if the desired or current velocity is smaller than the activation speed
             return desiredVelocity; // disable velocity control
 
-        final double maxAcceleration = 1.0 / timeNeededToFullyAccelerate;
+        final double maxAcceleration = 1.0 / speedControlAccelerateTime;
         Vector2D velocityDifference = desiredVelocity.addBy(
                 decidedVelocity.multiplyBy(-1)
         );
@@ -210,13 +142,6 @@ public class SwerveDriveChassis extends SwerveDriveChassisLogic {
         if (velocityDifference.getMagnitude() < maxAcceleration * ignoredAccelerateTime)
             return desiredVelocity;
         return decidedVelocity;
-    }
-
-    private Vector2D processOrientation(Vector2D desiredVelocity) {
-        return desiredVelocity
-                .multiplyBy(
-                        new Rotation2D(positionEstimator.getRobotRotation()).getReversal()
-                );
     }
 
     /**
@@ -256,54 +181,6 @@ public class SwerveDriveChassis extends SwerveDriveChassisLogic {
                 desiredRotation
         ));
         return goToRotationController.getMotorPower(AngleUtils.simplifyAngle(positionEstimator.getRobotRotation()), positionEstimator.getRobotRotationalVelocity(), dt);
-    }
-
-    @Override
-    public void setLowSpeedModeEnabled(boolean enabled, RobotModuleOperatorMarker operator) {
-        if (isOwner(operator))
-            this.lowSpeedModeEnabled = enabled;
-    }
-
-    /**
-     * set the translational task of the chassis
-     * @param translationalTask the desired task for rotation
-     * @param operator the module or service that is calling for the task
-     * */
-    @Override
-    public void setTranslationalTask(ChassisTaskTranslation translationalTask, RobotModuleOperatorMarker operator) {
-        super.setTranslationalTask(translationalTask, operator);
-        if (!this.isOwner(operator))
-                return;
-
-        this.translationalTask = translationalTask;
-    }
-
-    @Override
-    public void setOrientationMode(OrientationMode mode, RobotModuleOperatorMarker operator) {
-        if (!this.isOwner(operator))
-            return;
-        this.orientationMode = mode;
-    }
-
-    /**
-     * sets the rotational task of the chassis
-     * @param rotationalTask the desired task for rotation
-     * @param operator the module or service that is calling for the task
-     */
-    @Override
-    public void setRotationalTask(ChassisTaskRotation rotationalTask, RobotModuleOperatorMarker operator) {
-        super.setRotationalTask(rotationalTask, operator);
-        if (!this.isOwner(operator))
-            return;
-        this.rotationalTask = rotationalTask;
-    }
-
-    @Override
-    public void setChassisLocked(boolean locked, RobotModuleOperatorMarker operator) {
-        if (!this.isOwner(operator))
-            return;
-        for (SwerveWheelLogic swerveWheel:swerveWheels)
-            swerveWheel.setWheelLocked(locked, this);
     }
 
     @Override
