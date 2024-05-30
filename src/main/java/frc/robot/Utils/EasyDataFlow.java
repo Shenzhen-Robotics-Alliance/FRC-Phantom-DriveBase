@@ -9,12 +9,9 @@ import edu.wpi.first.networktables.StructArrayPublisher;
 import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.util.datalog.DoubleLogEntry;
-import edu.wpi.first.util.sendable.Sendable;
-import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
-import edu.wpi.first.wpilibj.smartdashboard.FieldObject2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Utils.MathUtils.Rotation2D;
 import frc.robot.Utils.MathUtils.Vector2D;
@@ -22,7 +19,6 @@ import org.littletonrobotics.junction.Logger;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Vector;
 
 /**
  * a simple tool that deals with logs and dashboards

@@ -11,11 +11,11 @@ import frc.robot.Utils.MathUtils.Vector2D;
 import frc.robot.Utils.PilotController;
 import frc.robot.Utils.RobotConfigReader;
 
-public class DataFlowTest implements SimpleRobotTest {
+public class ConceptSwerveDrivePhysicsSimulation implements SimpleRobotTest {
     final PilotController pilotController;
     final CollisionDetectionGrid collisionDetectionGrid = new CollisionDetectionGrid();
 
-    public DataFlowTest(RobotConfigReader robotConfig) {
+    public ConceptSwerveDrivePhysicsSimulation(RobotConfigReader robotConfig) {
         this.pilotController = new PilotController(robotConfig, "control-XBOX");
     }
 

@@ -1,7 +1,8 @@
 package frc.robot.Modules.Chassis;
 
 import frc.robot.Modules.PositionReader.PositionsEstimatorSimulation;
-import frc.robot.Modules.PositionReader.RobotFieldPositionEstimator;
+import frc.robot.Utils.EasyDataFlow;
+import frc.robot.Utils.MathUtils.Vector2D;
 import frc.robot.Utils.RobotConfigReader;
 import frc.robot.Utils.RobotModuleOperatorMarker;
 
@@ -65,12 +66,58 @@ public class SwerveDriveChassisSimulation extends SwerveDriveChassisLogic {
 
     @Override
     protected void periodic(double dt) {
-        switch (translationalTask.taskType) {
-
-        }
+        /* run swerve wheel simulation to simulate the behaviors of swerve wheels */
         driveWheelsSafeLogic(translationalTask.translationValue, rotationalTask.rotationalValue);
 
+        /* simulate chassis translation behavior */
+        switch (translationalTask.taskType) {
+            case SET_VELOCITY -> simulateChassisBehaviorSetVelocity();
+            case GO_TO_POSITION -> simulateChassisBehaviorGoToPosition();
+        }
+        /* simulate chassis rotation behavior */
+        switch (rotationalTask.taskType) {
+            case SET_VELOCITY -> simulateChassisBehaviorSetRotationalVelocity();
+            case FACE_DIRECTION -> simulateChassisBehaviorFaceDirection();
+        }
+
+
+        final double defaultSwerveDirection = Math.toRadians(90);
+        if (super.positionEstimator.getRobotVelocity2D().getMagnitude() != 0 && super.positionEstimator.getRobotRotationalVelocity() != 0)
+            EasyDataFlow.putSwerveState(
+                    "actual swerve state",
+                    frontLeft.calculateWheelMotion(positionEstimator.getRobotVelocity2D(), positionEstimator.getRobotRotationalVelocity()),
+                    frontRight.calculateWheelMotion(positionEstimator.getRobotVelocity2D(), positionEstimator.getRobotRotationalVelocity()),
+                    backLeft.calculateWheelMotion(positionEstimator.getRobotVelocity2D(), positionEstimator.getRobotRotationalVelocity()),
+                    backRight.calculateWheelMotion(positionEstimator.getRobotVelocity2D(), positionEstimator.getRobotRotationalVelocity()),
+                    positionEstimator.getRobotRotation2D()
+            );
+        else
+            EasyDataFlow.putSwerveState(
+                    "actual swerve state",
+                    0, defaultSwerveDirection,
+                    0 ,defaultSwerveDirection ,
+                    0 ,defaultSwerveDirection,
+                    0 ,defaultSwerveDirection,
+                    positionEstimator.getRobotRotation2D()
+            );
         super.periodic(dt);
+    }
+
+    private void simulateChassisBehaviorGoToPosition() {
+        // TODO simulate how the chassis will behave when asked to go to a position
+
+    }
+
+    private void simulateChassisBehaviorSetVelocity() {
+        // TODO simulate how the chassis will behave when asked to move in a given translational velocity, in reference to ConceptSwerveDrivePhysicsSimulation
+    }
+
+    private void simulateChassisBehaviorFaceDirection() {
+        // TODO simulate how the chassis will behave when asked to face a direction
+    }
+
+    private void simulateChassisBehaviorSetRotationalVelocity() {
+        // TODO complete this using robotFacing = AngleUtils.simplifyAngle(robotFacing + robotAngularVelocity * dt);
     }
 
     @Override

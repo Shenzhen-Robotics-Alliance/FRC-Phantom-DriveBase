@@ -39,9 +39,12 @@ public class PositionsEstimatorSimulation extends RobotFieldPositionEstimator {
         this.robotPosition = robotPosition;
     }
 
-    public void setRobotStatus(Vector2D robotVelocity, Vector2D robotAcceleration) {
+    public void setRobotStatus(Vector2D robotPosition, Vector2D robotVelocity, Vector2D robotAcceleration, double robotFacingRadian, double robotAngularVelocityRadPerSec) {
+        this.robotPosition = robotPosition;
         this.robotVelocity = robotVelocity;
         this.robotAcceleration = robotAcceleration;
+        this.robotFacing = robotFacingRadian;
+        this.robotAngularVelocity = robotAngularVelocityRadPerSec;
     }
 
     @Override
@@ -58,8 +61,6 @@ public class PositionsEstimatorSimulation extends RobotFieldPositionEstimator {
 
     @Override
     protected void periodic(double dt) {
-        this.robotFacing = AngleUtils.simplifyAngle(robotFacing + robotAngularVelocity * dt);
-        this.robotPosition = robotPosition.addBy(robotVelocity.multiplyBy(dt));
     }
 
     @Override

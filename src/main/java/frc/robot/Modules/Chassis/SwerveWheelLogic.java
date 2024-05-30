@@ -160,8 +160,12 @@ public abstract class SwerveWheelLogic extends RobotModuleBase {
      * note that some operations might make motors go over full power, this will tear the chassis apart, so in chassis module we need to avoid that
      */
     public double drive(Vector2D desiredRobotMotion, double desiredRobotRotationSpeed, RobotModuleOperatorMarker operator) {
-        Vector2D rotationVector = rotationDirectionVector.multiplyBy(desiredRobotRotationSpeed);
-        return drive(desiredRobotMotion.addBy(rotationVector), operator);
+        return drive(calculateWheelMotion(desiredRobotMotion, desiredRobotRotationSpeed), operator);
+    }
+
+    public Vector2D calculateWheelMotion(Vector2D robotTranslationalMotion, double robotRotationalMotion) {
+        Vector2D rotationVector = rotationDirectionVector.multiplyBy(robotRotationalMotion);
+        return robotTranslationalMotion.addBy(rotationVector);
     }
 
     public void setWheelLocked(boolean locked, RobotModuleOperatorMarker operatorMarker) {
