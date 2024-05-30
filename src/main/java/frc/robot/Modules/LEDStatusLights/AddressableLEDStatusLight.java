@@ -22,9 +22,7 @@ public class AddressableLEDStatusLight extends LEDStatusLight {
     }
 
     @Override
-    public void init() {
-        onReset();
-    }
+    public void init() {}
 
     @Override
     protected void periodic(double dt) {

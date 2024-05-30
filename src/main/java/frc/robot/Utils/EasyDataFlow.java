@@ -136,7 +136,7 @@ public class EasyDataFlow {
         swerveStates[0] = new SwerveModuleState(frontLeftWheelSpeed, Rotation2d.fromRadians(frontLeftWheelFacing - Math.toRadians(90)));
         swerveStates[1] = new SwerveModuleState(frontRightWheelSpeed, Rotation2d.fromRadians(frontRightWheelFacing - Math.toRadians(90)));
         swerveStates[2] = new SwerveModuleState(backLeftWheelSpeed, Rotation2d.fromRadians(backLeftWheelFacing - Math.toRadians(90)));
-        swerveStates[3] = new SwerveModuleState(backRightWheelSpeed, Rotation2d.fromRadians(backRightWheelSpeed - Math.toRadians(90)));
+        swerveStates[3] = new SwerveModuleState(backRightWheelSpeed, Rotation2d.fromRadians(backRightWheelFacing - Math.toRadians(90)));
 
         putSwerveState(name, swerveStates, robotFacing);
     }

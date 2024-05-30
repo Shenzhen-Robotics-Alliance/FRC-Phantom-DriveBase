@@ -33,9 +33,7 @@ public class SwerveDriveOdometer extends RobotFieldPositionEstimator {
     }
 
     @Override
-    public void init() {
-        onReset();
-    }
+    public void init() {}
 
     @Override
     protected void periodic(double dt) {

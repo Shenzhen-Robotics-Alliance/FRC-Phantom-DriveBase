@@ -31,6 +31,7 @@ import frc.robot.Utils.RobotConfigReader;
  * note that services are not included in this field
  * */
 public class RobotCore {
+        private boolean initialized = false;
         private static final long printTimeIfTimeMillisExceeds = 20;
 
         public RobotConfigReader robotConfig;
@@ -155,6 +156,7 @@ public class RobotCore {
                 /* initialize the modules and services */
                 for (RobotModuleBase module:modules) {
                         module.init();
+                        module.reset();
                         module.disable();
                 }
 
@@ -164,6 +166,7 @@ public class RobotCore {
                         robotConfig.startTuningConfig(config);
 
                 System.out.println("<-- Robot | robot initialized -->");
+                this.initialized = true;
         }
 
         private void addConfigsToTune() {
@@ -222,6 +225,8 @@ public class RobotCore {
          * @param services the robot services that will be used this stage
          * */
         public void startStage(List<RobotServiceBase> services) {
+                if (!initialized)
+                        initializeRobot();
                 this.services = services;
                 System.out.println("<-- Robot Core | starting current stage... -->");
                 /* initialize the services */

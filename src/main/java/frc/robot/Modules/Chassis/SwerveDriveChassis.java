@@ -28,7 +28,7 @@ public class SwerveDriveChassis extends SwerveDriveChassisLogic {
 
     @Override
     public void init() {
-        this.onReset();
+
     }
 
     @Override

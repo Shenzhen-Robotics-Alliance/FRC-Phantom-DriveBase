@@ -54,7 +54,6 @@ public class SwerveWheel extends SwerveWheelLogic {
     public void init() {
         /* calibrate the steer encoder */
         this.steerEncoder.setZeroPosition(motorEncoderBias);
-        onReset();
     }
 
     @Override

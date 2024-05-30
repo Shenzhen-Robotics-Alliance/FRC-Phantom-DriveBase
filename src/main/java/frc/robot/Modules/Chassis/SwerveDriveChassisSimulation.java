@@ -80,6 +80,6 @@ public class SwerveDriveChassisSimulation extends SwerveDriveChassisLogic {
 
     @Override
     public void onReset() {
-
+        super.onReset();
     }
 }

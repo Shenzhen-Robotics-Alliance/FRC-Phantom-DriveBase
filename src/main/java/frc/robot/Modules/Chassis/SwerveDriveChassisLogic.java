@@ -63,6 +63,7 @@ public abstract class SwerveDriveChassisLogic extends RobotModuleBase {
         EasyDataFlow.putPosition("/chassis/desiredPosition", displayedDesiredPosition, displayedDesiredRotation);
         SmartDashboard.putNumber("imu yaw:", Math.toDegrees(positionEstimator.getRobotRotation()));
 
+        // TODO: the two values are zero over here
         EasyDataFlow.putNumber("test", "front left decided drive power", frontLeft.getModuleDecidedDrivingPower());
         EasyDataFlow.putNumber("test", "front left decided drive direction", frontLeft.decideModuleDrivingDirection());
 
@@ -129,6 +130,11 @@ public abstract class SwerveDriveChassisLogic extends RobotModuleBase {
     }
 
     @Override
+    public void init() {
+
+    }
+
+    @Override
     public void onReset() {
         this.lowSpeedModeEnabled = false;
         /* reset and recover ownerships to the wheels */
@@ -141,6 +147,7 @@ public abstract class SwerveDriveChassisLogic extends RobotModuleBase {
         positionEstimator.gainOwnerShip(this);
 
         /* reset translational and rotation tasks */
+        System.out.println("setting chassis tasks to stop...");
         this.translationalTask = new ChassisTaskTranslation(ChassisTaskTranslation.TaskType.SET_VELOCITY, new Vector2D());
         this.rotationalTask = new ChassisTaskRotation(ChassisTaskRotation.TaskType.SET_VELOCITY, 0);
     }
@@ -172,6 +179,8 @@ public abstract class SwerveDriveChassisLogic extends RobotModuleBase {
     public void setTranslationalTask(ChassisTaskTranslation translationalTask, RobotModuleOperatorMarker operator) {
         if (!isOwner(operator))
             return;
+        if (translationalTask == null)
+            throw new IllegalArgumentException("translational task cannot be null!!!");
         this.translationalTask = translationalTask;
         this.displayedDesiredPosition = switch (translationalTask.taskType) {
             case SET_VELOCITY -> null;
@@ -187,6 +196,9 @@ public abstract class SwerveDriveChassisLogic extends RobotModuleBase {
     public void setRotationalTask(ChassisTaskRotation rotationalTask, RobotModuleOperatorMarker operator) {
         if (!isOwner(operator))
             return;
+        if (rotationalTask == null)
+            throw new IllegalArgumentException("rotational task cannot be null!!!");
+
         this.rotationalTask = rotationalTask;
         this.displayedDesiredRotation = switch (rotationalTask.taskType) {
             case SET_VELOCITY -> null;
