@@ -9,6 +9,8 @@ import edu.wpi.first.networktables.StructArrayPublisher;
 import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.util.datalog.DoubleLogEntry;
+import edu.wpi.first.util.sendable.Sendable;
+import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
@@ -110,6 +112,8 @@ public class EasyDataFlow {
 
     private static final class EasySwerveStatesPositionPublisher {
         private final String name;
+        private SwerveModuleState[] swerveModuleStates = new SwerveModuleState[4];
+        private double robotFacingRadian;
         private StructArrayPublisher<SwerveModuleState> swerveStatesPublisher = null;
         private DoublePublisher robotFacingPublisher = null;
         public EasySwerveStatesPositionPublisher(String name) {
@@ -119,12 +123,34 @@ public class EasyDataFlow {
                         .getStructArrayTopic(name + "/swerveStates", SwerveModuleState.struct).publish();
                 robotFacingPublisher = NetworkTableInstance.getDefault()
                         .getDoubleTopic(name + "/robotFacing").publish();
+                /* put swerve drive data on dashboard */
+                swerveModuleStates[0] = swerveModuleStates[1] = swerveModuleStates[2] = swerveModuleStates[3] = new SwerveModuleState();
+                robotFacingRadian = 0;
+                SmartDashboard.putData(name, builder -> {
+                    builder.setSmartDashboardType("SwerveDrive");
+
+                    builder.addDoubleProperty("Front Left Angle", () -> swerveModuleStates[0].angle.getRadians(), null);
+                    builder.addDoubleProperty("Front Left Velocity", () -> swerveModuleStates[0].speedMetersPerSecond, null);
+
+                    builder.addDoubleProperty("Front Right Angle", () -> swerveModuleStates[1].angle.getRadians(), null);
+                    builder.addDoubleProperty("Front Right Velocity", () -> swerveModuleStates[1].speedMetersPerSecond, null);
+
+                    builder.addDoubleProperty("Back Left Angle", () -> swerveModuleStates[2].angle.getRadians(), null);
+                    builder.addDoubleProperty("Back Left Velocity", () -> swerveModuleStates[2].speedMetersPerSecond, null);
+
+                    builder.addDoubleProperty("Back Right Angle", () -> swerveModuleStates[3].angle.getRadians(), null);
+                    builder.addDoubleProperty("Back Right Velocity", () -> swerveModuleStates[3].speedMetersPerSecond, null);
+
+                    builder.addDoubleProperty("Robot Angle", () -> robotFacingRadian, null);
+                });
             } catch (Exception ignored) {}
         }
 
         public void setSwerveStates(SwerveModuleState[] swerveStates, Rotation2D robotFacing) {
+            this.swerveModuleStates = swerveStates;
             swerveStatesPublisher.set(swerveStates);
-            robotFacingPublisher.set(robotFacing.getRadian());
+            robotFacingRadian = robotFacing.getRadian();
+            robotFacingPublisher.set(robotFacingRadian);
             Logger.recordOutput(name + "/swerveStates", swerveStates);
             Logger.recordOutput(name + "/robotFacing", robotFacing.getRadian());
         }
