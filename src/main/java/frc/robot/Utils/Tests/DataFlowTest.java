@@ -97,9 +97,10 @@ public class DataFlowTest implements SimpleRobotTest {
         EasyDataFlow.putNumber("test",  "new speed", newSpeed);
         EasyDataFlow.putNumber("test", "chassis max spd", currentMaxChassisSpeed);
         EasyDataFlow.putNumber("test", "pilot stick dir", Math.toDegrees(pilotStickDirection));
-        EasyDataFlow.putNumber("test", "pilot stick dir", Math.toDegrees(pilotStickDirection));
+        EasyDataFlow.putNumber("test", "pilot rotational input speed", pilotController.getRotationalStickValue() * maxAngularVelocity);
         pos = pos.addBy(vel.multiplyBy(dt));
         rotation += pilotController.getRotationalStickValue() * dt * maxAngularVelocity;
+        EasyDataFlow.putNumber("test", "accumulated rotation (rad)", rotation);
 
         // apply two times to prevent the robot from going through walls
         EasyDataFlow.putNumber("test", "robot vel x unbounded", vel.getX());

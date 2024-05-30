@@ -167,9 +167,13 @@ public abstract class SwerveDriveChassisLogic extends RobotModuleBase {
     }
 
     public abstract double getChassisHeading();
-    public abstract ChassisTaskTranslation getCurrentTranslationalTask();
+    public ChassisTaskTranslation getCurrentTranslationalTask() {
+        return this.translationalTask;
+    }
 
-    public abstract ChassisTaskRotation getCurrentRotationalTask();
+    public ChassisTaskRotation getCurrentRotationalTask() {
+        return this.rotationalTask;
+    }
 
     /**
      * set the translational task of the chassis

@@ -69,7 +69,8 @@ public class RobotCore {
         private void createRobotSim() {
                 System.out.println("<-- Robot Core | creating robot in simulation... -->");
 
-                this.positionEstimator = new SimulationPositionsEstimator();
+                final PositionsEstimatorSimulation positionsEstimatorSimulation = new PositionsEstimatorSimulation();
+                this.positionEstimator = positionsEstimatorSimulation;
                 modules.add(positionEstimator);
                 this.statusLight = new SimulatedLEDStatusLight();
                 modules.add(statusLight);
@@ -83,7 +84,7 @@ public class RobotCore {
                 modules.add(backLeftWheel);
                 modules.add(frontRightWheel);
                 modules.add(backRightWheel);
-                this.chassis = new SwerveDriveChassisSimulation(frontLeftWheel, frontRightWheel, backLeftWheel, backRightWheel, positionEstimator, robotConfig);
+                this.chassis = new SwerveDriveChassisSimulation(frontLeftWheel, frontRightWheel, backLeftWheel, backRightWheel, positionsEstimatorSimulation, robotConfig);
                 modules.add(chassis);
         }
 

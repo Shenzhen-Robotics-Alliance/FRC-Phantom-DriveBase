@@ -189,16 +189,6 @@ public class SwerveDriveChassis extends SwerveDriveChassisLogic {
     }
 
     @Override
-    public ChassisTaskTranslation getCurrentTranslationalTask() {
-        return translationalTask;
-    }
-
-    @Override
-    public ChassisTaskRotation getCurrentRotationalTask() {
-        return rotationalTask;
-    }
-
-    @Override
     public boolean isCurrentTranslationalTaskFinished() {
         System.out.println("<-- waiting for chassis to finish movement -->");
         System.out.println("Task Type: " + translationalTask.taskType);
