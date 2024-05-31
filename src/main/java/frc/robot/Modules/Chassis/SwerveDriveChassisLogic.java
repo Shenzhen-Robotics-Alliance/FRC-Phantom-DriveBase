@@ -14,7 +14,7 @@ public abstract class SwerveDriveChassisLogic extends RobotModuleBase {
     protected ChassisTaskTranslation translationalTask;
     /** the current rotational task  */
     protected ChassisTaskRotation rotationalTask;
-    private OrientationMode orientationMode;
+    protected OrientationMode orientationMode;
     private boolean lowSpeedModeEnabled;
 
 
@@ -61,6 +61,7 @@ public abstract class SwerveDriveChassisLogic extends RobotModuleBase {
         EasyDataFlow.putNumber("chassis", "rotational task", rotationalTask.rotationalValue);
 
         EasyDataFlow.putPosition("/chassis/desiredPosition", displayedDesiredPosition, displayedDesiredRotation);
+        EasyDataFlow.putPosition("/chassis/actualPosition", positionEstimator.getRobotPosition2D(), positionEstimator.getRobotRotation2D());
         SmartDashboard.putNumber("imu yaw:", Math.toDegrees(positionEstimator.getRobotRotation()));
 
         // TODO: the two values are zero over here
@@ -68,7 +69,7 @@ public abstract class SwerveDriveChassisLogic extends RobotModuleBase {
         EasyDataFlow.putNumber("test", "front left decided drive direction", frontLeft.decideModuleDrivingDirection());
 
         EasyDataFlow.putSwerveState(
-                "calculated swerve state",
+                "desired swerve state",
                 frontLeft.getModuleDecidedDrivingPower() * robotMaximumSpeed,
                 frontLeft.decideModuleDrivingDirection(),
                 frontRight.getModuleDecidedDrivingPower() * robotMaximumSpeed,

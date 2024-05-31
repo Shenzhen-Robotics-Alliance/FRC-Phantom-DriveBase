@@ -60,7 +60,7 @@ public class ConceptSwerveDrivePhysicsSimulation implements SimpleRobotTest {
                 minStepTime = 0.05,
                 speedDifference = desiredSpeed - vel.getMagnitude(),
                 linearAccelerationConstrain = speedDifference > 0 ?
-                        LookUpTable.linearInterpretationWithBounding(0, maxLinearAcceleration, maxChassisSpeed, 0, vel.getMagnitude())
+                        LookUpTable.linearInterpretationWithBounding(0, maxLinearAcceleration * (desiredSpeed / maxChassisSpeed), maxChassisSpeed, 0, vel.getMagnitude())
                         : -LookUpTable.linearInterpretationWithBounding(0, friction, maxChassisSpeed, 0, desiredSpeed),
                 speedChange = linearAccelerationConstrain * dt,
                 linearSpeedMinStep = Math.abs(linearAccelerationConstrain) * minStepTime,
