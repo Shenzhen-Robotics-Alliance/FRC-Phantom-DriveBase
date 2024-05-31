@@ -36,33 +36,18 @@ public class SwerveDriveChassisSimulation extends SwerveDriveChassisLogic {
     }
 
     @Override
-    public void setChassisLocked(boolean locked, RobotModuleOperatorMarker operator) {
-
-    }
-
-    @Override
-    public void setOrientationMode(OrientationMode mode, RobotModuleOperatorMarker operator) {
-
-    }
-
-    @Override
-    public void setLowSpeedModeEnabled(boolean enabled, RobotModuleOperatorMarker operator) {
-
-    }
-
-    @Override
     public boolean isCurrentTranslationalTaskFinished() {
-        return false;
+        return false; // TODO: write this method
     }
 
     @Override
     public boolean isCurrentRotationalTaskFinished() {
-        return false;
+        return false; // TODO: write this method
     }
 
     @Override
     public void resetChassisPositionAndRotation() {
-
+        positionEstimatorSimulation.reset();
     }
 
     private double
@@ -129,7 +114,7 @@ public class SwerveDriveChassisSimulation extends SwerveDriveChassisLogic {
     }
 
     private void simulateChassisBehaviorSetVelocity(double dt) {
-        final Rotation2D pilotFacing = RobotFieldPositionEstimator.toActualRobotRotation(new Rotation2D(Math.toRadians(270)));
+        final Rotation2D pilotFacing = RobotFieldPositionEstimator.toActualRobotRotation(new Rotation2D(Math.toRadians(270))); // TODO: orientation mode not match
         final Vector2D desiredMotion =
                 orientationMode == OrientationMode.FIELD ?
                         super.translationalTask.translationValue.multiplyBy(pilotFacing)
