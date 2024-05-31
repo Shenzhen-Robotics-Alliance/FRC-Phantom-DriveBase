@@ -189,7 +189,7 @@ public class CollisionDetectionGrid {
      * particle was moving right and hit the lefter-edge of its current grid
      * */
     private Vector2D[] applyRightwardsCollisionLimit(Vector2D originalPosition, Vector2D originalVelocity) {
-        EasyDataFlow.putNumber("test", "collision dir",  3);
+        EasyDataFlow.putNumber("chassis physics simulation", "collision dir",  3);
         if (Math.abs(originalVelocity.getX()) > maxImpactVelocity)
             throw new RobotDamagedException();
         return new Vector2D[] {

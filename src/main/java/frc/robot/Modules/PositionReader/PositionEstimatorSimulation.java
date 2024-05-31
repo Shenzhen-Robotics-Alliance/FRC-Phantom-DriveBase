@@ -62,10 +62,6 @@ public class PositionEstimatorSimulation extends RobotFieldPositionEstimator {
     public void init() {}
 
     @Override
-    protected void periodic(double dt) {
-    }
-
-    @Override
     public void onReset() {
         this.robotFacing = RobotFieldPositionEstimator.toActualRobotRotation(new Rotation2D(Math.toRadians(90))).getRadian();
         this.robotAngularVelocity = 0;

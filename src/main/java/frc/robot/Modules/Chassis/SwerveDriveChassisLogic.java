@@ -64,10 +64,6 @@ public abstract class SwerveDriveChassisLogic extends RobotModuleBase {
         EasyDataFlow.putPosition("/chassis/actualPosition", positionEstimator.getRobotPosition2D(), positionEstimator.getRobotRotation2D());
         SmartDashboard.putNumber("imu yaw:", Math.toDegrees(positionEstimator.getRobotRotation()));
 
-        // TODO: the two values are zero over here
-        EasyDataFlow.putNumber("test", "front left decided drive power", frontLeft.getModuleDecidedDrivingPower());
-        EasyDataFlow.putNumber("test", "front left decided drive direction", frontLeft.decideModuleDrivingDirection());
-
         EasyDataFlow.putSwerveState(
                 "desired swerve state",
                 frontLeft.getModuleDecidedDrivingPower() * robotMaximumSpeed,

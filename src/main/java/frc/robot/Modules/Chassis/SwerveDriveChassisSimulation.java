@@ -130,10 +130,11 @@ public class SwerveDriveChassisSimulation extends SwerveDriveChassisLogic {
 
     private void simulateChassisBehaviorSetVelocity(double dt) {
         final Rotation2D pilotFacing = RobotFieldPositionEstimator.toActualRobotRotation(new Rotation2D(Math.toRadians(270)));
-        final Vector2D desiredVelocity = 
+        final Vector2D desiredMotion =
                 orientationMode == OrientationMode.FIELD ?
                         super.translationalTask.translationValue.multiplyBy(pilotFacing)
-                        : super.translationalTask.translationValue.multiplyBy(new Rotation2D(positionEstimator.getRobotRotation() + Math.toRadians(90)));
+                        : super.translationalTask.translationValue.multiplyBy(new Rotation2D(positionEstimator.getRobotRotation() + Math.toRadians(90))),
+                desiredVelocity = desiredMotion.multiplyBy(robotMaximumSpeed);
         
         Vector2D simulatedVelocity = positionEstimator.getRobotVelocity2D(), simulatedPosition = positionEstimator.getRobotPosition2D();
 
