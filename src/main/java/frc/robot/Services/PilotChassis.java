@@ -1,10 +1,14 @@
 package frc.robot.Services;
 
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Modules.Chassis.SwerveDriveChassisLogic;
+import frc.robot.Utils.EasyDataFlow;
+import frc.robot.Utils.MathUtils.AngleUtils;
+import frc.robot.Utils.MathUtils.Rotation2D;
 import frc.robot.Utils.PilotController;
 import frc.robot.Utils.RobotConfigReader;
 
@@ -129,7 +133,7 @@ public class PilotChassis extends RobotServiceBase {
             chassis.resetChassisPositionAndRotation();
         } else copilotGamePad.setRumble(GenericHID.RumbleType.kBothRumble, 0);
 
-        SmartDashboard.putNumber("rotation maintenance heading", Math.toDegrees(smartRotationControlDesiredHeading));
+        EasyDataFlow.putRotation("chassis/rotation maintenance rotation", new Rotation2D(smartRotationControlDesiredHeading));
     }
 
     @Override

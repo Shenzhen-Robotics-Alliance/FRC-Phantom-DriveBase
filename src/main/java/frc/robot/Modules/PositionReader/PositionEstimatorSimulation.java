@@ -1,5 +1,6 @@
 package frc.robot.Modules.PositionReader;
 
+import frc.robot.Utils.MathUtils.AngleUtils;
 import frc.robot.Utils.MathUtils.Rotation2D;
 import frc.robot.Utils.MathUtils.Vector2D;
 
@@ -9,7 +10,7 @@ public class PositionEstimatorSimulation extends RobotFieldPositionEstimator {
     public PositionEstimatorSimulation() {}
 
     @Override
-    public Vector2D getRobotVelocity2D() {
+    public Vector2D getRobotVelocity2DToField() {
         return robotVelocity;
     }
 
@@ -24,7 +25,7 @@ public class PositionEstimatorSimulation extends RobotFieldPositionEstimator {
     }
 
     @Override
-    public Vector2D getRobotAcceleration2D() {
+    public Vector2D getRobotAcceleration2DToField() {
         return robotAcceleration;
     }
 
@@ -45,13 +46,13 @@ public class PositionEstimatorSimulation extends RobotFieldPositionEstimator {
     }
 
     public void updateRobotRotationalStatus(double robotFacingRadian, double robotAngularVelocityRadPerSec) {
-        this.robotFacing = robotFacingRadian;
+        this.robotFacing = AngleUtils.simplifyAngle(robotFacingRadian);
         this.robotAngularVelocity = robotAngularVelocityRadPerSec;
     }
 
     @Override
     public void setRobotRotation(double rotation) {
-        this.robotFacing = rotation;
+        this.robotFacing = AngleUtils.simplifyAngle(rotation);
     }
 
     public void setRobotAngularVelocity(double angularVelocity) {

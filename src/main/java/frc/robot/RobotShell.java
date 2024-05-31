@@ -127,8 +127,7 @@ public class RobotShell extends LoggedRobot {
     public void testInit() {
         // System.out.println("<-- Robot Shell | test init -->");
         if (robotTest == null)
-            this.robotTest = new ConceptSwerveDrivePhysicsSimulation(robotCore.robotConfig);
-            // this.robotTest = new WheelsCalibration(robotCore.robotConfig);
+            this.robotTest = new DashboardDataTest();
         robotTest.testStart();
     }
 

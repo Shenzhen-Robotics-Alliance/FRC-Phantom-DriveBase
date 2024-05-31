@@ -12,7 +12,8 @@ import frc.robot.Utils.MathUtils.Vector2D;
  *  the position of the robot is defined in meter and in an X-Y plane where the origin is in the BOTTOM-LEFT corner of the field
  *  positive-x is rightwards and positive-y is upwards
  * rotation:
- *  the rotation is defined in radian, POSITIVE is COUNTER-CLOCKWISE and zero is pointing upwards in the field
+ *  the rotation is defined in radian, POSITIVE is COUNTER-CLOCKWISE
+ *  notice that the rotation of a robot is the direction of the x-axis of the robot, which its right, not front
  * */
 public abstract class RobotFieldPositionEstimator extends RobotModuleBase {
     public static final Vector2D robotDefaultStartingPositionBlue = new Vector2D(new double[] {0.5, 4.1});
@@ -22,8 +23,13 @@ public abstract class RobotFieldPositionEstimator extends RobotModuleBase {
         super("Position-Estimator");
     }
 
-    /** get the velocity of the robot */
-    public abstract Vector2D getRobotVelocity2D();
+    /** get the velocity of the robot to field */
+    public abstract Vector2D getRobotVelocity2DToField();
+
+    /** get the velocity of the robot to itself */
+    public Vector2D getRobotVelocity2DToRobot() {
+        return getRobotVelocity2DToField().multiplyBy(getRobotRotation2D().getReversal());
+    }
 
     /** get the angular velocity (radian/second) of the robot, positive is counter-clockwise */
     public abstract double getRobotRotationalVelocity();
@@ -31,7 +37,13 @@ public abstract class RobotFieldPositionEstimator extends RobotModuleBase {
     /** get the position of the robot */
     public abstract Vector2D getRobotPosition2D();
 
-    public abstract Vector2D getRobotAcceleration2D();
+    /** get the acceleration of the robot to field */
+    public abstract Vector2D getRobotAcceleration2DToField();
+
+    /** get the acceleration of the robot to field */
+    public Vector2D getRobotAcceleration2DToRobot() {
+        return getRobotVelocity2DToField().multiplyBy(getRobotRotation2D().getReversal());
+    }
 
     /** get the current facing of the robot */
     public abstract double getRobotRotation();

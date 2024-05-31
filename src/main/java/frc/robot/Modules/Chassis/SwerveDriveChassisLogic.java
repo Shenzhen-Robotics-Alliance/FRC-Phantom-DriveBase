@@ -4,6 +4,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Modules.PositionReader.RobotFieldPositionEstimator;
 import frc.robot.Modules.RobotModuleBase;
 import frc.robot.Utils.EasyDataFlow;
+import frc.robot.Utils.MathUtils.AngleUtils;
 import frc.robot.Utils.MathUtils.Rotation2D;
 import frc.robot.Utils.MathUtils.Vector2D;
 import frc.robot.Utils.RobotConfigReader;
@@ -60,20 +61,20 @@ public abstract class SwerveDriveChassisLogic extends RobotModuleBase {
         EasyDataFlow.putNumber("chassis", "translational task (y)", translationalTask.translationValue.getY());
         EasyDataFlow.putNumber("chassis", "rotational task", rotationalTask.rotationalValue);
 
-        EasyDataFlow.putPosition("/chassis/desiredPosition", displayedDesiredPosition, displayedDesiredRotation);
-        EasyDataFlow.putPosition("/chassis/actualPosition", positionEstimator.getRobotPosition2D(), positionEstimator.getRobotRotation2D());
+        EasyDataFlow.putPosition("chassis/desiredPosition", displayedDesiredPosition, displayedDesiredRotation);
+        EasyDataFlow.putPosition("chassis/actualPosition", positionEstimator.getRobotPosition2D(), positionEstimator.getRobotRotation2D());
         SmartDashboard.putNumber("imu yaw:", Math.toDegrees(positionEstimator.getRobotRotation()));
 
         EasyDataFlow.putSwerveState(
-                "desired swerve state",
+                "chassis/desired swerve state",
                 frontLeft.getModuleDecidedDrivingPower() * robotMaximumSpeed,
-                frontLeft.decideModuleDrivingDirection(),
+                AngleUtils.simplifyAngle(frontLeft.decideModuleDrivingDirection() - positionEstimator.getRobotRotation()),
                 frontRight.getModuleDecidedDrivingPower() * robotMaximumSpeed,
-                frontRight.decideModuleDrivingDirection(),
+                AngleUtils.simplifyAngle( frontRight.decideModuleDrivingDirection() - positionEstimator.getRobotRotation()),
                 backLeft.getModuleDecidedDrivingPower() * robotMaximumSpeed,
-                backLeft.decideModuleDrivingDirection(),
+                AngleUtils.simplifyAngle(backLeft.decideModuleDrivingDirection() - positionEstimator.getRobotRotation()),
                 backRight.getModuleDecidedDrivingPower() * robotMaximumSpeed,
-                backRight.decideModuleDrivingDirection(),
+                AngleUtils.simplifyAngle(backRight.decideModuleDrivingDirection() - positionEstimator.getRobotRotation()),
                 positionEstimator.getRobotRotation2D()
         );
     }

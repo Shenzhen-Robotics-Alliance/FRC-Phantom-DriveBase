@@ -11,7 +11,7 @@ import java.io.File;
 import java.io.FileReader;
 
 public class CollisionDetectionGrid {
-    private static final double bounceCoefficient = -0.3, bounceBackDistance = 0.03, maxImpactVelocity = 5;
+    private static final double bounceCoefficient = -0.1, bounceBackDistance = 0.05, maxImpactVelocity = 5;
     private boolean[][] grid = null;
     private double cellSize = 0, fieldLength = 0, fieldWidth = 0;
 
@@ -70,10 +70,8 @@ public class CollisionDetectionGrid {
      * @return {boundedPosition, boundedVelocity}
      */
     public Vector2D[] applyCollisionDetection(Vector2D originalPosition, Vector2D originalVelocity) {
-        if (!isInObstacle(originalPosition)) {
-            EasyDataFlow.putNumber("test", "collision dir", -1);
+        if (!isInObstacle(originalPosition))
             return new Vector2D[] {originalPosition, originalVelocity};
-        }
 
         // TODO: this is a very complicated program, write the explanations as fast as possible
         if (originalVelocity.getX() > 0) { // horizontal velocity is to the right
@@ -132,7 +130,7 @@ public class CollisionDetectionGrid {
      * particle was moving up and hit the lower-edge of its current grid
      * */
     private Vector2D[] applyUpwardsCollisionLimit(Vector2D originalPosition, Vector2D originalVelocity) {
-        EasyDataFlow.putNumber("test", "collision dir", 0);
+        EasyDataFlow.putNumber("chassis physics simulation", "collision dir", 0);
         if (Math.abs(originalVelocity.getY()) > maxImpactVelocity)
             throw new RobotDamagedException();
         return new Vector2D[] {
@@ -151,7 +149,7 @@ public class CollisionDetectionGrid {
      * particle was moving down and hit the upper-edge of its current grid
      * */
     private Vector2D[] applyDownwardsCollisionLimit(Vector2D originalPosition, Vector2D originalVelocity) {
-        EasyDataFlow.putNumber("test", "collision dir", 1);
+        EasyDataFlow.putNumber("chassis physics simulation", "collision dir", 1);
         if (Math.abs(originalVelocity.getY()) > maxImpactVelocity)
             throw new RobotDamagedException();
         return new Vector2D[] {
@@ -170,7 +168,7 @@ public class CollisionDetectionGrid {
      * particle was moving left and hit the righter-edge of its current grid
      * */
     private Vector2D[] applyLeftwardsCollisionLimit(Vector2D originalPosition, Vector2D originalVelocity) {
-        EasyDataFlow.putNumber("test", "collision dir", 2);
+        EasyDataFlow.putNumber("chassis physics simulation", "collision dir", 2);
         if (Math.abs(originalVelocity.getX()) > maxImpactVelocity)
             throw new RobotDamagedException();
         return new Vector2D[] {
@@ -179,7 +177,7 @@ public class CollisionDetectionGrid {
                         originalPosition.getY()
                 }),
                 new Vector2D(new double[] {
-                        originalPosition.getX() * bounceCoefficient,
+                        originalVelocity.getX() * bounceCoefficient,
                         originalVelocity.getY()
                 })
         };
@@ -198,7 +196,7 @@ public class CollisionDetectionGrid {
                         originalPosition.getY()
                 }),
                 new Vector2D(new double[] {
-                        originalPosition.getX() * bounceCoefficient,
+                        originalVelocity.getX() * bounceCoefficient,
                         originalVelocity.getY()
                 })
         };

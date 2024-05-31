@@ -88,22 +88,22 @@ public class SwerveDriveChassisSimulation extends SwerveDriveChassisLogic {
         }
 
         /* simulate the swerve actual status from chassis motion */
-        if (super.positionEstimator.getRobotVelocity2D().getMagnitude() != 0 && super.positionEstimator.getRobotRotationalVelocity() != 0)
+        if (super.positionEstimator.getRobotVelocity2DToField().getMagnitude() == 0 && super.positionEstimator.getRobotRotationalVelocity() == 0)
             EasyDataFlow.putSwerveState(
-                    "actual swerve state",
-                    frontLeft.calculateWheelMotion(positionEstimator.getRobotVelocity2D(), positionEstimator.getRobotRotationalVelocity()),
-                    frontRight.calculateWheelMotion(positionEstimator.getRobotVelocity2D(), positionEstimator.getRobotRotationalVelocity()),
-                    backLeft.calculateWheelMotion(positionEstimator.getRobotVelocity2D(), positionEstimator.getRobotRotationalVelocity()),
-                    backRight.calculateWheelMotion(positionEstimator.getRobotVelocity2D(), positionEstimator.getRobotRotationalVelocity()),
-                    positionEstimator.getRobotRotation2D()
-            );
-        else
-            EasyDataFlow.putSwerveState(
-                    "actual swerve state",
+                    "chassis/actual swerve state",
                     0, frontLeft.decideModuleDrivingDirection(),
                     0, frontRight.decideModuleDrivingDirection(),
                     0, backLeft.decideModuleDrivingDirection(),
                     0, backRight.decideModuleDrivingDirection(),
+                    positionEstimator.getRobotRotation2D()
+            );
+        else
+            EasyDataFlow.putSwerveState(
+                    "chassis/actual swerve state",
+                    frontLeft.calculateWheelMotion(positionEstimator.getRobotVelocity2DToRobot(), positionEstimator.getRobotRotationalVelocity()),
+                    frontRight.calculateWheelMotion(positionEstimator.getRobotVelocity2DToRobot(), positionEstimator.getRobotRotationalVelocity()),
+                    backLeft.calculateWheelMotion(positionEstimator.getRobotVelocity2DToRobot(), positionEstimator.getRobotRotationalVelocity()),
+                    backRight.calculateWheelMotion(positionEstimator.getRobotVelocity2DToRobot(), positionEstimator.getRobotRotationalVelocity()),
                     positionEstimator.getRobotRotation2D()
             );
         super.periodic(dt);
@@ -114,14 +114,14 @@ public class SwerveDriveChassisSimulation extends SwerveDriveChassisLogic {
     }
 
     private void simulateChassisBehaviorSetVelocity(double dt) {
-        final Rotation2D pilotFacing = RobotFieldPositionEstimator.toActualRobotRotation(new Rotation2D(Math.toRadians(270))); // TODO: orientation mode not match
+        final Rotation2D pilotFacing = RobotFieldPositionEstimator.toActualRobotRotation(RobotFieldPositionEstimator.pilotFacingBlue);
         final Vector2D desiredMotion =
                 orientationMode == OrientationMode.FIELD ?
                         super.translationalTask.translationValue.multiplyBy(pilotFacing)
-                        : super.translationalTask.translationValue.multiplyBy(new Rotation2D(positionEstimator.getRobotRotation() + Math.toRadians(90))),
+                        : super.translationalTask.translationValue.multiplyBy(new Rotation2D(positionEstimator.getRobotRotation())),
                 desiredVelocity = desiredMotion.multiplyBy(robotMaximumSpeed);
         
-        Vector2D simulatedVelocity = positionEstimator.getRobotVelocity2D(), simulatedPosition = positionEstimator.getRobotPosition2D();
+        Vector2D simulatedVelocity = positionEstimator.getRobotVelocity2DToField(), simulatedPosition = positionEstimator.getRobotPosition2D();
 
         double desiredSpeed = desiredVelocity.getMagnitude(),
                 pilotStickDirection = desiredVelocity.getHeading();
@@ -189,7 +189,7 @@ public class SwerveDriveChassisSimulation extends SwerveDriveChassisLogic {
 
         EasyDataFlow.putNumber("chassis physics simulation", "is in collision grid", collisionDetectionGrid.isInObstacle(simulatedPosition) ? 1 : 0);
 
-        final Vector2D acceleration = Vector2D.displacementToTarget(positionEstimator.getRobotVelocity2D(), simulatedVelocity).multiplyBy(1.0/dt);
+        final Vector2D acceleration = Vector2D.displacementToTarget(positionEstimator.getRobotVelocity2DToField(), simulatedVelocity).multiplyBy(1.0/dt);
         positionEstimatorSimulation.updateRobotTranslationalStatus(simulatedPosition, simulatedVelocity, acceleration);
     }
 

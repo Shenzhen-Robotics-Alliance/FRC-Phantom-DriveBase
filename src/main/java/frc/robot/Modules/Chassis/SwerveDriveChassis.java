@@ -34,15 +34,11 @@ public class SwerveDriveChassis extends SwerveDriveChassisLogic {
     @Override
     protected void periodic(double dt) {
         EasyDataFlow.putSwerveState(
-                "actual swerve state",
-                frontLeft.getModuleVelocity2D(ChassisUnit.METER).getMagnitude(),
-                frontLeft.getWheelDrivingEncoderValue(),
-                frontRight.getModuleVelocity2D(ChassisUnit.METER).getMagnitude(),
-                frontRight.getWheelDrivingEncoderValue(),
-                backLeft.getModuleVelocity2D(ChassisUnit.METER).getMagnitude(),
-                backLeft.getWheelDrivingEncoderValue(),
-                backRight.getModuleVelocity2D(ChassisUnit.METER).getMagnitude(),
-                backRight.getWheelDrivingEncoderValue(),
+                "chassis/actual swerve state",
+                frontLeft.getModuleVelocity2D(ChassisUnit.METER).getMagnitude(), frontLeft.getWheelDrivingEncoderValue(),
+                frontRight.getModuleVelocity2D(ChassisUnit.METER).getMagnitude(), frontRight.getWheelDrivingEncoderValue(),
+                backLeft.getModuleVelocity2D(ChassisUnit.METER).getMagnitude(), backLeft.getWheelDrivingEncoderValue(),
+                backRight.getModuleVelocity2D(ChassisUnit.METER).getMagnitude(), backRight.getWheelDrivingEncoderValue(),
                 positionEstimator.getRobotRotation2D()
         );
 
@@ -125,7 +121,7 @@ public class SwerveDriveChassis extends SwerveDriveChassisLogic {
      * */
     private Vector2D processTranslationalVelocityControl(Vector2D desiredVelocity, double dt) {
         if (!useProfiledSpeedControl
-                || Math.max(desiredVelocity.getMagnitude(), positionEstimator.getRobotVelocity2D().getMagnitude()/robotMaximumSpeed)
+                || Math.max(desiredVelocity.getMagnitude(), positionEstimator.getRobotVelocity2DToField().getMagnitude()/robotMaximumSpeed)
                 < robotSpeedActivateSpeedControl) // if the desired or current velocity is smaller than the activation speed
             return desiredVelocity; // disable velocity control
 
@@ -151,7 +147,7 @@ public class SwerveDriveChassis extends SwerveDriveChassisLogic {
      */
     public Vector2D processTranslationalPositionControl(Vector2D desiredPosition) {
         final Vector2D chassisPosition2D = positionEstimator.getRobotPosition2D(),
-                chassisVelocity2D = positionEstimator.getRobotVelocity2D();
+                chassisVelocity2D = positionEstimator.getRobotVelocity2DToField();
 
         chassisPIDController.setDesiredPosition(desiredPosition);
         return chassisPIDController.getCorrectionPower(chassisPosition2D, chassisVelocity2D);

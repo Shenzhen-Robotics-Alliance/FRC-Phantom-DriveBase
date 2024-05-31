@@ -71,7 +71,7 @@ public class SwerveDriveOdometer extends RobotFieldPositionEstimator {
     }
 
     @Override
-    public Vector2D getRobotVelocity2D() {
+    public Vector2D getRobotVelocity2DToField() {
         Vector2D robotVelocity = new Vector2D();
         for (int wheelID = 0; wheelID < swerveWheels.length; wheelID++)
             robotVelocity = robotVelocity.addBy(
@@ -94,7 +94,7 @@ public class SwerveDriveOdometer extends RobotFieldPositionEstimator {
     }
 
     @Override
-    public Vector2D getRobotAcceleration2D() {
+    public Vector2D getRobotAcceleration2DToField() {
         Vector2D robotAcceleration = new Vector2D();
         for (int wheelID = 0; wheelID < swerveWheels.length; wheelID++)
             robotAcceleration = robotAcceleration.addBy(

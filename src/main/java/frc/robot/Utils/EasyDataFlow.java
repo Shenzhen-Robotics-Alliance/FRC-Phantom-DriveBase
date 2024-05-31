@@ -13,6 +13,8 @@ import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.Modules.PositionReader.RobotFieldPositionEstimator;
+import frc.robot.Utils.MathUtils.AngleUtils;
 import frc.robot.Utils.MathUtils.Rotation2D;
 import frc.robot.Utils.MathUtils.Vector2D;
 import org.littletonrobotics.junction.Logger;
@@ -26,6 +28,7 @@ import java.util.Map;
  * */
 public class EasyDataFlow {
     private static final Map<String, EasyDoubleDataEntry> dataEntries = new HashMap<>();
+    private static final Map<String, EasyRotation2DEntry> rotationEntries = new HashMap<>();
     private static final Map<String, EasyPosePublisher> positionEntries = new HashMap<>();
     private static final Map<String, EasyPoseArrayPublisher> positionArrayEntries = new HashMap<>();
     private static final Map<String, EasySwerveStatesPositionPublisher> swerveStatesPublisher = new HashMap<>();
@@ -38,6 +41,34 @@ public class EasyDataFlow {
 
     public static void log(String message) {
         DataLogManager.log(message);
+    }
+
+    private static final class EasyRotation2DEntry {
+        private StructPublisher<Rotation2d> publisher = null;
+        private final String name;
+        private EasyRotation2DEntry(String name) {
+            this.name = name;
+            try {
+                this.publisher = NetworkTableInstance.getDefault()
+                        .getStructTopic(name, Rotation2d.struct).publish();
+            } catch (Exception ignored) {}
+        }
+
+        public void setRotation(Rotation2D rotation) {
+            if (rotation == null) {
+                publisher.set(null);
+                return;
+            }
+            Rotation2d rotation2d = Rotation2d.fromRadians(rotation.getRadian() + Math.toRadians(90));
+            publisher.set(rotation2d);
+            Logger.recordOutput(name, Rotation2d.struct, rotation2d);
+        }
+    }
+
+    public static void putRotation(String name, Rotation2D rotation) {
+        if (!rotationEntries.containsKey(name))
+            rotationEntries.put(name, new EasyRotation2DEntry(name));
+        rotationEntries.get(name).setRotation(rotation);
     }
 
     private static final class EasyPosePublisher {
@@ -145,7 +176,7 @@ public class EasyDataFlow {
         public void setSwerveStates(SwerveModuleState[] swerveStates, Rotation2D robotFacing) {
             this.swerveModuleStates = swerveStates;
             swerveStatesPublisher.set(swerveStates);
-            robotFacingRadian = robotFacing.getRadian();
+            robotFacingRadian = AngleUtils.simplifyAngle(robotFacing.getRadian() - RobotFieldPositionEstimator.toActualRobotRotation(RobotFieldPositionEstimator.pilotFacingBlue).getRadian());
             robotFacingPublisher.set(robotFacingRadian);
             Logger.recordOutput(name + "/swerveStates", swerveStates);
             Logger.recordOutput(name + "/robotFacing", robotFacing.getRadian());
