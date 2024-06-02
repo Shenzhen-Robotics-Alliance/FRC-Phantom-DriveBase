@@ -41,8 +41,8 @@
         <encoderValuePerMotorRevolution type="double">2048</encoderValuePerMotorRevolution>
         <robotMaximumSpeed type="double">4.8</robotMaximumSpeed>
         <motorMaximumLinearAcceleration type="double">8</motorMaximumLinearAcceleration>
-        <robotSpeedConstrainAtSharpTurn type="double">3.2</robotSpeedConstrainAtSharpTurn>
-        <robotMaximumCentripetalAcceleration type="double">12</robotMaximumCentripetalAcceleration>
+        <robotSpeedConstrainAtSharpTurn type="double">2.8</robotSpeedConstrainAtSharpTurn>
+        <robotMaximumCentripetalAcceleration type="double">10</robotMaximumCentripetalAcceleration>
         <simulationFriction type="double">16</simulationFriction>
         <robotMaxAngularVelocity>300</robotMaxAngularVelocity>
 
