@@ -1,5 +1,7 @@
 package frc.robot.Utils.MathUtils;
 
+import org.dyn4j.geometry.Transform;
+
 public class Rotation2D extends Transformation2D {
     private final double radian;
     public Rotation2D(double radian) {
@@ -24,6 +26,10 @@ public class Rotation2D extends Transformation2D {
     @Override
     public String toString() {
         return "rotation with radian: " + this.getRadian() + "\nand vector value: " +  super.toString();
+    }
+
+    public static Rotation2D fromTransform(Transform transform) {
+        return new Rotation2D(transform.getRotationAngle());
     }
 }
 

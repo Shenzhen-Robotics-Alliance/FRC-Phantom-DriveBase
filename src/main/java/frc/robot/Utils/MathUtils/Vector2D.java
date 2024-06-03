@@ -1,5 +1,8 @@
 package frc.robot.Utils.MathUtils;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import org.dyn4j.geometry.Vector2;
+
 /**
  * a math library written myself for the control algorithm of steer wheels
  * stores a vector sitting a 2d space
@@ -109,5 +112,13 @@ public class Vector2D {
 
     public static Vector2D displacementToTarget(Vector2D currentPosition, Vector2D desiredPosition) {
         return desiredPosition.addBy(currentPosition.multiplyBy(-1));
+    }
+
+    public static Vector2 toVector2(Vector2D vector2D) {
+        return new Vector2(vector2D.getX(), vector2D.getY());
+    }
+
+    public static Vector2D fromVector2(Vector2 vector2) {
+        return new Vector2D(new double[] {vector2.x, vector2.y});
     }
 }

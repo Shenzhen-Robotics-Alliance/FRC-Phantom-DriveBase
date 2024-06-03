@@ -17,6 +17,7 @@ import frc.robot.Modules.PositionReader.RobotFieldPositionEstimator;
 import frc.robot.Utils.MathUtils.AngleUtils;
 import frc.robot.Utils.MathUtils.Rotation2D;
 import frc.robot.Utils.MathUtils.Vector2D;
+import org.dyn4j.dynamics.Body;
 import org.littletonrobotics.junction.Logger;
 
 import java.util.HashMap;
@@ -92,10 +93,16 @@ public class EasyDataFlow {
         }
     }
 
+    public static void putRobot(Body robot) {
+        putRobot(Vector2D.fromVector2(robot.getWorldCenter()), Rotation2D.fromTransform(robot.getTransform()));
+    }
+
     public static void putRobot(Vector2D position, Rotation2D rotation) {
         putPosition("/chassis/robotPosition", position, rotation);
         field.setRobotPose(getPose(position, rotation));
     }
+
+
 
     public static void putPosition(String name, Vector2D position, Rotation2D rotation) {
         if (!positionEntries.containsKey(name))
