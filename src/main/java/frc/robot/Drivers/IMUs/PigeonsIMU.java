@@ -4,7 +4,7 @@ import com.ctre.phoenix6.hardware.Pigeon2;
 import edu.wpi.first.wpilibj.Timer;
 
 public class PigeonsIMU implements RawGyro {
-    private Pigeon2 pigeonInstance;
+    private final Pigeon2 pigeonInstance;
     private double lastYaw;
     private Timer dt;
     /** in degrees per second */

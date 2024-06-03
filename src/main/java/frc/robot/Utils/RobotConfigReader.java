@@ -48,6 +48,7 @@ public class RobotConfigReader {
             readConfigs("robotConfig");
             // System.out.println("robot config: " + robotConfigs);
         } catch (Exception e) {
+            e.printStackTrace();
             throw new RuntimeException("error while reading robot config:" + e);
         }
     }
@@ -64,7 +65,7 @@ public class RobotConfigReader {
 
     private void readConfigs(String configName) throws IOException, SAXException, ParserConfigurationException, XPathExpressionException {
         /* read xml file from filesystem */
-        xmlFile = new File(Filesystem.getDeployDirectory(),configName+ ".xml");
+        xmlFile = new File(Filesystem.getDeployDirectory(),"configs/" + configName+ ".xml");
         DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
         doc = dBuilder.parse(xmlFile);
