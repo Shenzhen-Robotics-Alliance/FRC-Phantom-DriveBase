@@ -1,5 +1,6 @@
 package frc.robot.Modules;
 
+import edu.wpi.first.wpilibj.Timer;
 import frc.robot.Drivers.Motors.Motor;
 import frc.robot.RobotShell;
 import frc.robot.Utils.RobotModuleOperatorMarker;
@@ -34,7 +35,7 @@ public abstract class RobotModuleBase extends RobotModuleOperatorMarker {
     /** always add motors to this list */
     protected List<Motor> motors = new ArrayList<>();
 
-    private long previousTimeMillis;
+    private double previousTime;
 
     /**
      * public RobotModule(HashMap<String, RobotModule> dependenciesModules,
@@ -43,7 +44,7 @@ public abstract class RobotModuleBase extends RobotModuleOperatorMarker {
     protected RobotModuleBase(String moduleName, boolean updateDuringDisabled) {
         this.moduleName = moduleName;
         this.updateDuringDisabled = updateDuringDisabled;
-        previousTimeMillis = System.currentTimeMillis();
+        previousTime = Timer.getFPGATimestamp();
     }
 
     protected RobotModuleBase(String moduleName) {
@@ -61,16 +62,16 @@ public abstract class RobotModuleBase extends RobotModuleOperatorMarker {
         // System.out.println("<-- base periodic of " + moduleName + ", enabled: " + enabled + "-->");
         if (!enabled && !updateDuringDisabled)
             return;
-        long newTimeMillis = System.currentTimeMillis();
-        if (newTimeMillis == previousTimeMillis) {
+        double newTime = Timer.getFPGATimestamp();
+        if (newTime == previousTime) {
             /* in case of dt=0 */
             TimeUtils.sleep(1);
-            newTimeMillis = System.currentTimeMillis();
+            newTime = Timer.getFPGATimestamp();
         }
         updateConfigs();
         // System.out.println("executing periodic");
-        periodic((newTimeMillis - previousTimeMillis) / 1000.0f);
-        this.previousTimeMillis = newTimeMillis;
+        periodic(newTime - previousTime);
+        this.previousTime = newTime;
         // System.out.println("<-- end of base periodic -->");
     }
 
@@ -85,7 +86,7 @@ public abstract class RobotModuleBase extends RobotModuleOperatorMarker {
     public abstract void onReset();
 
     public void reset() {
-        this.previousTimeMillis = System.currentTimeMillis();
+        this.previousTime = Timer.getFPGATimestamp();
         onReset();
         clearAccumulations();
     }
@@ -135,7 +136,7 @@ public abstract class RobotModuleBase extends RobotModuleOperatorMarker {
         return operator == null || operator == owner;
     }
 
-    public long getPreviousUpdateTimeMillis() {
-        return previousTimeMillis;
+    public double getPreviousUpdateTimeMillis() {
+        return previousTime;
     }
 }

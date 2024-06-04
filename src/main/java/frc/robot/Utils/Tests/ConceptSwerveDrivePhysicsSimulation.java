@@ -2,7 +2,7 @@ package frc.robot.Utils.Tests;
 
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.Modules.PositionReader.RobotFieldPositionEstimator;
-import frc.robot.Utils.CollisionDetectionGrid;
+import frc.robot.Utils.PhysicsSimulation.CollisionDetectionGrid;
 import frc.robot.Utils.EasyDataFlow;
 import frc.robot.Utils.MathUtils.AngleUtils;
 import frc.robot.Utils.MathUtils.LookUpTable;

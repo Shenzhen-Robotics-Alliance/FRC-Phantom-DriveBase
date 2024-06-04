@@ -98,4 +98,12 @@ public abstract class RobotFieldPositionEstimator extends RobotModuleBase {
             case Blue -> positionOnFieldAtBlueAlliance;
         };
     }
+
+    public static Vector2D getRobotDefaultStartingPosition() {
+        return toActualPositionOnField(robotDefaultStartingPositionBlue);
+    }
+
+    public static Rotation2D getPilotFacing() {
+        return toActualRobotRotation(pilotFacingBlue);
+    }
 }

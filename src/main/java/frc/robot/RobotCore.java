@@ -9,6 +9,7 @@ import com.ctre.phoenix6.hardware.CANcoder;
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.PowerDistribution;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Drivers.Encoders.CanCoder;
 import frc.robot.Drivers.IMUs.PigeonsIMU;
@@ -23,6 +24,7 @@ import frc.robot.Modules.PositionReader.*;
 import frc.robot.Modules.RobotModuleBase;
 import frc.robot.Services.RobotServiceBase;
 import frc.robot.Utils.MathUtils.Vector2D;
+import frc.robot.Utils.PhysicsSimulation.AllRealFieldPhysicsSimulation;
 import frc.robot.Utils.RobotConfigReader;
 
 /**
@@ -66,10 +68,12 @@ public class RobotCore {
                         createRobotReal();
         }
 
+        private AllRealFieldPhysicsSimulation physicsSimulation;
         private void createRobotSim() {
                 System.out.println("<-- Robot Core | creating robot in simulation... -->");
+                physicsSimulation = new AllRealFieldPhysicsSimulation();
 
-                final PositionEstimatorSimulation positionEstimatorSimulation = new PositionEstimatorSimulation();
+                final PositionEstimatorSimulation positionEstimatorSimulation = new PositionEstimatorSimulation(physicsSimulation, SwerveDriveChassisSimulation.robotPhysicsProfile);
                 this.positionEstimator = positionEstimatorSimulation;
                 modules.add(positionEstimator);
                 this.statusLight = new SimulatedLEDStatusLight();
@@ -84,7 +88,7 @@ public class RobotCore {
                 modules.add(backLeftWheel);
                 modules.add(frontRightWheel);
                 modules.add(backRightWheel);
-                this.chassis = new SwerveDriveChassisSimulation(frontLeftWheel, frontRightWheel, backLeftWheel, backRightWheel, positionEstimatorSimulation, robotConfig);
+                this.chassis = new SwerveDriveChassisSimulation(frontLeftWheel, frontRightWheel, backLeftWheel, backRightWheel, positionEstimatorSimulation, physicsSimulation, robotConfig);
                 modules.add(chassis);
         }
 

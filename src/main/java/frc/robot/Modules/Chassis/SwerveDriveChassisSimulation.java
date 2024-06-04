@@ -2,7 +2,8 @@ package frc.robot.Modules.Chassis;
 
 import frc.robot.Modules.PositionReader.PositionEstimatorSimulation;
 import frc.robot.Modules.PositionReader.RobotFieldPositionEstimator;
-import frc.robot.Utils.CollisionDetectionGrid;
+import frc.robot.Utils.PhysicsSimulation.AllRealFieldPhysicsSimulation;
+import frc.robot.Utils.PhysicsSimulation.CollisionDetectionGrid;
 import frc.robot.Utils.EasyDataFlow;
 import frc.robot.Utils.MathUtils.AngleUtils;
 import frc.robot.Utils.MathUtils.LookUpTable;
@@ -12,11 +13,21 @@ import frc.robot.Utils.RobotConfigReader;
 import frc.robot.Utils.RobotModuleOperatorMarker;
 
 public class SwerveDriveChassisSimulation extends SwerveDriveChassisLogic {
-    private final PositionEstimatorSimulation positionEstimatorSimulation;
-    private final CollisionDetectionGrid collisionDetectionGrid = new CollisionDetectionGrid();
-    public SwerveDriveChassisSimulation(SwerveWheelLogic frontLeft, SwerveWheelLogic frontRight, SwerveWheelLogic backLeft, SwerveWheelLogic backRight, PositionEstimatorSimulation positionEstimatorSimulation, RobotConfigReader robotConfig) {
+    public static final AllRealFieldPhysicsSimulation.RobotProfile robotPhysicsProfile = new AllRealFieldPhysicsSimulation.RobotProfile(
+            70,
+            10,
+            0.8, 0.8
+    );
 
+    private final PositionEstimatorSimulation positionEstimatorSimulation;
+    private final CollisionDetectionGrid collisionDetectionGrid;
+    private final AllRealFieldPhysicsSimulation physicsSimulation;
+    private final AllRealFieldPhysicsSimulation.HolomonicRobotPhysicsSimulation robotPhysicsSimulation;
+    public SwerveDriveChassisSimulation(SwerveWheelLogic frontLeft, SwerveWheelLogic frontRight, SwerveWheelLogic backLeft, SwerveWheelLogic backRight, PositionEstimatorSimulation positionEstimatorSimulation, AllRealFieldPhysicsSimulation physicsSimulation, RobotConfigReader robotConfig) {
         super(frontLeft, frontRight, backLeft, backRight, positionEstimatorSimulation, robotConfig);
+        this.physicsSimulation = physicsSimulation;
+        collisionDetectionGrid = new CollisionDetectionGrid();
+        robotPhysicsSimulation = positionEstimatorSimulation.robotPhysicsSimulation;
         this.positionEstimatorSimulation = positionEstimatorSimulation;
     }
 
@@ -114,12 +125,15 @@ public class SwerveDriveChassisSimulation extends SwerveDriveChassisLogic {
     }
 
     private void simulateChassisBehaviorSetVelocity(double dt) {
-        final Rotation2D pilotFacing = RobotFieldPositionEstimator.toActualRobotRotation(RobotFieldPositionEstimator.pilotFacingBlue);
         final Vector2D desiredMotion =
                 orientationMode == OrientationMode.FIELD ?
-                        super.translationalTask.translationValue.multiplyBy(pilotFacing)
-                        : super.translationalTask.translationValue.multiplyBy(new Rotation2D(positionEstimator.getRobotRotation())),
-                desiredVelocity = desiredMotion.multiplyBy(robotMaximumSpeed);
+                        super.translationalTask.translationValue.multiplyBy(RobotFieldPositionEstimator.getPilotFacing())
+                        : super.translationalTask.translationValue.multiplyBy(new Rotation2D(positionEstimator.getRobotRotation()));
+        simulateChassisBehaviorSetVelocity(dt, desiredMotion);
+    }
+
+    private void simulateChassisBehaviorSetVelocity(double dt, Vector2D desiredMotion) {
+        final Vector2D desiredVelocity = desiredMotion.multiplyBy(robotMaximumSpeed);
         
         Vector2D simulatedVelocity = positionEstimator.getRobotVelocity2DToField(), simulatedPosition = positionEstimator.getRobotPosition2D();
 
@@ -175,14 +189,23 @@ public class SwerveDriveChassisSimulation extends SwerveDriveChassisLogic {
         EasyDataFlow.putNumber("chassis physics simulation",  "new speed", newSpeed);
         EasyDataFlow.putNumber("chassis physics simulation", "chassis max spd", currentMaximumSpeed);
         EasyDataFlow.putNumber("chassis physics simulation", "pilot stick dir", Math.toDegrees(pilotStickDirection));
-        simulatedPosition = simulatedPosition.addBy(simulatedVelocity.multiplyBy(dt));
+
+        /* collision grid simulation */
+//        simulatedPosition = simulatedPosition.addBy(simulatedVelocity.multiplyBy(dt));
+//        Vector2D[] pos_vel = collisionDetectionGrid.applyCollisionDetection(simulatedPosition, simulatedVelocity);
+//        simulatedPosition = pos_vel[0];
+//        simulatedVelocity = pos_vel[1];
+
 
         // apply two times to prevent the robot from going through walls
         EasyDataFlow.putNumber("chassis physics simulation", "robot vel x unbounded", simulatedVelocity.getX());
         EasyDataFlow.putNumber("chassis physics simulation", "robot vel y unbounded", simulatedVelocity.getY());
-        Vector2D[] pos_vel = collisionDetectionGrid.applyCollisionDetection(simulatedPosition, simulatedVelocity);
-        simulatedPosition = pos_vel[0];
-        simulatedVelocity = pos_vel[1];
+
+        /* all-real physics simulation */
+        robotPhysicsSimulation.setMotion(simulatedVelocity, robotPhysicsSimulation.getAngularVelocity());
+        physicsSimulation.update(dt);
+        simulatedPosition = Vector2D.fromVector2(robotPhysicsSimulation.getWorldCenter());
+        simulatedVelocity = Vector2D.fromVector2(robotPhysicsSimulation.getLinearVelocity());
 
         EasyDataFlow.putNumber("chassis physics simulation", "robot vel x", simulatedVelocity.getX());
         EasyDataFlow.putNumber("chassis physics simulation", "robot vel y", simulatedVelocity.getY());

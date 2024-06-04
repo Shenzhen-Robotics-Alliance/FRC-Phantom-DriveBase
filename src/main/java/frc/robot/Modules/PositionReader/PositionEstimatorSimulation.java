@@ -3,11 +3,26 @@ package frc.robot.Modules.PositionReader;
 import frc.robot.Utils.MathUtils.AngleUtils;
 import frc.robot.Utils.MathUtils.Rotation2D;
 import frc.robot.Utils.MathUtils.Vector2D;
+import frc.robot.Utils.PhysicsSimulation.AllRealFieldPhysicsSimulation;
 
 public class PositionEstimatorSimulation extends RobotFieldPositionEstimator {
     private Vector2D robotPosition, robotVelocity, robotAcceleration;
     private double robotFacing, robotAngularVelocity;
-    public PositionEstimatorSimulation() {}
+    public final AllRealFieldPhysicsSimulation physicsSimulation;
+    public final AllRealFieldPhysicsSimulation.HolomonicRobotPhysicsSimulation robotPhysicsSimulation;
+
+    public PositionEstimatorSimulation(AllRealFieldPhysicsSimulation physicsSimulation, AllRealFieldPhysicsSimulation.RobotProfile robotProfile) {
+        this.physicsSimulation = physicsSimulation;
+        this.robotPhysicsSimulation = physicsSimulation.addRobot(
+                new AllRealFieldPhysicsSimulation.HolomonicRobotPhysicsSimulation(robotProfile));
+    }
+
+    @Override
+    public void periodic(double dt) {
+        physicsSimulation.update(dt);
+        final Vector2D acceleration = Vector2D.displacementToTarget(getRobotPosition2D(), robotPhysicsSimulation.getFieldPosition()).multiplyBy(1.0/dt);
+        updateRobotTranslationalStatus(robotPhysicsSimulation.getFieldPosition(), robotPhysicsSimulation.getFieldVelocity(), acceleration);
+    }
 
     @Override
     public Vector2D getRobotVelocity2DToField() {
@@ -64,9 +79,10 @@ public class PositionEstimatorSimulation extends RobotFieldPositionEstimator {
 
     @Override
     public void onReset() {
-        this.robotFacing = RobotFieldPositionEstimator.toActualRobotRotation(new Rotation2D(Math.toRadians(90))).getRadian();
+        this.robotFacing = RobotFieldPositionEstimator.toActualRobotRotation(new Rotation2D(Math.toRadians(-90))).getRadian();
         this.robotAngularVelocity = 0;
-        this.robotPosition = RobotFieldPositionEstimator.toActualPositionOnField(new Vector2D(new double[] {3, 1.6}));
+        this.robotPosition = RobotFieldPositionEstimator.getRobotDefaultStartingPosition();
         this.robotVelocity = this.robotAcceleration = new Vector2D();
+        robotPhysicsSimulation.reset(getRobotPosition2D(), getRobotRotation2D());
     }
 }
