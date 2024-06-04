@@ -14,11 +14,9 @@ import org.dyn4j.dynamics.Force;
 import org.dyn4j.dynamics.Torque;
 import org.dyn4j.geometry.Geometry;
 import org.dyn4j.geometry.MassType;
-import org.dyn4j.geometry.Vector2;
 import org.dyn4j.world.PhysicsWorld;
 import org.dyn4j.world.World;
 
-import java.awt.*;
 
 public class AllRealPhysicsSimulationTest implements SimpleRobotTest {
     private final XboxController xboxController = new XboxController(1);

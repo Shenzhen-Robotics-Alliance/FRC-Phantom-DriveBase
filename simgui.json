@@ -10,6 +10,9 @@
     }
   },
   "NetworkTables": {
+    "Retained Values": {
+      "open": false
+    },
     "transitory": {
       "Pose2d[]##v_position 1": {
         "open": true

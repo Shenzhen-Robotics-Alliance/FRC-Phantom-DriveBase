@@ -190,23 +190,26 @@ public class SwerveDriveChassisSimulation extends SwerveDriveChassisLogic {
         EasyDataFlow.putNumber("chassis physics simulation", "chassis max spd", currentMaximumSpeed);
         EasyDataFlow.putNumber("chassis physics simulation", "pilot stick dir", Math.toDegrees(pilotStickDirection));
 
+
+
+
         /* collision grid simulation */
-//        simulatedPosition = simulatedPosition.addBy(simulatedVelocity.multiplyBy(dt));
+        // simulatedPosition = simulatedPosition.addBy(simulatedVelocity.multiplyBy(dt));
 //        Vector2D[] pos_vel = collisionDetectionGrid.applyCollisionDetection(simulatedPosition, simulatedVelocity);
 //        simulatedPosition = pos_vel[0];
 //        simulatedVelocity = pos_vel[1];
 
-
-        // apply two times to prevent the robot from going through walls
-        EasyDataFlow.putNumber("chassis physics simulation", "robot vel x unbounded", simulatedVelocity.getX());
-        EasyDataFlow.putNumber("chassis physics simulation", "robot vel y unbounded", simulatedVelocity.getY());
-
         /* all-real physics simulation */
         robotPhysicsSimulation.setMotion(simulatedVelocity, robotPhysicsSimulation.getAngularVelocity());
+        robotPhysicsSimulation.setAtRest(false);
         physicsSimulation.update(dt);
         simulatedPosition = Vector2D.fromVector2(robotPhysicsSimulation.getWorldCenter());
         simulatedVelocity = Vector2D.fromVector2(robotPhysicsSimulation.getLinearVelocity());
 
+
+
+        EasyDataFlow.putNumber("chassis physics simulation", "robot vel x unbounded", simulatedVelocity.getX());
+        EasyDataFlow.putNumber("chassis physics simulation", "robot vel y unbounded", simulatedVelocity.getY());
         EasyDataFlow.putNumber("chassis physics simulation", "robot vel x", simulatedVelocity.getX());
         EasyDataFlow.putNumber("chassis physics simulation", "robot vel y", simulatedVelocity.getY());
 

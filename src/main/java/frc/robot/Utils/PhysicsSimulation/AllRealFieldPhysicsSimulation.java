@@ -70,8 +70,8 @@ public class AllRealFieldPhysicsSimulation {
         }
 
         public void setMotion(Vector2D linearVelocity, double angularVelocity) {
-            super.linearVelocity.set(Vector2D.toVector2(linearVelocity));
-            super.angularVelocity = angularVelocity;
+            super.setLinearVelocity(Vector2D.toVector2(linearVelocity));
+            super.setAngularVelocity(angularVelocity);
         }
 
         public Vector2D getFieldPosition() {

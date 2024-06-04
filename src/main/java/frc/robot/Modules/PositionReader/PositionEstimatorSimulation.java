@@ -18,13 +18,6 @@ public class PositionEstimatorSimulation extends RobotFieldPositionEstimator {
     }
 
     @Override
-    public void periodic(double dt) {
-        physicsSimulation.update(dt);
-        final Vector2D acceleration = Vector2D.displacementToTarget(getRobotPosition2D(), robotPhysicsSimulation.getFieldPosition()).multiplyBy(1.0/dt);
-        updateRobotTranslationalStatus(robotPhysicsSimulation.getFieldPosition(), robotPhysicsSimulation.getFieldVelocity(), acceleration);
-    }
-
-    @Override
     public Vector2D getRobotVelocity2DToField() {
         return robotVelocity;
     }
