@@ -39,12 +39,16 @@
         <wheelDiameter type="double">0.1016</wheelDiameter>
         <wheelGearRatio type="double">6.12</wheelGearRatio>
         <encoderValuePerMotorRevolution type="double">2048</encoderValuePerMotorRevolution>
+
+        <!-- robot physical features -->
         <robotMaximumSpeed type="double">4.8</robotMaximumSpeed>
-        <motorMaximumLinearAcceleration type="double">8</motorMaximumLinearAcceleration>
-        <robotSpeedConstrainAtSharpTurn type="double">2.8</robotSpeedConstrainAtSharpTurn>
-        <robotMaximumCentripetalAcceleration type="double">10</robotMaximumCentripetalAcceleration>
-        <simulationFriction type="double">16</simulationFriction>
-        <robotMaxAngularVelocity>300</robotMaxAngularVelocity>
+        <motorMaximumAcceleration type="double">12</motorMaximumAcceleration>
+        <robotMass type="double">75</robotMass>
+        <floorFrictionAcceleration type="double">10</floorFrictionAcceleration>
+        <robotMaxAngularVelocity type="double">300</robotMaxAngularVelocity>
+        <robotMaxAngularAcceleration type="double">600</robotMaxAngularAcceleration>
+        <width>0.8</width>
+        <height>0.8</height>
 
         <!-- PID coefficients for steer wheels -->
         <steerWheelErrorTolerance type = "double">1</steerWheelErrorTolerance> <!-- the amount of error to ignore, in degrees -->

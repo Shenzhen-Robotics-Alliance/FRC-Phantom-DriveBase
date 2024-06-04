@@ -1,15 +1,13 @@
 package frc.robot.Utils.PhysicsSimulation;
 
-import frc.robot.Modules.PositionReader.RobotFieldPositionEstimator;
 import frc.robot.Utils.MathUtils.Rotation2D;
 import frc.robot.Utils.MathUtils.Vector2D;
 import frc.robot.Utils.PhysicsSimulation.FieldMaps.CrescendoDefault;
+import frc.robot.Utils.RobotConfigReader;
 import org.dyn4j.dynamics.Body;
 import org.dyn4j.dynamics.BodyFixture;
 import org.dyn4j.geometry.Geometry;
-import org.dyn4j.geometry.Mass;
 import org.dyn4j.geometry.MassType;
-import org.dyn4j.geometry.Vector2;
 import org.dyn4j.world.World;
 
 import java.util.ArrayList;
@@ -37,30 +35,59 @@ public class AllRealFieldPhysicsSimulation {
     }
 
     public static final class RobotProfile {
-        private final double
+        public final double
+                robotMaxVelocity,
+                robotMaxAcceleration,
                 robotMass,
-                robotRotationInterior,
+                propellingForce,
+                frictionForce,
+                linearVelocityDamping,
+                maxAngularVelocity,
+                angularDamping,
                 width,
                 height;
-        public RobotProfile(double robotMass, double robotRotationInterior, double width, double height) {
+
+        public RobotProfile(RobotConfigReader robotConfig) {
+            this(
+                    robotConfig.getConfig("chassis", "robotMaximumSpeed"),
+                    robotConfig.getConfig("chassis", "motorMaximumAcceleration"),
+                    robotConfig.getConfig("chassis", "floorFrictionAcceleration"),
+                    Math.toRadians(robotConfig.getConfig("chassis", "robotMaxAngularVelocity")),
+                    Math.toRadians(robotConfig.getConfig("chassis", "robotMaxAngularAcceleration")),
+                    robotConfig.getConfig("chassis", "robotMass"),
+                    robotConfig.getConfig("chassis", "width"),
+                    robotConfig.getConfig("chassis", "height")
+            );
+        }
+        public RobotProfile(double robotMaxVelocity, double robotMaxAcceleration, double floorFrictionAcceleration, double maxAngularVelocity, double maxAngularAcceleration, double robotMass, double width, double height) {
+            this.robotMaxVelocity = robotMaxVelocity;
+            this.robotMaxAcceleration = robotMaxAcceleration;
             this.robotMass = robotMass;
-            this.robotRotationInterior = robotRotationInterior;
+            this.propellingForce = robotMaxAcceleration * robotMass;
+            this.frictionForce = floorFrictionAcceleration * robotMass;
+            this.linearVelocityDamping = robotMaxAcceleration / robotMaxVelocity;
+            this.maxAngularVelocity = maxAngularVelocity;
+            this.angularDamping = maxAngularAcceleration / maxAngularVelocity;
             this.width = width;
             this.height = height;
         }
     }
 
     public static class HolomonicRobotPhysicsSimulation extends Body {
-        private final RobotProfile profile;
+        public final RobotProfile profile;
         public HolomonicRobotPhysicsSimulation(RobotProfile profile) {
             this.profile = profile;
 
-            super.setMass(new Mass(new Vector2(), profile.robotMass, profile.robotRotationInterior));
             /* height and width is reversed */
-            final BodyFixture fixture = super.addFixture(Geometry.createRectangle(profile.height, profile.width));
+            super.addFixture(
+                    Geometry.createRectangle(profile.width, profile.height),
+                    profile.robotMass / (profile.height * profile.width),
+                    0.6,
+                    0.2
+            );
 
-            fixture.setFriction(0.5);
-            fixture.setRestitution(0.3);
+            super.setLinearDamping(profile.linearVelocityDamping);
+            super.setAngularDamping(profile.angularDamping);
         }
 
         public void reset(Vector2D robotPositionOnField, Rotation2D robotFacing) {

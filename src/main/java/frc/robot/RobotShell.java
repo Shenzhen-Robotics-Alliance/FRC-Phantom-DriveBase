@@ -127,7 +127,7 @@ public class RobotShell extends LoggedRobot {
     public void testInit() {
         // System.out.println("<-- Robot Shell | test init -->");
         if (robotTest == null)
-            this.robotTest = new BasicPhysicsSimulation();
+            this.robotTest = new BasicPhysicsSimulationTest();
         robotTest.testStart();
     }
 

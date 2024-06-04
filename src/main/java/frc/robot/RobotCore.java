@@ -73,7 +73,7 @@ public class RobotCore {
                 System.out.println("<-- Robot Core | creating robot in simulation... -->");
                 physicsSimulation = new AllRealFieldPhysicsSimulation();
 
-                final PositionEstimatorSimulation positionEstimatorSimulation = new PositionEstimatorSimulation(physicsSimulation, SwerveDriveChassisSimulation.robotPhysicsProfile);
+                final PositionEstimatorSimulation positionEstimatorSimulation = new PositionEstimatorSimulation(robotConfig);
                 this.positionEstimator = positionEstimatorSimulation;
                 modules.add(positionEstimator);
                 this.statusLight = new SimulatedLEDStatusLight();

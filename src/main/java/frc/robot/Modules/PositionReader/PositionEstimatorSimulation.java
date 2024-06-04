@@ -1,20 +1,35 @@
 package frc.robot.Modules.PositionReader;
 
+import frc.robot.Utils.EasyDataFlow;
 import frc.robot.Utils.MathUtils.AngleUtils;
 import frc.robot.Utils.MathUtils.Rotation2D;
 import frc.robot.Utils.MathUtils.Vector2D;
 import frc.robot.Utils.PhysicsSimulation.AllRealFieldPhysicsSimulation;
+import frc.robot.Utils.RobotConfigReader;
 
 public class PositionEstimatorSimulation extends RobotFieldPositionEstimator {
     private Vector2D robotPosition, robotVelocity, robotAcceleration;
     private double robotFacing, robotAngularVelocity;
-    public final AllRealFieldPhysicsSimulation physicsSimulation;
     public final AllRealFieldPhysicsSimulation.HolomonicRobotPhysicsSimulation robotPhysicsSimulation;
 
-    public PositionEstimatorSimulation(AllRealFieldPhysicsSimulation physicsSimulation, AllRealFieldPhysicsSimulation.RobotProfile robotProfile) {
-        this.physicsSimulation = physicsSimulation;
-        this.robotPhysicsSimulation = physicsSimulation.addRobot(
-                new AllRealFieldPhysicsSimulation.HolomonicRobotPhysicsSimulation(robotProfile));
+    public PositionEstimatorSimulation(RobotConfigReader robotConfig) {
+        final AllRealFieldPhysicsSimulation.RobotProfile robotProfile = new AllRealFieldPhysicsSimulation.RobotProfile(robotConfig);
+        this.robotPhysicsSimulation = new AllRealFieldPhysicsSimulation.HolomonicRobotPhysicsSimulation(robotProfile);
+    }
+
+    @Override
+    protected void periodic(double dt) {
+        final Vector2D acceleration = Vector2D.displacementToTarget(getRobotVelocity2DToField(), robotPhysicsSimulation.getFieldVelocity()).multiplyBy(1.0/dt);
+        updateRobotTranslationalStatus(robotPhysicsSimulation.getFieldPosition(), robotPhysicsSimulation.getFieldVelocity(), acceleration);
+
+        updateRobotRotationalStatus(robotPhysicsSimulation.getFacing().getRadian(), robotPhysicsSimulation.getAngularVelocity());
+
+        EasyDataFlow.putNumber("chassis physics simulation", "robot velocity (X)", getRobotVelocity2DToField().getX());
+        EasyDataFlow.putNumber("chassis physics simulation", "robot velocity (Y)", getRobotVelocity2DToField().getY());
+        EasyDataFlow.putNumber("chassis physics simulation", "robot facing (Deg)", Math.toDegrees(getRobotRotation()));
+        EasyDataFlow.putNumber("chassis physics simulation", "robot angular velocity (Deg/Sec)", Math.toDegrees(getRobotRotationalVelocity()));
+
+        EasyDataFlow.putRobot(robotPhysicsSimulation);
     }
 
     @Override
