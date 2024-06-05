@@ -131,9 +131,17 @@ public class SwerveDriveChassisSimulation extends SwerveDriveChassisLogic {
 
     private void simulateChassisBehaviorSetRotationalVelocity(double dt) {
         EasyDataFlow.putNumber("chassis physics simulation", "desired rotational motion", rotationalTask.rotationalValue);
-        robotPhysicsSimulation.applyTorque(rotationalTask.rotationalValue * robotPhysicsSimulation.profile.maxAngularVelocity * robotPhysicsSimulation.getMass().getInertia() * robotPhysicsSimulation.profile.angularDamping);
-        if (Math.abs(robotPhysicsSimulation.getAngularVelocity()) < Math.toRadians(5))
-            robotPhysicsSimulation.setAngularVelocity(0);
+        if (Math.abs(rotationalTask.rotationalValue) > 0.05)
+            robotPhysicsSimulation.applyTorque(rotationalTask.rotationalValue * robotPhysicsSimulation.profile.maxAngularVelocity * robotPhysicsSimulation.getMass().getInertia() * robotPhysicsSimulation.profile.angularDamping);
+        else {
+            if (Math.abs(robotPhysicsSimulation.getAngularVelocity()) < robotPhysicsSimulation.profile.maxAngularVelocity * 0.05)
+                robotPhysicsSimulation.setAngularVelocity(0);
+            else
+                robotPhysicsSimulation.applyTorque(Math.copySign(-robotPhysicsSimulation.profile.angularFrictionAcceleration * robotPhysicsSimulation.getMass().getInertia(), robotPhysicsSimulation.getAngularVelocity()));
+            // TODO find out why the robot is not responding to this correctly
+            System.out.println("robot angular velocity: " + Math.toDegrees(robotPhysicsSimulation.getAngularVelocity()));
+            System.out.println("applied torque: " + Math.copySign(-robotPhysicsSimulation.profile.angularFrictionAcceleration * robotPhysicsSimulation.getMass().getInertia(), robotPhysicsSimulation.getAngularVelocity()));
+        }
     }
 
     @Override

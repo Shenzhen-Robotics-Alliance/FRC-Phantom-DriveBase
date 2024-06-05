@@ -39,7 +39,7 @@ public class RobotShell extends LoggedRobot {
     @Override
     public void robotInit() {
         System.out.println("<-- Robot Shell | robot init -->");
-        robotCore = new RobotCore("fasterChassis", isSimulation());
+        robotCore = new RobotCore("5516-2022", isSimulation());
 
         DataLogManager.start();
         DriverStation.startDataLog(DataLogManager.getLog());
@@ -127,7 +127,7 @@ public class RobotShell extends LoggedRobot {
     public void testInit() {
         // System.out.println("<-- Robot Shell | test init -->");
         if (robotTest == null)
-            this.robotTest = new BasicPhysicsSimulationTest();
+            this.robotTest = new WheelsCalibration(robotCore.robotConfig);
         robotTest.testStart();
     }
 

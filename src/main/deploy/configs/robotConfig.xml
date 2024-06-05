@@ -47,6 +47,7 @@
         <floorFrictionAcceleration type="double">10</floorFrictionAcceleration>
         <robotMaxAngularVelocity type="double">300</robotMaxAngularVelocity>
         <robotMaxAngularAcceleration type="double">600</robotMaxAngularAcceleration>
+        <timeChassisStopsRotating>0.4</timeChassisStopsRotating>
         <width>0.8</width>
         <height>0.8</height>
 
@@ -99,98 +100,6 @@
         <minUsageSpeed type="double">0.05</minUsageSpeed>
     </chassis>
 
-    <!-- robot module configs goes here -->
-    <shooter>
-        <shooterMotorEncoderTicksPerRevolution>2048</shooterMotorEncoderTicksPerRevolution>
-        <speedControllerProportionGain>1</speedControllerProportionGain>
-        <speedControllerFeedForwardGain>2</speedControllerFeedForwardGain>
-        <speedControllerFrictionGain>0</speedControllerFrictionGain>
-        <speedControllerFeedForwardDelay>0</speedControllerFeedForwardDelay>
-        <speedControllerMaximumSpeed>6000</speedControllerMaximumSpeed>
-        <speedControllerTimeNeededToAccelerateToMaxSpeed>0.7</speedControllerTimeNeededToAccelerateToMaxSpeed>
-        <flyWheelSpeedErrorTolerance>0.06</flyWheelSpeedErrorTolerance>
-
-        <additionalInAdvanceTime>0.3</additionalInAdvanceTime>
-
-        <defaultShootingRPM>5200</defaultShootingRPM>
-        <amplifyRPM>3000</amplifyRPM>
-        <idleRPM>0</idleRPM>
-        <preparingForShootRPM>2000</preparingForShootRPM>
-        <projectileSpeed>16</projectileSpeed>
-        <shootingRange>4</shootingRange>
-
-        <!-- shooting lookup table -->
-        <targetDistance0>1.3</targetDistance0>
-        <shooterRPM0>3400</shooterRPM0>
-        <armAngle0>12</armAngle0>
-
-        <targetDistance1>1.6</targetDistance1>
-        <shooterRPM1>3800</shooterRPM1>
-        <armAngle1>7</armAngle1>
-
-        <targetDistance2>2.1</targetDistance2>
-        <shooterRPM2>4600</shooterRPM2>
-        <armAngle2>-3</armAngle2>
-
-        <targetDistance3>2.6</targetDistance3>
-        <shooterRPM3>5400</shooterRPM3>
-        <armAngle3>-6</armAngle3>
-
-        <targetDistance4>3.1</targetDistance4>
-        <shooterRPM4>6000</shooterRPM4>
-        <armAngle4>-12</armAngle4>
-
-        <targetDistance5>3.6</targetDistance5>
-        <shooterRPM5>6000</shooterRPM5>
-        <armAngle5>-26</armAngle5>
-
-        <targetDistance6>4.1</targetDistance6>
-        <shooterRPM6>6000</shooterRPM6>
-        <armAngle6>-21</armAngle6>
-    </shooter>
-    <intake>
-        <intakeMotorPort>-1</intakeMotorPort>
-        <intakeMotorReversed>0</intakeMotorReversed>
-        <intakeAidMotorPort>-1</intakeAidMotorPort>
-        <intakeAidMotorReversed>0</intakeAidMotorReversed>
-        <distanceSensorThreshold>30</distanceSensorThreshold>
-<!--        <moveBackToPositionTime>0.15</moveBackToPositionTime>-->
-
-        <moveNoteUpInsideIntakePower>0.35</moveNoteUpInsideIntakePower>
-        <moveNoteDownInsideIntakePower>0.1</moveNoteDownInsideIntakePower>
-
-        <launchPower>0.45</launchPower>
-        <intakePower>0.18</intakePower>
-        <intakeAidPower>0.4</intakeAidPower>
-        <revertPower>-0.3</revertPower>
-
-        <splitTime>0.3</splitTime>
-        <launchTime>0.5</launchTime>
-    </intake>
-    <arm>
-        <!-- arm PID -->
-        <maximumPower>0.65</maximumPower>
-        <errorStartDecelerate>35</errorStartDecelerate>
-        <minPowerToMove>0</minPowerToMove>
-        <errorTolerance>1</errorTolerance>
-        <feedForwardTime>0.06</feedForwardTime>
-        <errorAccumulationProportion>0</errorAccumulationProportion>
-        <errorAccumulationLimit>0</errorAccumulationLimit>
-        <maxAcceleration>180</maxAcceleration>
-        <maxVelocity>120</maxVelocity>
-        <inAdvanceTime>0.25</inAdvanceTime>
-        <errorToleranceAsInPosition>4.5</errorToleranceAsInPosition>
-    </arm>
-
-    <vision-autopilot>
-        <autoFaceTargetTimeUnseenToleranceMS>5000</autoFaceTargetTimeUnseenToleranceMS>
-        <aimingTimeUnseenToleranceMS>2000</aimingTimeUnseenToleranceMS>
-
-        <updateTargetPositionTolerance>0.2</updateTargetPositionTolerance>
-
-        <defaultShootingPositionDistance>1.8</defaultShootingPositionDistance>
-    </vision-autopilot>
-
     <auto>
         <autoStageMaxAcceleration type="double">12</autoStageMaxAcceleration>
         <autoStageMaxVelocity type="double">4.8</autoStageMaxVelocity>
@@ -201,17 +110,6 @@
         <shootingSegmentSpeedFactor>0.3</shootingSegmentSpeedFactor>
         <additionalRotationInAdvanceTime>0.3</additionalRotationInAdvanceTime>
     </auto>
-
-    <climb>
-        <leftClimbMotorPort>-1</leftClimbMotorPort>
-        <leftClimbMotorReversed>0</leftClimbMotorReversed>
-        <rightClimbMotorPort>-1</rightClimbMotorPort>
-        <rightClimbMotorReversed>0</rightClimbMotorReversed>
-
-        <movingPower>-0.4</movingPower>
-        <tolerance>5000</tolerance>
-        <upMostPointEncoderPosition>420000</upMostPointEncoderPosition>
-    </climb>
 
     <!-- the config for xbox controller, currently using radio master in replace -->
     <control-RM_POCKET>

@@ -188,40 +188,6 @@ public class RobotCore {
 //                configsToTune.add("chassis/steerWheelFeedForwardTime");
 //                configsToTune.add("chassis/steerCorrectionPowerRateAtZeroWheelSpeed");
 //                configsToTune.add("chassis/steerCorrectionPowerFullWheelSpeed");
-
-                /* arm pid */
-//                configsToTune.add("arm/maximumPower");
-//                configsToTune.add("arm/errorStartDecelerate");
-//                configsToTune.add("arm/errorTolerance");
-//                configsToTune.add("arm/feedForwardTime");
-//                configsToTune.add("arm/errorAccumulationProportion");
-//                configsToTune.add("arm/maxAcceleration");
-//                configsToTune.add("arm/maxVelocity");
-//                configsToTune.add("arm/inAdvanceTime");
-//                configsToTune.add("arm/errorToleranceAsInPosition");
-
-                /* arm positions */
-                configsToTune.add("arm/position-DEFAULT");
-                configsToTune.add("arm/position-INTAKE");
-                configsToTune.add("arm/position-SHOOT_NOTE");
-                configsToTune.add("arm/position-SCORE_AMPLIFIER");
-
-                configsToTune.add("shooter/defaultShootingRPM");
-//                configsToTune.add("shooter/speedControllerProportionGain");
-//                configsToTune.add("shooter/speedControllerFeedForwardGain");
-
-                configsToTune.add("shooter/shooterRPM0");
-                configsToTune.add("shooter/armAngle0");
-                configsToTune.add("shooter/shooterRPM1");
-                configsToTune.add("shooter/armAngle1");
-                configsToTune.add("shooter/shooterRPM2");
-                configsToTune.add("shooter/armAngle2");
-                configsToTune.add("shooter/shooterRPM3");
-                configsToTune.add("shooter/armAngle3");
-                configsToTune.add("shooter/shooterRPM4");
-                configsToTune.add("shooter/armAngle4");
-                configsToTune.add("shooter/shooterRPM5");
-                configsToTune.add("shooter/armAngle5");
         }
 
         /**
