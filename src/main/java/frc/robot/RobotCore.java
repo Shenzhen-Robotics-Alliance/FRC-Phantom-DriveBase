@@ -9,7 +9,6 @@ import com.ctre.phoenix6.hardware.CANcoder;
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.PowerDistribution;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Drivers.Encoders.CanCoder;
 import frc.robot.Drivers.IMUs.PigeonsIMU;
@@ -90,6 +89,8 @@ public class RobotCore {
                 modules.add(backRightWheel);
                 this.chassis = new SwerveDriveChassisSimulation(frontLeftWheel, frontRightWheel, backLeftWheel, backRightWheel, positionEstimatorSimulation, physicsSimulation, robotConfig);
                 modules.add(chassis);
+
+                physicsSimulation.addNoteToField(new Vector2D(new double[] {16.54/2, 8.21/2}));
         }
 
         private void createRobotReal() {

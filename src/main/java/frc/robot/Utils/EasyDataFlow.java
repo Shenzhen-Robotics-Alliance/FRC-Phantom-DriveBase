@@ -1,6 +1,7 @@
 package frc.robot.Utils;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.networktables.DoublePublisher;
@@ -32,6 +33,7 @@ public class EasyDataFlow {
     private static final Map<String, EasyRotation2DEntry> rotationEntries = new HashMap<>();
     private static final Map<String, EasyPosePublisher> positionEntries = new HashMap<>();
     private static final Map<String, EasyPoseArrayPublisher> positionArrayEntries = new HashMap<>();
+    private static final Map<String, StructArrayPublisher<Pose3d>> position3dArraysEntries = new HashMap<>();
     private static final Map<String, EasySwerveStatesPositionPublisher> swerveStatesPublisher = new HashMap<>();
     private static final DataLog log = DataLogManager.getLog();
     private static final Field2d field = new Field2d();
@@ -142,6 +144,12 @@ public class EasyDataFlow {
 
     private static Pose2d getPose(Vector2D position, Rotation2D rotation) {
         return new Pose2d(position.getX(), position.getY(), Rotation2d.fromRadians(rotation == null ? 0 : rotation.getRadian() + Math.toRadians(90)));
+    }
+
+    public static void putPosition3dArray(String name, Pose3d[] pose3ds) {
+        if (!position3dArraysEntries.containsKey(name))
+            position3dArraysEntries.put(name, NetworkTableInstance.getDefault().getStructArrayTopic(name, Pose3d.struct).publish());
+        position3dArraysEntries.get(name).set(pose3ds);
     }
 
     private static final class EasySwerveStatesPositionPublisher {

@@ -33,6 +33,5 @@ public class DashboardDataTest implements SimpleRobotTest {
         };
         pose3dStructArrayPublisher.set(pose3ds);
         Logger.recordOutput("test2", pose3ds);
-
     }
 }
