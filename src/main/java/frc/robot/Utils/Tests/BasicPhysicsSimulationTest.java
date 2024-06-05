@@ -5,13 +5,7 @@ import frc.robot.Utils.EasyDataFlow;
 import frc.robot.Utils.MathUtils.Rotation2D;
 import frc.robot.Utils.MathUtils.Vector2D;
 import frc.robot.Utils.PhysicsSimulation.AllRealFieldPhysicsSimulation;
-import frc.robot.Utils.PhysicsSimulation.FieldMaps.CrescendoDefault;
-import org.dyn4j.dynamics.Body;
 import org.dyn4j.dynamics.Force;
-import org.dyn4j.geometry.Geometry;
-import org.dyn4j.geometry.MassType;
-import org.dyn4j.world.PhysicsWorld;
-import org.dyn4j.world.World;
 
 public class BasicPhysicsSimulationTest implements SimpleRobotTest {
     private final XboxController xboxController = new XboxController(1);
@@ -27,6 +21,7 @@ public class BasicPhysicsSimulationTest implements SimpleRobotTest {
                 10,
                 Math.toRadians(300),
                 Math.toRadians(600),
+                0.3,
                 75,
                 0.8,
                 0.8
@@ -53,7 +48,7 @@ public class BasicPhysicsSimulationTest implements SimpleRobotTest {
         }
 
         robotPhysicsSimulation.applyTorque(-xboxController.getLeftX() * 10 * robotPhysicsSimulation.getMass().getInertia() * Math.toRadians(270));
-        if (Math.abs(robotPhysicsSimulation.getAngularVelocity()) < Math.toRadians(2))
+        if (Math.abs(xboxController.getLeftX()) < 0.05 && Math.abs(robotPhysicsSimulation.getAngularVelocity()) < Math.toRadians(5))
             robotPhysicsSimulation.setAngularVelocity(0);
 
         simulation.update(0.01);

@@ -2,8 +2,6 @@ package frc.robot.Utils.Tests;
 
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
-import edu.wpi.first.hal.SimEnum;
-import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -36,24 +34,22 @@ public class WheelsCalibration implements SimpleRobotTest { // calibrate wheel
 
     @Override
     public void testPeriodic() {
-        // new TalonFX((int) config.getConfig("hardware", wheelsSendableChooser.getSelected().name() + "WheelDriveMotor"))
+        final boolean chassisOnCanivore = config.getConfig("hardware", "chassisOnCanivore") != 0;
         TalonFXMotor testDriveMotor = new TalonFXMotor(
-                // new TalonFX((int) config.getConfig("hardware", wheelsSendableChooser.getSelected().name() + "WheelDriveMotor"))
-                new TalonFX((int) config.getConfig("hardware", wheelsSendableChooser.getSelected().name() + "WheelDriveMotor"), "ChassisCanivore")
+                chassisOnCanivore? new TalonFX((int) config.getConfig("hardware", wheelsSendableChooser.getSelected().name() + "WheelDriveMotor"), "ChassisCanivore")
+                : new TalonFX((int) config.getConfig("hardware", wheelsSendableChooser.getSelected().name() + "WheelDriveMotor"))
         );
         testDriveMotor.gainOwnerShip(null);
 
-        // new TalonFX((int) config.getConfig("hardware", wheelsSendableChooser.getSelected().name() + "WheelSteerMotor"))
         TalonFXMotor testSteerMotor = new TalonFXMotor(
-                // new TalonFX((int) config.getConfig("hardware", wheelsSendableChooser.getSelected().name() + "WheelSteerMotor"))
-                new TalonFX((int) config.getConfig("hardware", wheelsSendableChooser.getSelected().name() + "WheelSteerMotor"), "ChassisCanivore")
+                chassisOnCanivore? new TalonFX((int) config.getConfig("hardware", wheelsSendableChooser.getSelected().name() + "WheelSteerMotor"), "ChassisCanivore")
+                :new TalonFX((int) config.getConfig("hardware", wheelsSendableChooser.getSelected().name() + "WheelSteerMotor"))
         );
         testSteerMotor.gainOwnerShip(null);
 
-        // new CANCoder((int)config.getConfig("hardware", wheelsSendableChooser.getSelected().name() + "WheelEncoder"))
         CanCoder testCanCoder = new CanCoder(
-                // new CANCoder((int)config.getConfig("hardware", wheelsSendableChooser.getSelected().name() + "WheelEncoder"))
-                new CANcoder((int) config.getConfig("hardware", wheelsSendableChooser.getSelected().name() + "WheelEncoder"), "ChassisCanivore")
+                chassisOnCanivore ? new CANcoder((int)config.getConfig("hardware", wheelsSendableChooser.getSelected().name() + "WheelEncoder"), "ChassisCanivore")
+                :new CANcoder((int)config.getConfig("hardware", wheelsSendableChooser.getSelected().name() + "WheelEncoder"))
         );
 
         SmartDashboard.putNumber("raw steer encoder reading", testCanCoder.getRawEncoderReading());

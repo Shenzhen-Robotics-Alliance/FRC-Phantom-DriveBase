@@ -8,6 +8,7 @@ import org.dyn4j.dynamics.Body;
 import org.dyn4j.dynamics.BodyFixture;
 import org.dyn4j.geometry.Geometry;
 import org.dyn4j.geometry.MassType;
+import org.dyn4j.world.PhysicsWorld;
 import org.dyn4j.world.World;
 
 import java.util.ArrayList;
@@ -20,6 +21,7 @@ public class AllRealFieldPhysicsSimulation {
     public AllRealFieldPhysicsSimulation() {
         this.robots = new ArrayList<>();
         field = new World<>();
+        field.setGravity(PhysicsWorld.ZERO_GRAVITY);
         map = new CrescendoDefault();
         map.addObstaclesToField(field);
     }
@@ -44,6 +46,7 @@ public class AllRealFieldPhysicsSimulation {
                 linearVelocityDamping,
                 maxAngularVelocity,
                 angularDamping,
+                angularFrictionAcceleration,
                 width,
                 height;
 
@@ -54,12 +57,13 @@ public class AllRealFieldPhysicsSimulation {
                     robotConfig.getConfig("chassis", "floorFrictionAcceleration"),
                     Math.toRadians(robotConfig.getConfig("chassis", "robotMaxAngularVelocity")),
                     Math.toRadians(robotConfig.getConfig("chassis", "robotMaxAngularAcceleration")),
+                    robotConfig.getConfig("chassis", "timeChassisStopsRotating"),
                     robotConfig.getConfig("chassis", "robotMass"),
                     robotConfig.getConfig("chassis", "width"),
                     robotConfig.getConfig("chassis", "height")
             );
         }
-        public RobotProfile(double robotMaxVelocity, double robotMaxAcceleration, double floorFrictionAcceleration, double maxAngularVelocity, double maxAngularAcceleration, double robotMass, double width, double height) {
+        public RobotProfile(double robotMaxVelocity, double robotMaxAcceleration, double floorFrictionAcceleration, double maxAngularVelocity, double maxAngularAcceleration, double timeChassisStopsRotating, double robotMass, double width, double height) {
             this.robotMaxVelocity = robotMaxVelocity;
             this.robotMaxAcceleration = robotMaxAcceleration;
             this.robotMass = robotMass;
@@ -68,6 +72,7 @@ public class AllRealFieldPhysicsSimulation {
             this.linearVelocityDamping = robotMaxAcceleration / robotMaxVelocity;
             this.maxAngularVelocity = maxAngularVelocity;
             this.angularDamping = maxAngularAcceleration / maxAngularVelocity;
+            this.angularFrictionAcceleration = maxAngularVelocity / timeChassisStopsRotating;
             this.width = width;
             this.height = height;
         }
@@ -86,6 +91,7 @@ public class AllRealFieldPhysicsSimulation {
                     0.2
             );
 
+            super.setMass(MassType.NORMAL);
             super.setLinearDamping(profile.linearVelocityDamping);
             super.setAngularDamping(profile.angularDamping);
         }

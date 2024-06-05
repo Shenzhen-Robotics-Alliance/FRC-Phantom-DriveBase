@@ -28,10 +28,10 @@
         <gyroPort type="int">15</gyroPort>
 
         <!-- the zero position of encoders, to measure this value, turn the wheel to the direct front, and see the value of encoder.getRawSensorReading() -->
-        <frontLeftWheelZeroPosition type = "double">-2.957</frontLeftWheelZeroPosition>
-        <frontRightWheelZeroPosition type = "double">1.814</frontRightWheelZeroPosition>
-        <backLeftWheelZeroPosition type = "double">0.286</backLeftWheelZeroPosition>
-        <backRightWheelZeroPosition type = "double">0.047</backRightWheelZeroPosition>
+        <frontLeftWheelZeroPosition type = "double">1.945</frontLeftWheelZeroPosition>
+        <frontRightWheelZeroPosition type = "double">2.693</frontRightWheelZeroPosition>
+        <backLeftWheelZeroPosition type = "double">-0.860</backLeftWheelZeroPosition>
+        <backRightWheelZeroPosition type = "double">2.584</backRightWheelZeroPosition>
     </hardware>
     <chassis>
         <wheelGearRatio type="double">6.12</wheelGearRatio>
