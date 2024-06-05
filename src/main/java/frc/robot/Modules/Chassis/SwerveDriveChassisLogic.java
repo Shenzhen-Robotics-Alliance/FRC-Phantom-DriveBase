@@ -68,13 +68,13 @@ public abstract class SwerveDriveChassisLogic extends RobotModuleBase {
         EasyDataFlow.putSwerveState(
                 "chassis/desired swerve state",
                 frontLeft.getModuleDecidedDrivingPower() * robotMaximumSpeed,
-                AngleUtils.simplifyAngle(frontLeft.decideModuleDrivingDirection() - positionEstimator.getRobotRotation()),
+                AngleUtils.simplifyAngle(frontLeft.decideModuleDrivingDirection()),
                 frontRight.getModuleDecidedDrivingPower() * robotMaximumSpeed,
-                AngleUtils.simplifyAngle( frontRight.decideModuleDrivingDirection() - positionEstimator.getRobotRotation()),
+                AngleUtils.simplifyAngle( frontRight.decideModuleDrivingDirection()),
                 backLeft.getModuleDecidedDrivingPower() * robotMaximumSpeed,
-                AngleUtils.simplifyAngle(backLeft.decideModuleDrivingDirection() - positionEstimator.getRobotRotation()),
+                AngleUtils.simplifyAngle(backLeft.decideModuleDrivingDirection()),
                 backRight.getModuleDecidedDrivingPower() * robotMaximumSpeed,
-                AngleUtils.simplifyAngle(backRight.decideModuleDrivingDirection() - positionEstimator.getRobotRotation()),
+                AngleUtils.simplifyAngle(backRight.decideModuleDrivingDirection()),
                 positionEstimator.getRobotRotation2D()
         );
     }

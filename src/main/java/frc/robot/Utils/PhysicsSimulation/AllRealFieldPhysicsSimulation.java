@@ -89,7 +89,7 @@ public class AllRealFieldPhysicsSimulation {
             super.addFixture(
                     Geometry.createRectangle(profile.width, profile.height),
                     profile.robotMass / (profile.height * profile.width),
-                    0.6,
+                    0.8,
                     0.08
             );
 
@@ -138,7 +138,7 @@ public class AllRealFieldPhysicsSimulation {
             final Body obstacle = new Body();
             obstacle.setMass(MassType.INFINITE);
             final BodyFixture fixture = obstacle.addFixture(Geometry.createRectangle(width, height));
-            fixture.setFriction(0.7);
+            fixture.setFriction(0.8);
             fixture.setRestitution(0.4);
             obstacle.getTransform().setTranslation(Vector2D.toVector2(centerPosition));
             obstacle.getTransform().setRotation(rotation.getRadian());

@@ -42,7 +42,7 @@
 
         <!-- robot physical features -->
         <robotMaximumSpeed type="double">4.8</robotMaximumSpeed>
-        <motorMaximumAcceleration type="double">12</motorMaximumAcceleration>
+        <motorMaximumAcceleration type="double">15</motorMaximumAcceleration>
         <robotMass type="double">75</robotMass>
         <floorFrictionAcceleration type="double">10</floorFrictionAcceleration>
         <robotMaxAngularVelocity type="double">600</robotMaxAngularVelocity>
