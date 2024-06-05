@@ -45,6 +45,7 @@ public class AllRealFieldPhysicsSimulation {
                 frictionForce,
                 linearVelocityDamping,
                 maxAngularVelocity,
+                maxAngularAcceleration,
                 angularDamping,
                 angularFrictionAcceleration,
                 width,
@@ -71,6 +72,7 @@ public class AllRealFieldPhysicsSimulation {
             this.frictionForce = floorFrictionAcceleration * robotMass;
             this.linearVelocityDamping = robotMaxAcceleration / robotMaxVelocity;
             this.maxAngularVelocity = maxAngularVelocity;
+            this.maxAngularAcceleration = maxAngularAcceleration;
             this.angularDamping = maxAngularAcceleration / maxAngularVelocity;
             this.angularFrictionAcceleration = maxAngularVelocity / timeChassisStopsRotating;
             this.width = width;
@@ -88,7 +90,7 @@ public class AllRealFieldPhysicsSimulation {
                     Geometry.createRectangle(profile.width, profile.height),
                     profile.robotMass / (profile.height * profile.width),
                     0.6,
-                    0.2
+                    0.08
             );
 
             super.setMass(MassType.NORMAL);
@@ -137,7 +139,7 @@ public class AllRealFieldPhysicsSimulation {
             obstacle.setMass(MassType.INFINITE);
             final BodyFixture fixture = obstacle.addFixture(Geometry.createRectangle(width, height));
             fixture.setFriction(0.7);
-            fixture.setRestitution(0.6);
+            fixture.setRestitution(0.4);
             obstacle.getTransform().setTranslation(Vector2D.toVector2(centerPosition));
             obstacle.getTransform().setRotation(rotation.getRadian());
             addCustomObstacle(obstacle);
