@@ -16,12 +16,15 @@ import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Modules.PositionReader.RobotFieldPositionEstimator;
 import frc.robot.Utils.MathUtils.AngleUtils;
+import frc.robot.Utils.MathUtils.BezierCurve;
 import frc.robot.Utils.MathUtils.Rotation2D;
 import frc.robot.Utils.MathUtils.Vector2D;
 import org.dyn4j.dynamics.Body;
 import org.littletonrobotics.junction.Logger;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -150,6 +153,32 @@ public class EasyDataFlow {
         if (!position3dArraysEntries.containsKey(name))
             position3dArraysEntries.put(name, NetworkTableInstance.getDefault().getStructArrayTopic(name, Pose3d.struct).publish());
         position3dArraysEntries.get(name).set(pose3ds);
+    }
+
+
+    public static void putCurveOnField(String name, BezierCurve curve) {
+        final List<BezierCurve> curves = new ArrayList<>();
+        curves.add(curve);
+        putCurvesOnField(name, curves);
+    }
+    public static void putCurvesOnField(String name, List<BezierCurve> curves) {
+        final int resolution = 20;
+        Vector2D[] trajectoryPoints = new Vector2D[curves.size() * resolution];
+        int i = 0;
+        for (BezierCurve curve:curves)
+            for (int j = 0; j < curve.previewPoints.length; j++)
+                trajectoryPoints[i++] = curve.previewPoints[j];
+        putTrajectory(name, trajectoryPoints);
+    }
+    public static void putTrajectory(String name, Vector2D[] trajectoryPoints) {
+        putPositionArray(name, trajectoryPoints, emptyRotationsArray(trajectoryPoints.length));
+    }
+
+    public static Rotation2D[] emptyRotationsArray(int length) {
+        Rotation2D[] rotation2DArray = new Rotation2D[length];
+        for (int i =0; i < length; i++)
+            rotation2DArray[i] = new Rotation2D(0);
+        return rotation2DArray;
     }
 
     private static final class EasySwerveStatesPositionPublisher {

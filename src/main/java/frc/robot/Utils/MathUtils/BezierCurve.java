@@ -4,18 +4,13 @@ package frc.robot.Utils.MathUtils;
  * Bézier curve with four points
  */
 
-import com.pathplanner.lib.commands.PathPlannerAuto;
-import com.pathplanner.lib.path.PathPlannerPath;
-import com.pathplanner.lib.path.PathPoint;
-
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * Bézier curve with four points
  */
 public class BezierCurve {
+    private static final int resolution = 20;
     private final Vector2D p0, p1, p2, p3;
+    public final Vector2D[] previewPoints = new Vector2D[resolution];
 
     /**
      * create a bezier curve to be a straight line
@@ -35,6 +30,9 @@ public class BezierCurve {
         this.p1 = startingPointAnotherPoint;
         this.p2 = endingPointAnotherPoint;
         this.p3 = endingPoint;
+
+        for (int i = 0; i < resolution; i++)
+            previewPoints[i] = getPositionWithLERP(1.0 * i / resolution);
     }
 
     public Vector2D getPositionWithLERP(double t) {
