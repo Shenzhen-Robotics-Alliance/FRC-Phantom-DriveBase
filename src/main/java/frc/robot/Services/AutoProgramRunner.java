@@ -4,10 +4,7 @@ import edu.wpi.first.wpilibj.Timer;
 import frc.robot.Modules.Chassis.SwerveDriveChassisLogic;
 import frc.robot.Modules.Chassis.SwerveDriveChassis;
 import frc.robot.Utils.EasyDataFlow;
-import frc.robot.Utils.MathUtils.BezierCurveSchedule;
-import frc.robot.Utils.MathUtils.BezierCurveScheduleGenerator;
-import frc.robot.Utils.MathUtils.Rotation2D;
-import frc.robot.Utils.MathUtils.Vector2D;
+import frc.robot.Utils.MathUtils.*;
 import frc.robot.Utils.RobotConfigReader;
 import frc.robot.Utils.SequentialCommandSegment;
 
@@ -144,7 +141,7 @@ public class AutoProgramRunner extends RobotServiceBase {
         if (currentCommandSegment.chassisMovementPath == null) return;
         this.currentPathSchedule = scheduleGenerator.generateTranslationalSchedule(currentCommandSegment.chassisMovementPath);
         chassis.gainOwnerShip(this);
-        EasyDataFlow.putCurveOnField("auto/current auto path", currentCommandSegment.chassisMovementPath);
+        EasyDataFlow.putCurveOnField("auto/currentAutoPath", currentCommandSegment.chassisMovementPath);
     }
 
     public void scheduleCommandSegments(List<SequentialCommandSegment> commandSegments) {
@@ -154,7 +151,8 @@ public class AutoProgramRunner extends RobotServiceBase {
     public boolean isAutoStageComplete() {
         if (this.commandSegments.size() - this.currentSegmentID == 1
                 && this.isCurrentSegmentComplete()) {
-            EasyDataFlow.putPosition("/auto/currentAutoStagePosition", null, null); // remove the dashboard data
+            EasyDataFlow.putCurveOnField("auto/currentAutoPath", new BezierCurve(new Vector2D(), new Vector2D()));
+            EasyDataFlow.putPosition("/auto/currentAutoStagePosition", new Vector2D(new double[] {-100, -100}), new Rotation2D(0)); // remove the dashboard data
             return true;
         }
         return false;

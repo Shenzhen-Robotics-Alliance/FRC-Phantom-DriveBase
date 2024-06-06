@@ -92,8 +92,8 @@ public class RobotShell extends LoggedRobot {
         System.out.println("<-- Robot Shell | auto periodic -->");
         robotCore.updateRobot();
 
-//        if (autoProgramRunner.isAutoStageComplete())
-//            robotCore.stopStage();
+        if (autoProgramRunner.isAutoStageComplete())
+            robotCore.stopStage();
     }
 
     @Override
