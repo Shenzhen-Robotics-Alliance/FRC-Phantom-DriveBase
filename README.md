@@ -1,2 +1,2 @@
 # FRC-Phantom-DriveBase
-A ready-to-use FRC drivebase code with computer vision integrated
+An FRC swerve-drive base project, embedded with all-real robot simulation, custom autonomous framework and computer vision code.
