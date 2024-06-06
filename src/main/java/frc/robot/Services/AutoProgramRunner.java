@@ -144,6 +144,7 @@ public class AutoProgramRunner extends RobotServiceBase {
         if (currentCommandSegment.chassisMovementPath == null) return;
         this.currentPathSchedule = scheduleGenerator.generateTranslationalSchedule(currentCommandSegment.chassisMovementPath);
         chassis.gainOwnerShip(this);
+        EasyDataFlow.putCurveOnField("auto/current auto path", currentCommandSegment.chassisMovementPath);
     }
 
     public void scheduleCommandSegments(List<SequentialCommandSegment> commandSegments) {

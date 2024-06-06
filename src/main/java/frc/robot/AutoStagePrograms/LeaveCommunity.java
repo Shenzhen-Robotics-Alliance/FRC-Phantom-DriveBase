@@ -15,7 +15,7 @@ public class LeaveCommunity implements CommandSequenceGenerator {
         final List<SequentialCommandSegment> commandSegments = new ArrayList<>();
         final SequentialCommandFactory commandFactory = new SequentialCommandFactory(robotCore, "Leave Community", new Rotation2D(Math.toRadians(90)));
         commandSegments.add(commandFactory.calibratePositionEstimator());
-        commandSegments.add(commandFactory.followSingleCurve("Leave Community", 0, new Rotation2D(Math.toRadians(90))));
+        commandSegments.add(commandFactory.followSingleCurve("Leave Community", 0, new Rotation2D(Math.toRadians(0))));
         return commandSegments;
     }
 }
