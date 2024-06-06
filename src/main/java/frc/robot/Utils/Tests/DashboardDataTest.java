@@ -1,48 +1,18 @@
 package frc.robot.Utils.Tests;
 
-
-import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.geometry.Translation3d;
-import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.XboxController;
-import frc.robot.Utils.EasyDataFlow;
-import frc.robot.Utils.MathUtils.LookUpTable;
-import frc.robot.Utils.MathUtils.Vector2D;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class DashboardDataTest implements SimpleRobotTest {
+    private final Field2d field = new Field2d();
     @Override
     public void testStart() {
-
+        field.getObject("Note").setPose(2, 3, Rotation2d.fromRadians(0));
+        SmartDashboard.putData("test field", field);
     }
 
-    private final XboxController xboxController = new XboxController(1);
-    private double launchTime = 0;
-    private static final double
-            startingX = 3.6, startingY = 5.55, startingHeight = 0.4,
-            speakerX = 0, speakerY = 5.55, speakerHeight = 2.2;
     @Override
     public void testPeriodic() {
-        if (xboxController.getAButton())
-            launchTime = Timer.getFPGATimestamp();
-        final double
-                x = LookUpTable.linearInterpretationWithBounding(launchTime, startingX, launchTime+0.5, speakerX, Timer.getFPGATimestamp()),
-                y = LookUpTable.linearInterpretationWithBounding(launchTime, startingY, launchTime+0.5, speakerY, Timer.getFPGATimestamp()),
-                z = LookUpTable.linearInterpretationWithBounding(launchTime, startingHeight, launchTime+0.5, speakerHeight, Timer.getFPGATimestamp());
-        final Vector2D displacement2D = Vector2D.displacementToTarget(new Vector2D(new double[] {startingX, startingY}), new Vector2D(new double[] {speakerX, speakerY}));
-        final double yaw = displacement2D.getHeading(),
-                pitch = -Math.atan2(speakerHeight - startingHeight, displacement2D.getMagnitude());
-
-//        final double
-//                x = 1,
-//                y = 2,
-//                z = 1;
-//        final Vector2D displacement2D = Vector2D.displacementToTarget(new Vector2D(new double[] {startingX, startingY}), new Vector2D(new double[] {speakerX, speakerY}));
-//        final double pitch = Math.toRadians(-30),
-//                yaw = xboxController.getLeftX() * Math.toRadians(180);
-
-        EasyDataFlow.putNumber("test", "yaw", yaw);
-        EasyDataFlow.putNumber("test", "pitch", pitch);
-        EasyDataFlow.putPosition3dArray("test/flying notes", new Pose3d[] {new Pose3d(new Translation3d(x, y, z), new Rotation3d(0, pitch, yaw))});
     }
 }

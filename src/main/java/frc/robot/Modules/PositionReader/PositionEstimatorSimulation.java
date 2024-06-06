@@ -60,6 +60,7 @@ public class PositionEstimatorSimulation extends RobotFieldPositionEstimator {
     @Override
     public void setRobotPosition(Vector2D robotPosition) {
         this.robotPosition = robotPosition;
+        robotPhysicsSimulation.setRobotPosition(robotPosition);
     }
 
     public void updateRobotTranslationalStatus(Vector2D robotPosition, Vector2D robotVelocity, Vector2D robotAcceleration) {
@@ -76,6 +77,7 @@ public class PositionEstimatorSimulation extends RobotFieldPositionEstimator {
     @Override
     public void setRobotRotation(double rotation) {
         this.robotFacing = AngleUtils.simplifyAngle(rotation);
+        this.robotPhysicsSimulation.setRobotRotation(new Rotation2D(rotation));
     }
 
     public void setRobotAngularVelocity(double angularVelocity) {
@@ -87,10 +89,10 @@ public class PositionEstimatorSimulation extends RobotFieldPositionEstimator {
 
     @Override
     public void onReset() {
-        this.robotFacing = RobotFieldPositionEstimator.toActualRobotRotation(new Rotation2D(Math.toRadians(-90))).getRadian();
-        this.robotAngularVelocity = 0;
-        this.robotPosition = RobotFieldPositionEstimator.getRobotDefaultStartingPosition();
-        this.robotVelocity = this.robotAcceleration = new Vector2D();
-        robotPhysicsSimulation.reset(getRobotPosition2D(), getRobotRotation2D());
+        robotPhysicsSimulation.resetMotion();
+        robotVelocity = new Vector2D();
+        robotAngularVelocity = 0;
+        setRobotRotation(RobotFieldPositionEstimator.getPilotFacing().getRadian());
+        setRobotPosition(RobotFieldPositionEstimator.getRobotDefaultStartingPosition());
     }
 }

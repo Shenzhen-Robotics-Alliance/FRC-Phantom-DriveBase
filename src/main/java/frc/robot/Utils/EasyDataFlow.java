@@ -4,6 +4,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.networktables.DoublePublisher;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StructArrayPublisher;
@@ -172,6 +173,10 @@ public class EasyDataFlow {
     }
     public static void putTrajectory(String name, Vector2D[] trajectoryPoints) {
         putPositionArray(name, trajectoryPoints, emptyRotationsArray(trajectoryPoints.length));
+        final List<Trajectory.State> states = new ArrayList<>();
+        for (Vector2D point:trajectoryPoints)
+            states.add(new Trajectory.State(0, 0, 0, getPose(point, new Rotation2D(0)), 0));
+        field.getObject(name).setTrajectory(new Trajectory(states));
     }
 
     public static Rotation2D[] emptyRotationsArray(int length) {

@@ -6,7 +6,18 @@
       "/SmartDashboard/field": "Field2d",
       "/SmartDashboard/orientation mode": "String Chooser",
       "/SmartDashboard/pilot controller type": "String Chooser",
-      "/SmartDashboard/select wheel to calibrate": "String Chooser"
+      "/SmartDashboard/select wheel to calibrate": "String Chooser",
+      "/SmartDashboard/test field": "Field2d"
+    },
+    "windows": {
+      "/SmartDashboard/test field": {
+        "bottom": 1476,
+        "height": 8.210550308227539,
+        "left": 150,
+        "right": 2961,
+        "top": 79,
+        "width": 16.541748046875
+      }
     }
   },
   "NetworkTables": {

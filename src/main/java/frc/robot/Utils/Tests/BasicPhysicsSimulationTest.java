@@ -26,7 +26,9 @@ public class BasicPhysicsSimulationTest implements SimpleRobotTest {
                 0.8,
                 0.8
         ));
-        robotPhysicsSimulation.reset(new Vector2D(new double[] {1,2}), new Rotation2D(0));
+        robotPhysicsSimulation.resetMotion();
+        robotPhysicsSimulation.setRobotPosition(new Vector2D(new double[] {1,2}));
+        robotPhysicsSimulation.setRobotRotation(new Rotation2D(0));
         simulation.addRobot(robotPhysicsSimulation);
     }
 

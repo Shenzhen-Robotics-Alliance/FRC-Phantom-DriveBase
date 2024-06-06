@@ -124,9 +124,15 @@ public class AllRealFieldPhysicsSimulation {
             super.setAngularDamping(profile.angularDamping);
         }
 
-        public void reset(Vector2D robotPositionOnField, Rotation2D robotFacing) {
+        public void setRobotPosition(Vector2D robotPositionOnField) {
             super.transform.setTranslation(robotPositionOnField.getX(), robotPositionOnField.getY());
+        }
+
+        public void setRobotRotation(Rotation2D robotFacing) {
             super.transform.setRotation(robotFacing.getRadian());
+        }
+
+        public void resetMotion() {
             setMotion(new Vector2D(), 0);
         }
 
