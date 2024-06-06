@@ -9,6 +9,7 @@ import com.ctre.phoenix6.hardware.CANcoder;
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.PowerDistribution;
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Drivers.Encoders.CanCoder;
 import frc.robot.Drivers.IMUs.NavX2IMU;
@@ -244,6 +245,8 @@ public class RobotCore {
                 /* monitor the program's performance */
                 SmartDashboard.putNumber("robot main thread delay", System.currentTimeMillis()-t);
                 t = System.currentTimeMillis();
+
+                testFunctions();
         }
 
         public void updateServices() {
@@ -262,5 +265,13 @@ public class RobotCore {
                         if (System.currentTimeMillis() - dt > printTimeIfTimeMillisExceeds)
                                 System.out.println("update module " + module.moduleName + " took longer than expected, time: " + (System.currentTimeMillis() - dt));
                 }
+        }
+
+        private final XboxController xboxController = new XboxController(1);
+        private boolean previouslyPressed = false;
+        public void testFunctions() {
+                if (xboxController.getXButton() && (!previouslyPressed))
+                        physicsSimulation.launchNote(positionEstimator.getRobotPosition2D());
+                previouslyPressed = xboxController.getXButton();
         }
 }

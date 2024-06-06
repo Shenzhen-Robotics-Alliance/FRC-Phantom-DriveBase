@@ -3,7 +3,10 @@ package frc.robot.Utils.PhysicsSimulation;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.wpilibj.Timer;
+import frc.robot.Modules.PositionReader.RobotFieldPositionEstimator;
 import frc.robot.Utils.EasyDataFlow;
+import frc.robot.Utils.MathUtils.LookUpTable;
 import frc.robot.Utils.MathUtils.Rotation2D;
 import frc.robot.Utils.MathUtils.Vector2D;
 import frc.robot.Utils.PhysicsSimulation.FieldMaps.CrescendoDefault;
@@ -25,6 +28,7 @@ public class AllRealFieldPhysicsSimulation {
     private final FieldCollisionMap map;
     private final List<HolomonicRobotPhysicsSimulation> robots;
     private final List<NoteOnField> notesOnField;
+    private final List<NotesOnFly> notesOnFly = new ArrayList<>();
     public AllRealFieldPhysicsSimulation() {
         this.robots = new ArrayList<>();
         this.notesOnField = new ArrayList<>();
@@ -54,7 +58,8 @@ public class AllRealFieldPhysicsSimulation {
             noteOnField.update();
         this.field.step(1, dt);
 
-        EasyDataFlow.putPosition3dArray("notePositions", getNotesOnFieldPose3d());
+        EasyDataFlow.putPosition3dArray("notePositions", getNotesPose3d());
+        removeArrivedNotesOnFly();
     }
 
     public static final class RobotProfile {
@@ -175,8 +180,55 @@ public class AllRealFieldPhysicsSimulation {
         }
     }
 
-    public Pose3d[] getNotesOnFieldPose3d() {
-        final Pose3d[] pose3ds = new Pose3d[notesOnField.size()];
+    public static class NotesOnFly {
+        public static final Vector2D blueSpeakerPosition = new Vector2D(new double[] {0, 5.55});
+        public static final double speakerHeight = 2.2;
+        private final Vector2D launcherPosition, speakerPosition;
+        private final double launcherHeight, launchTime, timeArrival;
+        private final Rotation3d rotation3d;
+        public NotesOnFly(Vector2D launcherPosition, double launcherHeight, double launchSpeed) {
+            this.launcherPosition = launcherPosition;
+            this.launcherHeight = launcherHeight;
+            this.speakerPosition = RobotFieldPositionEstimator.toActualPositionOnField(blueSpeakerPosition);
+            this.launchTime = Timer.getFPGATimestamp();
+            final double timeNeeded =
+                    Math.sqrt(
+                            Math.pow(Vector2D.displacementToTarget(launcherPosition, speakerPosition).getMagnitude(), 2)
+                                    + Math.pow(speakerHeight - launcherHeight, 2)
+                    ) / launchSpeed;
+            this.timeArrival = launchTime + timeNeeded;
+
+            final Vector2D displacement = Vector2D.displacementToTarget(launcherPosition, speakerPosition);
+            final double yaw = displacement.getHeading(),
+                    pitch = -Math.atan2(speakerHeight - launcherHeight, displacement.getMagnitude());
+            this.rotation3d = new Rotation3d(0, pitch, yaw);
+        }
+
+        public Pose3d getPose3d() {
+            final double
+                    x = LookUpTable.linearInterpretationWithBounding(launchTime, launcherPosition.getX(), launchTime+0.5, speakerPosition.getX(), Timer.getFPGATimestamp()),
+                    y = LookUpTable.linearInterpretationWithBounding(launchTime, launcherPosition.getY(), launchTime+0.5, speakerPosition.getY(), Timer.getFPGATimestamp()),
+                    z = LookUpTable.linearInterpretationWithBounding(launchTime, launcherHeight, launchTime+0.5, speakerHeight, Timer.getFPGATimestamp());
+            return new Pose3d(new Translation3d(x, y, z), rotation3d);
+        }
+
+        public boolean arrived() {
+            return Timer.getFPGATimestamp() >= timeArrival;
+        }
+    }
+
+    private static final double launcherHeight = 0.3, launchSpeed = 10;
+    private static final Vector2D shooterPositionOnRobot = new Vector2D(new double[] {0, 0});
+    public void launchNote(Vector2D robotFieldPosition) {
+        final double robotRotationRadian = Vector2D.displacementToTarget(robotFieldPosition, RobotFieldPositionEstimator.toActualPositionOnField(NotesOnFly.blueSpeakerPosition)).getHeading();
+        final Vector2D launcherPositionField =
+                robotFieldPosition.addBy(shooterPositionOnRobot.multiplyBy(new Rotation2D(robotRotationRadian - Math.toRadians(90))));
+        System.out.println("robot rotation (deg)): " + Math.toDegrees(robotRotationRadian));
+        this.notesOnFly.add(new NotesOnFly(launcherPositionField, launcherHeight, launchSpeed));
+    }
+
+    public Pose3d[] getNotesPose3d() {
+        final Pose3d[] pose3ds = new Pose3d[notesOnField.size() + notesOnFly.size()];
         for (int i = 0; i < notesOnField.size(); i++) {
             final Vector2D notePosition2D = notesOnField.get(i).getFieldPosition();
             pose3ds[i] = new Pose3d(
@@ -184,8 +236,18 @@ public class AllRealFieldPhysicsSimulation {
                     new Rotation3d()
             );
         }
+        for (int i = 0; i < notesOnFly.size(); i++)
+            pose3ds[i + notesOnField.size()] = notesOnFly.get(i).getPose3d();
         return pose3ds;
     }
+
+    public NotesOnFly removeArrivedNotesOnFly() {
+        for (int i =0; i < notesOnFly.size(); i++)
+            if (notesOnFly.get(i).arrived())
+                return notesOnFly.remove(i);
+        return null;
+    }
+
 
     public static abstract class FieldCollisionMap {
         private final List<Body> obstacles = new ArrayList<>();

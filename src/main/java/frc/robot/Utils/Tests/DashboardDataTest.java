@@ -31,8 +31,18 @@ public class DashboardDataTest implements SimpleRobotTest {
                 z = LookUpTable.linearInterpretationWithBounding(launchTime, startingHeight, launchTime+0.5, speakerHeight, Timer.getFPGATimestamp());
         final Vector2D displacement2D = Vector2D.displacementToTarget(new Vector2D(new double[] {startingX, startingY}), new Vector2D(new double[] {speakerX, speakerY}));
         final double yaw = displacement2D.getHeading(),
-                pitch = Math.atan2(speakerHeight - startingHeight, displacement2D.getMagnitude()); // TODO: bugs here
+                pitch = -Math.atan2(speakerHeight - startingHeight, displacement2D.getMagnitude());
 
+//        final double
+//                x = 1,
+//                y = 2,
+//                z = 1;
+//        final Vector2D displacement2D = Vector2D.displacementToTarget(new Vector2D(new double[] {startingX, startingY}), new Vector2D(new double[] {speakerX, speakerY}));
+//        final double pitch = Math.toRadians(-30),
+//                yaw = xboxController.getLeftX() * Math.toRadians(180);
+
+        EasyDataFlow.putNumber("test", "yaw", yaw);
+        EasyDataFlow.putNumber("test", "pitch", pitch);
         EasyDataFlow.putPosition3dArray("test/flying notes", new Pose3d[] {new Pose3d(new Translation3d(x, y, z), new Rotation3d(0, pitch, yaw))});
     }
 }
