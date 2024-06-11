@@ -1,11 +1,9 @@
 package frc.robot.Modules.Chassis;
 
 import frc.robot.Modules.PositionReader.PositionEstimatorSimulation;
-import frc.robot.Modules.PositionReader.RobotFieldPositionEstimator;
 import frc.robot.Utils.PhysicsSimulation.AllRealFieldPhysicsSimulation;
 import frc.robot.Utils.PhysicsSimulation.CollisionDetectionGrid;
 import frc.robot.Utils.EasyDataFlow;
-import frc.robot.Utils.MathUtils.Rotation2D;
 import frc.robot.Utils.MathUtils.Vector2D;
 import frc.robot.Utils.RobotConfigReader;
 import frc.robot.Utils.RobotModuleOperatorMarker;
@@ -62,18 +60,12 @@ public class SwerveDriveChassisSimulation extends SwerveDriveChassisLogic {
     @Override
     protected void periodic(double dt) {
         /* run swerve wheel simulation to simulate the behaviors of swerve wheels */
-        driveWheelsSafeLogic(translationalTask.translationValue, rotationalTask.rotationalValue);
+        driveWheelsSafeLogic(calculateTranslationalPowerToRobot(dt), calculateRotationalPower(dt));
 
         /* simulate chassis translation behavior */
-        switch (translationalTask.taskType) {
-            case SET_VELOCITY -> simulateChassisBehaviorSetVelocity(dt);
-            case GO_TO_POSITION -> simulateChassisBehaviorGoToPosition(dt);
-        }
+        simulateChassisTranslationalBehavior(calculateTranslationalPowerToRobot(dt));
         /* simulate chassis rotation behavior */
-        switch (rotationalTask.taskType) {
-            case SET_VELOCITY -> simulateChassisBehaviorSetRotationalVelocity(dt);
-            case FACE_DIRECTION -> simulateChassisBehaviorFaceDirection(dt);
-        }
+        simulateChassisRotationalBehavior(calculateRotationalPower(dt));
         physicsSimulation.update(dt);
 
         /* simulate the swerve actual status from chassis motion */
@@ -98,23 +90,11 @@ public class SwerveDriveChassisSimulation extends SwerveDriveChassisLogic {
         super.periodic(dt);
     }
 
-    private void simulateChassisBehaviorGoToPosition(double dt) {
-        // TODO simulate how the chassis will behave when asked to go to a position
-    }
-
-    private void simulateChassisBehaviorSetVelocity(double dt) {
-        final Vector2D desiredMotion =
-                orientationMode == OrientationMode.FIELD ?
-                        super.translationalTask.translationValue.multiplyBy(RobotFieldPositionEstimator.getPilotFacing())
-                        : super.translationalTask.translationValue.multiplyBy(new Rotation2D(positionEstimator.getRobotRotation()));
-        simulateChassisBehaviorSetVelocity(dt, desiredMotion);
-    }
-
-    private void simulateChassisBehaviorSetVelocity(double dt, Vector2D desiredMotion) {
+    private void simulateChassisTranslationalBehavior(Vector2D desiredMotionToRobot) {
         robotPhysicsSimulation.setAtRest(false);
-        if (desiredMotion.getMagnitude() > 0.03)
+        if (desiredMotionToRobot.getMagnitude() > 0.03)
             robotPhysicsSimulation.applyForce(new Force(Vector2D.toVector2(
-                    desiredMotion.multiplyBy(robotPhysicsSimulation.profile.propellingForce))));
+                    desiredMotionToRobot.multiplyBy(positionEstimator.getRobotRotation2D()).multiplyBy(robotPhysicsSimulation.profile.propellingForce))));
         else {
             if (Vector2D.fromVector2(robotPhysicsSimulation.getLinearVelocity()).getMagnitude() > 0.03 * robotPhysicsSimulation.profile.robotMaxVelocity)
                 robotPhysicsSimulation.applyForce(new Force(Vector2D.toVector2(
@@ -125,14 +105,10 @@ public class SwerveDriveChassisSimulation extends SwerveDriveChassisLogic {
         }
     }
 
-    private void simulateChassisBehaviorFaceDirection(double dt) {
-        // TODO simulate how the chassis will behave when asked to face a direction
-    }
-
-    private void simulateChassisBehaviorSetRotationalVelocity(double dt) {
-        EasyDataFlow.putNumber("chassis physics simulation", "desired rotational motion", rotationalTask.rotationalValue);
-        if (Math.abs(rotationalTask.rotationalValue) > 0.05)
-            robotPhysicsSimulation.applyTorque(rotationalTask.rotationalValue * robotPhysicsSimulation.profile.maxAngularAcceleration * robotPhysicsSimulation.getMass().getInertia());
+    private void simulateChassisRotationalBehavior(double rotationPower) {
+        EasyDataFlow.putNumber("chassis physics simulation", "desired rotational motion", rotationPower);
+        if (Math.abs(rotationPower) > 0.05)
+            robotPhysicsSimulation.applyTorque(rotationPower * robotPhysicsSimulation.profile.maxAngularAcceleration * robotPhysicsSimulation.getMass().getInertia());
         else {
             if (Math.abs(robotPhysicsSimulation.getAngularVelocity()) < robotPhysicsSimulation.profile.maxAngularVelocity * 0.05)
                 robotPhysicsSimulation.setAngularVelocity(0);

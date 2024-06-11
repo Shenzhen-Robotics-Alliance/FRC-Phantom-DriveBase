@@ -3,9 +3,12 @@ package frc.robot.Modules.Chassis;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Modules.PositionReader.RobotFieldPositionEstimator;
 import frc.robot.Modules.RobotModuleBase;
+import frc.robot.Utils.ChassisPositionController;
 import frc.robot.Utils.EasyDataFlow;
+import frc.robot.Utils.MathUtils.AngleUtils;
 import frc.robot.Utils.MathUtils.Rotation2D;
 import frc.robot.Utils.MathUtils.Vector2D;
+import frc.robot.Utils.MechanismControllers.EnhancedPIDController;
 import frc.robot.Utils.RobotConfigReader;
 import frc.robot.Utils.RobotModuleOperatorMarker;
 
@@ -25,6 +28,11 @@ public abstract class SwerveDriveChassisLogic extends RobotModuleBase {
     protected final RobotConfigReader robotConfig;
     private Vector2D displayedDesiredPosition = null;
     private Rotation2D displayedDesiredRotation = null;
+
+    /** the pid controller that controls the rotation of the robot when needed */
+    private EnhancedPIDController goToRotationController;
+    private ChassisPositionController chassisPIDController;
+    private double positionDifferenceAsTaskFinished, rotationDifferenceAsTaskFinished;
     protected SwerveDriveChassisLogic(SwerveWheelLogic frontLeft, SwerveWheelLogic frontRight, SwerveWheelLogic backLeft, SwerveWheelLogic backRight, RobotFieldPositionEstimator positionEstimator, RobotConfigReader robotConfig) {
         super("chassis");
         this.frontLeft = frontLeft;
@@ -52,6 +60,46 @@ public abstract class SwerveDriveChassisLogic extends RobotModuleBase {
         this.wheelsPowerConstrain = robotConfig.getConfig("chassis/wheelsPowerConstrain");
         this.wheelsPowerConstrainAtLowSpeedMode = robotConfig.getConfig("chassis/wheelsPowerConstrainAtLowSpeedMode");
         this.rotationalSpeedMaxSacrifice = robotConfig.getConfig("chassis/rotationalSpeedMaxSacrifice");
+
+
+        double robotRotationalErrorTolerance = Math.toRadians(robotConfig.getConfig("chassis/robotRotationalErrorTolerance"));
+        this.rotationDifferenceAsTaskFinished = Math.toRadians(robotConfig.getConfig("chassis/rotationalErrorAsCommandFinished"));
+        double robotRotationalErrorStartDecelerate = Math.toRadians(robotConfig.getConfig("chassis/robotRotationalErrorStartDecelerate"));
+        double robotRotationMaximumCorrectionPower = robotConfig.getConfig("chassis/robotRotationMaximumCorrectionPower");
+        double robotRotationMinimumCorrectionPower = robotConfig.getConfig("chassis/robotRotationMinimumCorrectionPower");
+        double robotRotationFeedForwardTime = robotConfig.getConfig("chassis/robotRotationFeedForwardTime");
+
+        double robotPositionErrorTolerance = robotConfig.getConfig("chassis/robotPositionErrorTolerance");
+        this.positionDifferenceAsTaskFinished = robotConfig.getConfig("chassis/translationalErrorAsCommandFinished");
+        double robotPositionErrorStartDecelerate = robotConfig.getConfig("chassis/robotPositionErrorStartDecelerate");
+        double robotPositionMaximumCorrectionPower = robotConfig.getConfig("chassis/robotPositionMaximumCorrectionPower");
+        double robotPositionMinimumCorrectionPower = robotConfig.getConfig("chassis/robotPositionMinimumCorrectionPower");
+        double robotPositionFeedForwardTime = robotConfig.getConfig("chassis/robotPositionFeedForwardTime");
+
+        this.goToRotationController = new EnhancedPIDController(new EnhancedPIDController.StaticPIDProfile(
+                Math.PI * 2,
+                robotRotationMaximumCorrectionPower,
+                robotRotationMinimumCorrectionPower,
+                robotRotationalErrorStartDecelerate,
+                robotRotationalErrorTolerance,
+                robotRotationFeedForwardTime,
+                0,
+                0
+        ));
+
+        final ChassisPositionController.ChassisPIDConfig chassisPIDConfig = new ChassisPositionController.ChassisPIDConfig(
+                robotPositionMaximumCorrectionPower,
+                robotPositionMinimumCorrectionPower,
+                robotPositionErrorStartDecelerate,
+                robotPositionErrorTolerance,
+                robotPositionFeedForwardTime
+        );
+
+        chassisPIDController = new ChassisPositionController(chassisPIDConfig);
+
+        this.speedControlAccelerateTime = robotConfig.getConfig("chassis/timeNeededToFullyAccelerate");
+        this.robotSpeedActivateSpeedControl = robotConfig.getConfig("chassis/robotSpeedActivateSpeedControl");
+        this.ignoredAccelerateTime = robotConfig.getConfig("chassis/ignoredAccelerateTime");
     }
 
     @Override
@@ -65,6 +113,70 @@ public abstract class SwerveDriveChassisLogic extends RobotModuleBase {
         SmartDashboard.putNumber("imu yaw:", Math.toDegrees(positionEstimator.getRobotRotation()));
 
         displayDesiredSwerveStates();
+    }
+
+    protected Vector2D calculateTranslationalPowerToRobot(double dt) {
+        return switch (translationalTask.taskType) {
+            case SET_VELOCITY -> processTranslationalVelocityControl(getPilotDesiredVelocityToRobot(), dt);
+            case GO_TO_POSITION -> processOrientation(
+                    processTranslationalPositionControl(this.translationalTask.translationValue)
+            );
+        };
+    }
+
+    private double speedControlAccelerateTime, robotSpeedActivateSpeedControl;
+    private Vector2D decidedVelocity;
+    /** if the chassis can accelerate to the targeted velocity within this amount time, it just jumps to the target */
+    private double ignoredAccelerateTime;
+    /**
+     * process the desired velocity into actual respond velocity using profiled speed-control
+     * @param desiredVelocity the desired velocity, in relationship to the robot itself and in PERCENT OUT OF FULL SPEED
+     * @return the amount
+     * */
+    protected Vector2D processTranslationalVelocityControl(Vector2D desiredVelocity, double dt) {
+        if (Math.max(desiredVelocity.getMagnitude(), positionEstimator.getRobotVelocity2DToField().getMagnitude()/robotMaximumSpeed)
+                < robotSpeedActivateSpeedControl) // if the desired or current velocity is smaller than the activation speed
+            return desiredVelocity; // disable velocity control
+
+        final double maxAcceleration = 1.0 / speedControlAccelerateTime;
+        Vector2D velocityDifference = desiredVelocity.addBy(
+                decidedVelocity.multiplyBy(-1)
+        );
+
+        EasyDataFlow.putNumber("chassis", "vel ctrl decided", decidedVelocity.getMagnitude());
+        Vector2D step = new Vector2D(velocityDifference.getHeading(),
+                Math.min(dt * maxAcceleration, velocityDifference.getMagnitude())
+        );
+        this.decidedVelocity = decidedVelocity.addBy(step);
+        if (velocityDifference.getMagnitude() < maxAcceleration * ignoredAccelerateTime)
+            return desiredVelocity;
+        return decidedVelocity;
+    }
+
+    /**
+     * gets the correction power to move to a given position
+     * @param desiredPosition the desired position, field-orientated
+     * @return the amount of chassis speed the robot needs at the current time, field-orientated
+     */
+    protected Vector2D processTranslationalPositionControl(Vector2D desiredPosition) {
+        final Vector2D chassisPosition2D = positionEstimator.getRobotPosition2D(),
+                chassisVelocity2D = positionEstimator.getRobotVelocity2DToField();
+
+        chassisPIDController.setDesiredPosition(desiredPosition);
+        return chassisPIDController.getCorrectionPower(chassisPosition2D, chassisVelocity2D);
+    }
+
+    protected double calculateRotationalPower(double dt) {
+        return switch (rotationalTask.taskType) {
+            case SET_VELOCITY -> this.rotationalTask.rotationalValue;
+            case FACE_DIRECTION -> {
+                goToRotationController.startNewTask(new EnhancedPIDController.Task(
+                        EnhancedPIDController.Task.TaskType.GO_TO_POSITION,
+                        this.rotationalTask.rotationalValue
+                ));
+                yield goToRotationController.getMotorPower(positionEstimator.getRobotRotation(), positionEstimator.getRobotRotationalVelocity(), dt);
+            }
+        };
     }
 
     protected void driveWheelsSafeLogic(Vector2D translationalSpeed, double rotationalSpeed) {
@@ -136,6 +248,8 @@ public abstract class SwerveDriveChassisLogic extends RobotModuleBase {
         System.out.println("setting chassis tasks to stop...");
         this.translationalTask = new ChassisTaskTranslation(ChassisTaskTranslation.TaskType.SET_VELOCITY, new Vector2D());
         this.rotationalTask = new ChassisTaskRotation(ChassisTaskRotation.TaskType.SET_VELOCITY, 0);
+
+        this.decidedVelocity = new Vector2D();
     }
 
     private void displayDesiredSwerveStates() {
@@ -168,13 +282,6 @@ public abstract class SwerveDriveChassisLogic extends RobotModuleBase {
     }
 
     public abstract double getChassisHeading();
-    public ChassisTaskTranslation getCurrentTranslationalTask() {
-        return this.translationalTask;
-    }
-
-    public ChassisTaskRotation getCurrentRotationalTask() {
-        return this.rotationalTask;
-    }
 
     /**
      * set the translational task of the chassis
@@ -229,9 +336,26 @@ public abstract class SwerveDriveChassisLogic extends RobotModuleBase {
             swerveWheel.setWheelLocked(locked, this);
     }
 
-    public abstract boolean isCurrentTranslationalTaskFinished();
+    public boolean isCurrentTranslationalTaskFinished() {
+        System.out.println("<-- waiting for chassis to finish movement -->");
+        System.out.println("Task Type: " + translationalTask.taskType);
+        System.out.println("Translational Error: " + Vector2D.displacementToTarget(positionEstimator.getRobotPosition2D(), translationalTask.translationValue));
+        System.out.println("Tolerance: " + positionDifferenceAsTaskFinished);
+        return switch (translationalTask.taskType) {
+            case SET_VELOCITY ->
+                    translationalTask.translationValue.getMagnitude() == 0;
+            case GO_TO_POSITION ->
+                    Vector2D.displacementToTarget(positionEstimator.getRobotPosition2D(), translationalTask.translationValue).getMagnitude() < positionDifferenceAsTaskFinished;
+        };
+    }
 
-    public abstract boolean isCurrentRotationalTaskFinished();
+    public boolean isCurrentRotationalTaskFinished() {
+        System.out.println("rotational error: " + Math.toDegrees(Math.abs(AngleUtils.getActualDifference(getChassisHeading(), rotationalTask.rotationalValue))) + ", tolerance: " + Math.toDegrees(rotationDifferenceAsTaskFinished));
+        return switch (rotationalTask.taskType) {
+            case SET_VELOCITY -> rotationalTask.rotationalValue == 0;
+            case FACE_DIRECTION -> Math.abs(AngleUtils.getActualDifference(getChassisHeading(), rotationalTask.rotationalValue)) < rotationDifferenceAsTaskFinished;
+        };
+    }
 
     public abstract void resetChassisPositionAndRotation();
 
