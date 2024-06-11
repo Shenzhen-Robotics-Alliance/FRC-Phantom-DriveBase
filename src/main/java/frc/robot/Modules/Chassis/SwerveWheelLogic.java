@@ -3,6 +3,7 @@ package frc.robot.Modules.Chassis;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.Modules.RobotModuleBase;
 import frc.robot.Utils.ChassisUnit;
+import frc.robot.Utils.MathUtils.AngleUtils;
 import frc.robot.Utils.MathUtils.Rotation2D;
 import frc.robot.Utils.MathUtils.Transformation2D;
 import frc.robot.Utils.MathUtils.Vector2D;
@@ -71,8 +72,20 @@ public abstract class SwerveWheelLogic extends RobotModuleBase {
         return commandedHeading;
     }
 
-    public double getModuleDecidedDrivingPower() {
-        return actualDriveMotorPower;
+    public double[] getDesiredSwerveState() {
+        return new double[] {
+                actualDriveMotorPower * robotConfig.getConfig("chassis/robotMaximumSpeed"),
+                actualDriveMotorPower > 0 ?
+                        AngleUtils.simplifyAngle(decideModuleDrivingDirection()) : AngleUtils.simplifyAngle(decideModuleDrivingDirection() + Math.PI)
+        };
+    }
+
+    public double[] getActualSwerveState() {
+        return new double[] {
+                getModuleVelocity2D(ChassisUnit.METER).getMagnitude(),
+                getModuleVelocity2D(ChassisUnit.METER).getMagnitude() > 0.05 ?
+                        getModuleVelocity2D(ChassisUnit.METER).getHeading() : getSteerHeading(),
+        };
     }
 
     /* <-- configurations --> */

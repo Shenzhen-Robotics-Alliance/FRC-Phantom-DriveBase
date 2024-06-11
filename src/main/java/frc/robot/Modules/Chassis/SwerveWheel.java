@@ -60,7 +60,7 @@ public class SwerveWheel extends SwerveWheelLogic {
     public void periodic(double dt) {
         super.periodic(dt);
         final double steerEncoderCurrentReading = getSteerHeading(),
-                steerEncoderCurrentVelocity = getSteerVelocity();
+                steerEncoderCurrentVelocity = steerEncoder.getEncoderVelocity();
 
         /**
          * update the desired heading of the steer wheel, given control module's
@@ -174,21 +174,12 @@ public class SwerveWheel extends SwerveWheelLogic {
     }
 
     /**
-     * gets the angular velocity of the steer
-     * @return in radian per second, positive is counter-clockwise
-     */
-    private double getSteerVelocity() {
-        return steerEncoder.getEncoderVelocity();
-    }
-
-    /**
      * gets the wheel's velocity from the driving motor's encoder
      * @return the velocity, direction is erased using the reversibility of the wheel
      */
     private double getWheelVelocityWithoutDirection() {
 //        return drivingEncoder.getEncoderVelocity()
 //                * (reverseWheel? -1 : 1);
-        long t0 = System.currentTimeMillis();
         double encoderVel = drivingEncoder.getEncoderVelocity();
         return encoderVel * (reverseWheel? -1 : 1);
     }

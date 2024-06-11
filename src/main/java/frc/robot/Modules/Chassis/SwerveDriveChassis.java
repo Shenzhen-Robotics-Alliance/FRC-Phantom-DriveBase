@@ -27,27 +27,29 @@ public class SwerveDriveChassis extends SwerveDriveChassisLogic {
     }
 
     @Override
-    public void init() {
-
-    }
-
-    @Override
     protected void periodic(double dt) {
-        EasyDataFlow.putSwerveState(
-                "chassis/actual swerve state",
-                frontLeft.getModuleVelocity2D(ChassisUnit.METER).getMagnitude(), frontLeft.getWheelDrivingEncoderValue(),
-                frontRight.getModuleVelocity2D(ChassisUnit.METER).getMagnitude(), frontRight.getWheelDrivingEncoderValue(),
-                backLeft.getModuleVelocity2D(ChassisUnit.METER).getMagnitude(), backLeft.getWheelDrivingEncoderValue(),
-                backRight.getModuleVelocity2D(ChassisUnit.METER).getMagnitude(), backRight.getWheelDrivingEncoderValue(),
-                positionEstimator.getRobotRotation2D()
-        );
-
         Vector2D processedTranslationalSpeed = processTranslationalMotion(dt);
         double rotationalSpeed = processRotationalMotion(dt);
 
         driveWheelsSafeLogic(processedTranslationalSpeed, rotationalSpeed);
 
+        displayActualSwerveStates();
         super.periodic(dt);
+    }
+
+    private void displayActualSwerveStates() {
+        EasyDataFlow.putSwerveState(
+                "chassis/actual swerve state",
+                frontLeft.getActualSwerveState()[0],
+                frontLeft.getActualSwerveState()[1],
+                frontRight.getActualSwerveState()[0],
+                frontRight.getActualSwerveState()[1],
+                backLeft.getActualSwerveState()[0],
+                backLeft.getActualSwerveState()[1],
+                backRight.getActualSwerveState()[0],
+                backRight.getActualSwerveState()[1],
+                positionEstimator.getRobotRotation2D()
+        );
     }
 
     @Override

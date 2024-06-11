@@ -232,7 +232,11 @@ public class EasyDataFlow {
         }
     }
 
-
+    /**
+     * put the swerve state to dashboard
+     * @param name the name of the dialog
+     * @param frontLeftWheelSpeed the wheel speed of the front left wheel
+     * */
     public static void putSwerveState(String name, double frontLeftWheelSpeed, double frontLeftWheelFacing, double frontRightWheelSpeed, double frontRightWheelFacing,  double backLeftWheelSpeed, double backLeftWheelFacing,  double backRightWheelSpeed, double backRightWheelFacing,  Rotation2D robotFacing) {
         final SwerveModuleState[] swerveStates = new SwerveModuleState[4];
         swerveStates[0] = new SwerveModuleState(frontLeftWheelSpeed, Rotation2d.fromRadians(frontLeftWheelFacing - Math.toRadians(90)));

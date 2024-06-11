@@ -4,7 +4,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Modules.PositionReader.RobotFieldPositionEstimator;
 import frc.robot.Modules.RobotModuleBase;
 import frc.robot.Utils.EasyDataFlow;
-import frc.robot.Utils.MathUtils.AngleUtils;
 import frc.robot.Utils.MathUtils.Rotation2D;
 import frc.robot.Utils.MathUtils.Vector2D;
 import frc.robot.Utils.RobotConfigReader;
@@ -65,18 +64,7 @@ public abstract class SwerveDriveChassisLogic extends RobotModuleBase {
         EasyDataFlow.putPosition("chassis/actualPosition", positionEstimator.getRobotPosition2D(), positionEstimator.getRobotRotation2D());
         SmartDashboard.putNumber("imu yaw:", Math.toDegrees(positionEstimator.getRobotRotation()));
 
-        EasyDataFlow.putSwerveState(
-                "chassis/desired swerve state",
-                frontLeft.getModuleDecidedDrivingPower() * robotMaximumSpeed,
-                AngleUtils.simplifyAngle(frontLeft.decideModuleDrivingDirection()),
-                frontRight.getModuleDecidedDrivingPower() * robotMaximumSpeed,
-                AngleUtils.simplifyAngle( frontRight.decideModuleDrivingDirection()),
-                backLeft.getModuleDecidedDrivingPower() * robotMaximumSpeed,
-                AngleUtils.simplifyAngle(backLeft.decideModuleDrivingDirection()),
-                backRight.getModuleDecidedDrivingPower() * robotMaximumSpeed,
-                AngleUtils.simplifyAngle(backRight.decideModuleDrivingDirection()),
-                positionEstimator.getRobotRotation2D()
-        );
+        displayDesiredSwerveStates();
     }
 
     protected void driveWheelsSafeLogic(Vector2D translationalSpeed, double rotationalSpeed) {
@@ -148,6 +136,21 @@ public abstract class SwerveDriveChassisLogic extends RobotModuleBase {
         System.out.println("setting chassis tasks to stop...");
         this.translationalTask = new ChassisTaskTranslation(ChassisTaskTranslation.TaskType.SET_VELOCITY, new Vector2D());
         this.rotationalTask = new ChassisTaskRotation(ChassisTaskRotation.TaskType.SET_VELOCITY, 0);
+    }
+
+    private void displayDesiredSwerveStates() {
+        EasyDataFlow.putSwerveState(
+                "chassis/desired swerve state",
+                frontLeft.getDesiredSwerveState()[0],
+                frontLeft.getDesiredSwerveState()[1],
+                frontRight.getDesiredSwerveState()[0],
+                frontRight.getDesiredSwerveState()[1],
+                backLeft.getDesiredSwerveState()[0],
+                backLeft.getDesiredSwerveState()[1],
+                backRight.getDesiredSwerveState()[0],
+                backRight.getDesiredSwerveState()[1],
+                positionEstimator.getRobotRotation2D()
+        );
     }
 
     protected Vector2D getPilotDesiredVelocityToRobot() {
