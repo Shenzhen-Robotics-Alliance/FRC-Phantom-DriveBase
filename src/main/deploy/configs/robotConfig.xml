@@ -45,7 +45,7 @@
         <motorMaximumAcceleration type="double">15</motorMaximumAcceleration>
         <robotMass type="double">75</robotMass>
         <floorFrictionAcceleration type="double">10</floorFrictionAcceleration>
-        <robotMaxAngularVelocity type="double">720</robotMaxAngularVelocity>
+        <robotMaxAngularVelocity type="double">680</robotMaxAngularVelocity>
         <robotMaxAngularAcceleration type="double">1200</robotMaxAngularAcceleration>
         <timeChassisStopsRotating>0.3</timeChassisStopsRotating>
         <width>0.8</width>

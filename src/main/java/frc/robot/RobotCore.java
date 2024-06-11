@@ -77,7 +77,7 @@ public class RobotCore {
                 final PositionEstimatorSimulation positionEstimatorSimulation = new PositionEstimatorSimulation(robotConfig);
                 this.positionEstimator = positionEstimatorSimulation;
                 modules.add(positionEstimator);
-                this.statusLight = new SimulatedLEDStatusLight();
+                this.statusLight = new SimulatedLEDStatusLight(155);
                 modules.add(statusLight);
 
                 final SwerveWheelSimulation
@@ -117,7 +117,7 @@ public class RobotCore {
                 this.chassis = new SwerveDriveChassis(frontLeftWheel, frontRightWheel, backLeftWheel, backRightWheel, positionEstimator, robotConfig);
                 modules.add(chassis);
 
-                this.statusLight = new AddressableLEDStatusLight(new AddressableLED(0), new AddressableLEDBuffer(155));
+                this.statusLight = new AddressableLEDStatusLight(new AddressableLED(0), 155);
                 modules.add(statusLight);
         }
 
