@@ -1,18 +1,20 @@
 package frc.robot.Utils.Tests;
 
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.wpilibj.smartdashboard.Field2d;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.Modules.LEDStatusLights.SimulatedLEDStatusLight;
+import frc.robot.Utils.LEDAnimation;
 
 public class DashboardDataTest implements SimpleRobotTest {
-    private final Field2d field = new Field2d();
+    final SimulatedLEDStatusLight simulatedLEDStatusLight = new SimulatedLEDStatusLight(100);
     @Override
     public void testStart() {
-        field.getObject("Note").setPose(2, 3, Rotation2d.fromRadians(0));
-        SmartDashboard.putData("test field", field);
+        simulatedLEDStatusLight.init();
+        simulatedLEDStatusLight.reset();
+        simulatedLEDStatusLight.enable();
     }
 
     @Override
     public void testPeriodic() {
+        simulatedLEDStatusLight.setAnimation(new LEDAnimation.Slide(0,200, 255, 1, 0.8), null);
+        simulatedLEDStatusLight.periodic();
     }
 }

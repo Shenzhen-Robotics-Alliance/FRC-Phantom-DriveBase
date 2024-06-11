@@ -74,11 +74,13 @@ public interface LEDAnimation {
                     upperEdge = lowerEdge + slideLength;
             EasyDataFlow.putNumber("led", "lowerEdge", lowerEdge);
             EasyDataFlow.putNumber("led", "upperEdge", upperEdge);
-            for (int i = 0; i < buffer.getLength() / 2; i++) {
+            /* strip is half the entire led */
+            final int stripLength = buffer.getLength() / 2;
+            for (int i = 0; i < stripLength; i++) {
                 int r = colorR, g = colorG, b = colorB;
-                if (i > upperEdge * buffer.getLength() || i < lowerEdge * buffer.getLength()) r = g = b = 0;
-                buffer.setRGB(buffer.getLength() / 2 + i, r, g, b);
-                buffer.setRGB(buffer.getLength() / 2 - i-1, r, g, b);
+                if (i >= (int)(upperEdge * stripLength) || i <= (int)(lowerEdge * stripLength)) r = g = b = 0;
+                buffer.setRGB(stripLength + i, r, g, b);
+                buffer.setRGB(stripLength - i-1, r, g, b);
             }
         }
     }
