@@ -10,11 +10,10 @@ import frc.robot.Utils.RobotConfigReader;
 public class PositionEstimatorSimulation extends RobotFieldPositionEstimator {
     private Vector2D robotPosition, robotVelocity, robotAcceleration;
     private double robotFacing, robotAngularVelocity;
-    public final AllRealFieldPhysicsSimulation.HolomonicRobotPhysicsSimulation robotPhysicsSimulation;
 
-    public PositionEstimatorSimulation(RobotConfigReader robotConfig) {
-        final AllRealFieldPhysicsSimulation.RobotProfile robotProfile = new AllRealFieldPhysicsSimulation.RobotProfile(robotConfig);
-        this.robotPhysicsSimulation = new AllRealFieldPhysicsSimulation.HolomonicRobotPhysicsSimulation(robotProfile);
+    private final AllRealFieldPhysicsSimulation.HolomonicRobotPhysicsSimulation robotPhysicsSimulation;
+    public PositionEstimatorSimulation(AllRealFieldPhysicsSimulation.HolomonicRobotPhysicsSimulation robotPhysicsSimulation) {
+        this.robotPhysicsSimulation = robotPhysicsSimulation;
     }
 
     @Override

@@ -1,9 +1,9 @@
 package frc.robot.Services;
 
 // TODO: write this class to control sparring robots
-public class SparringBotsService extends RobotServiceBase {
-    protected SparringBotsService() {
-        super("Sparring-Bots");
+public class MatchSimulationService extends RobotServiceBase {
+    public MatchSimulationService() {
+        super("Match-Sim-Service");
     }
 
     @Override

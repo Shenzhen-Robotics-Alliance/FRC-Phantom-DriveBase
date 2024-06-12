@@ -1,7 +1,7 @@
 package frc.robot.Modules.Chassis;
 
+import frc.robot.Modules.MatchFieldSimulation;
 import frc.robot.Modules.PositionReader.PositionEstimatorSimulation;
-import frc.robot.Utils.PhysicsSimulation.AllRealFieldPhysicsSimulation;
 import frc.robot.Utils.PhysicsSimulation.CollisionDetectionGrid;
 import frc.robot.Utils.EasyDataFlow;
 import frc.robot.Utils.RobotConfigReader;
@@ -10,13 +10,11 @@ import frc.robot.Utils.RobotModuleOperatorMarker;
 public class SwerveDriveChassisSimulation extends SwerveDriveChassisLogic {
     private final PositionEstimatorSimulation positionEstimatorSimulation;
     private final CollisionDetectionGrid collisionDetectionGrid; // legacy
-    private final AllRealFieldPhysicsSimulation physicsSimulation;
-    private final AllRealFieldPhysicsSimulation.HolomonicRobotPhysicsSimulation chassisSimulation;
-    public SwerveDriveChassisSimulation(SwerveWheelSimulation frontLeft, SwerveWheelSimulation frontRight, SwerveWheelSimulation backLeft, SwerveWheelSimulation backRight, PositionEstimatorSimulation positionEstimatorSimulation, AllRealFieldPhysicsSimulation physicsSimulation, RobotConfigReader robotConfig) {
+    private final MatchFieldSimulation simulation;
+    public SwerveDriveChassisSimulation(RobotConfigReader robotConfig, SwerveWheelSimulation frontLeft, SwerveWheelSimulation frontRight, SwerveWheelSimulation backLeft, SwerveWheelSimulation backRight, PositionEstimatorSimulation positionEstimatorSimulation, MatchFieldSimulation matchFieldSimulation) {
         super(frontLeft, frontRight, backLeft, backRight, positionEstimatorSimulation, robotConfig);
-        this.physicsSimulation = physicsSimulation;
+        this.simulation = matchFieldSimulation;
         collisionDetectionGrid = new CollisionDetectionGrid();
-        chassisSimulation = physicsSimulation.addRobot(positionEstimatorSimulation.robotPhysicsSimulation);
         this.positionEstimatorSimulation = positionEstimatorSimulation;
     }
 
@@ -60,11 +58,6 @@ public class SwerveDriveChassisSimulation extends SwerveDriveChassisLogic {
         /* run swerve wheel simulation to simulate the behaviors of swerve wheels */
         driveWheelsSafeLogic(calculateTranslationalPowerToRobot(dt), calculateRotationalPower(dt));
 
-        /* simulate chassis translation behavior */
-        chassisSimulation.simulateChassisRotationalBehavior(calculateRotationalPower(dt));
-        chassisSimulation.simulateChassisTranslationalBehavior(calculateTranslationalPowerToRobot(dt), positionEstimator.getRobotRotation2D());
-        physicsSimulation.update(dt);
-
         /* simulate the swerve actual status from chassis motion */
         if (super.positionEstimator.getRobotVelocity2DToField().getMagnitude() == 0 && super.positionEstimator.getRobotRotationalVelocity() == 0)
             EasyDataFlow.putSwerveState(
@@ -84,6 +77,11 @@ public class SwerveDriveChassisSimulation extends SwerveDriveChassisLogic {
                     backRight.calculateWheelMotion(positionEstimator.getRobotVelocity2DToRobot(), positionEstimator.getRobotRotationalVelocity()),
                     positionEstimator.getRobotRotation2D()
             );
+
+        /* simulate chassis translation behavior */
+        simulation.robotPhysicsSimulation.simulateChassisRotationalBehavior(calculateRotationalPower(dt));
+        simulation.robotPhysicsSimulation.simulateChassisTranslationalBehavior(calculateTranslationalPowerToRobot(dt), positionEstimator.getRobotRotation2D());
+        simulation.updatePhysics(dt);
         super.periodic(dt);
     }
 

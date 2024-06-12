@@ -10,7 +10,6 @@ import edu.wpi.first.wpilibj.*;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Drivers.Encoders.CanCoder;
 import frc.robot.Drivers.IMUs.NavX2IMU;
-import frc.robot.Drivers.IMUs.PigeonsIMU;
 import frc.robot.Drivers.IMUs.SimpleGyro;
 import frc.robot.Drivers.Motors.TalonFXMotor;
 import frc.robot.Drivers.Visions.PhantomClient;
@@ -18,6 +17,7 @@ import frc.robot.Modules.Chassis.*;
 import frc.robot.Modules.LEDStatusLights.AddressableLEDStatusLight;
 import frc.robot.Modules.LEDStatusLights.LEDStatusLight;
 import frc.robot.Modules.LEDStatusLights.SimulatedLEDStatusLight;
+import frc.robot.Modules.MatchFieldSimulation;
 import frc.robot.Modules.PositionReader.*;
 import frc.robot.Modules.RobotModuleBase;
 import frc.robot.Services.RobotServiceBase;
@@ -68,12 +68,13 @@ public class RobotCore {
                         createRobotReal();
         }
 
-        private AllRealFieldPhysicsSimulation physicsSimulation;
+        public MatchFieldSimulation matchFieldSimulation;
         private void createRobotSim() {
                 System.out.println("<-- Robot Core | creating robot in simulation... -->");
-                physicsSimulation = new AllRealFieldPhysicsSimulation();
+                matchFieldSimulation = new MatchFieldSimulation(robotConfig);
+                modules.add(matchFieldSimulation);
 
-                final PositionEstimatorSimulation positionEstimatorSimulation = new PositionEstimatorSimulation(robotConfig);
+                final PositionEstimatorSimulation positionEstimatorSimulation = new PositionEstimatorSimulation(matchFieldSimulation.robotPhysicsSimulation);
                 this.positionEstimator = positionEstimatorSimulation;
                 modules.add(positionEstimator);
                 this.statusLight = new SimulatedLEDStatusLight(155);
@@ -88,10 +89,8 @@ public class RobotCore {
                 modules.add(backLeftWheel);
                 modules.add(frontRightWheel);
                 modules.add(backRightWheel);
-                this.chassis = new SwerveDriveChassisSimulation(frontLeftWheel, frontRightWheel, backLeftWheel, backRightWheel, positionEstimatorSimulation, physicsSimulation, robotConfig);
+                this.chassis = new SwerveDriveChassisSimulation(robotConfig, frontLeftWheel, frontRightWheel, backLeftWheel, backRightWheel, positionEstimatorSimulation, matchFieldSimulation);
                 modules.add(chassis);
-
-                physicsSimulation.addNoteToField(new Vector2D(new double[] {16.54/2, 8.21/2}));
         }
 
         private void createRobotReal() {
@@ -231,25 +230,28 @@ public class RobotCore {
                 System.out.println("<-- Robot | robot paused... -->");
         }
 
+
+        private double t = Timer.getFPGATimestamp(),
+                lastLoopOverrunTime = Timer.getFPGATimestamp();
         /**
          * called when the robot is enabled
          * */
-        private double t = Timer.getFPGATimestamp();
         public void updateRobot() {
                 updateServices();
                 updateModules();
-
 
                 robotConfig.updateTuningConfigsFromDashboard();
 
                 /* monitor the program's performance */
                 final double delayMillis = (Timer.getFPGATimestamp()-t)*1000;
                 SmartDashboard.putNumber("robot main thread delay", delayMillis);
-                mainLoopTimeOverrunWarning.set(delayMillis > 50);
+                final int loopTimeOverrunWarningThresholdMS = 20,
+                        warningMessageStickAroundTimeSeconds = 2;
+                if (delayMillis > loopTimeOverrunWarningThresholdMS) lastLoopOverrunTime = Timer.getFPGATimestamp();
+                mainLoopTimeOverrunWarning.set(Timer.getFPGATimestamp() - lastLoopOverrunTime < warningMessageStickAroundTimeSeconds); // let the message stick around for 5 seconds
+                mainLoopTimeOverrunWarning.setText("Temporary Main-Loop Lagging, update time: " + (int)delayMillis + "(ms)");
 
                 t = Timer.getFPGATimestamp();
-
-                testFunctions();
         }
 
         public void updateServices() {
@@ -268,13 +270,5 @@ public class RobotCore {
                         if (System.currentTimeMillis() - dt > printTimeIfTimeMillisExceeds)
                                 System.out.println("update module " + module.moduleName + " took longer than expected, time: " + (System.currentTimeMillis() - dt));
                 }
-        }
-
-        private final XboxController xboxController = new XboxController(1);
-        private boolean previouslyPressed = false;
-        public void testFunctions() {
-                if (xboxController.getXButton() && (!previouslyPressed))
-                        physicsSimulation.launchNote(positionEstimator.getRobotPosition2D());
-                previouslyPressed = xboxController.getXButton();
         }
 }
