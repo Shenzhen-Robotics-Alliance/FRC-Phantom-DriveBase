@@ -2,6 +2,7 @@ package frc.robot.Modules.Chassis;
 
 import frc.robot.Modules.MatchFieldSimulation;
 import frc.robot.Modules.PositionReader.PositionEstimatorSimulation;
+import frc.robot.Utils.MechanismControllers.EnhancedPIDController;
 import frc.robot.Utils.PhysicsSimulation.CollisionDetectionGrid;
 import frc.robot.Utils.EasyDataFlow;
 import frc.robot.Utils.RobotConfigReader;
@@ -51,6 +52,17 @@ public class SwerveDriveChassisSimulation extends SwerveDriveChassisLogic {
     @Override
     public void updateConfigs() {
         super.updateConfigs();
+        // override rotational controller
+        super.goToRotationController = new EnhancedPIDController(new EnhancedPIDController.StaticPIDProfile(
+                Math.PI * 2,
+                0.6,
+                0.05,
+                Math.toRadians(35),
+                Math.toRadians(1),
+                0.1,
+                0,
+                0
+        ));
     }
 
     @Override

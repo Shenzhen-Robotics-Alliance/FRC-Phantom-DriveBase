@@ -27,8 +27,8 @@ public abstract class SwerveDriveChassisLogic extends RobotModuleBase {
     private Rotation2D displayedDesiredRotation = null;
 
     /** the pid controller that controls the rotation of the robot when needed */
-    private EnhancedPIDController goToRotationController;
-    private ChassisPositionController chassisPIDController;
+    protected EnhancedPIDController goToRotationController;
+    protected ChassisPositionController chassisPIDController;
     private double positionDifferenceAsTaskFinished, rotationDifferenceAsTaskFinished;
     protected SwerveDriveChassisLogic(SwerveWheelLogic frontLeft, SwerveWheelLogic frontRight, SwerveWheelLogic backLeft, SwerveWheelLogic backRight, RobotFieldPositionEstimator positionEstimator, RobotConfigReader robotConfig) {
         super("chassis");
