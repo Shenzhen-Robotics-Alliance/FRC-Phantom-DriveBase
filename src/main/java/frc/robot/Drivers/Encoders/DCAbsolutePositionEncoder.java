@@ -74,7 +74,7 @@ public class DCAbsolutePositionEncoder implements Encoder {
     }
 
     @Override
-    public boolean isEncoderAvailable() {
+    public boolean isEncoderAlive() {
         dutyCycleEncoder.setConnectedFrequencyThreshold(900);
         return dutyCycleEncoder.isConnected();
     }

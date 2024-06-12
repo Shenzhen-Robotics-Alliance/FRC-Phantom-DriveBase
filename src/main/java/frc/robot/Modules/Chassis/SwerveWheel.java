@@ -214,5 +214,12 @@ public class SwerveWheel extends SwerveWheelLogic {
                 .multiplyBy(scaleToUnit(unit));
     }
 
-
+    @Override
+    public boolean[] getErrors() {
+        return new boolean[] {
+                !drivingMotor.isAlive(),
+                !steerMotor.isAlive(),
+                !steerEncoder.isEncoderAlive()
+        };
+    }
 }

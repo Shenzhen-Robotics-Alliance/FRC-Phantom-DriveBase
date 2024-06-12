@@ -1,7 +1,5 @@
 package frc.robot.Drivers.Encoders;
 
-import frc.robot.Modules.RobotModuleBase;
-
 public interface Encoder {
     /**
      * set a selected position to be the referred origin
@@ -32,5 +30,5 @@ public interface Encoder {
      * */
     double getRawEncoderReading();
 
-    default boolean isEncoderAvailable() {return true;}
+    default boolean isEncoderAlive() {return true;}
 }

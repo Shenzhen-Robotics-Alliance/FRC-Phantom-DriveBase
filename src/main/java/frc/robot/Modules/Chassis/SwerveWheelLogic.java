@@ -210,4 +210,26 @@ public abstract class SwerveWheelLogic extends RobotModuleBase {
         return getModuleVelocity2D(ChassisUnit.METER); // default value
     }
     public abstract Vector2D getModuleVelocity2D(ChassisUnit unit);
+
+    public boolean[] getErrors() {
+        return new boolean[] {
+                false, // drive
+                false, // steer
+                false // enc
+        };
+    }
+    public boolean getError() {
+        return getErrors()[0] || getErrors()[1] || getErrors()[2];
+    }
+
+    public String getErrorMessage(String moduleName) {
+        String message = "Swerve Module " + moduleName + " has error:\n";
+        if (getErrors()[0])
+            message += "    Swerve Wheel Driving Motor Connection Fault;\n";
+        if (getErrors()[1])
+            message += "    Swerve Wheel Steering Motor Connection Fault;\n";
+        if (getErrors()[2])
+            message += "    Swerve Wheel CanCoder Connection Fault;\n";
+        return message;
+    }
 }

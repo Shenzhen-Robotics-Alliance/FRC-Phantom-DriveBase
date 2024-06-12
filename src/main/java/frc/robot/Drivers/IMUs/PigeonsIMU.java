@@ -42,4 +42,9 @@ public class PigeonsIMU implements RawGyro {
                 0
         };
     }
+
+    @Override
+    public boolean isConnected() {
+        return pigeonInstance.getNoMotionCount().getValueAsDouble() < 5;
+    }
 }

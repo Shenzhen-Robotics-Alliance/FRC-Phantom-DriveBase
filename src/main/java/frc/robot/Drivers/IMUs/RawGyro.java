@@ -9,4 +9,8 @@ public interface RawGyro {
 
     /** in radian per second */
     double[] getYawYawPitchRollVelocity();
+
+    default boolean isConnected() {
+        return true;
+    }
 }

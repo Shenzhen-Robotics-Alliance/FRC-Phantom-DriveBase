@@ -31,4 +31,8 @@ public interface Motor {
 
     /** lock the motors, so they can't move, can be overridden by set power */
     void lockMotor(RobotModuleBase operatorModule);
+
+    default boolean isAlive() {
+        return true;
+    }
 }

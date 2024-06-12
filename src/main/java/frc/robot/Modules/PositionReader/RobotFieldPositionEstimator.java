@@ -106,4 +106,8 @@ public abstract class RobotFieldPositionEstimator extends RobotModuleBase {
     public static Rotation2D getPilotFacing() {
         return toActualRobotRotation(pilotFacingBlue);
     }
+
+    public boolean imuCommunicationHealthy() {
+        return true;
+    }
 }

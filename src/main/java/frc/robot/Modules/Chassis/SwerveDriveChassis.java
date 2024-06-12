@@ -22,7 +22,24 @@ public class SwerveDriveChassis extends SwerveDriveChassisLogic {
         driveWheelsSafeLogic(processedTranslationalSpeed, rotationalSpeed);
 
         displayActualSwerveStates();
+        displayErrors();
         super.periodic(dt);
+    }
+
+    private void displayErrors() {
+        super.imuError.set(!positionEstimator.imuCommunicationHealthy());
+
+        super.frontLeftModuleError.set(frontLeft.getError());
+        super.frontLeftModuleError.setText(frontLeft.getErrorMessage("Front-Left"));
+
+        super.frontRightModuleError.set(frontRight.getError());
+        super.frontRightModuleError.setText(frontLeft.getErrorMessage("Front-Right"));
+
+        super.backLeftModuleError.set(backLeft.getError());
+        super.backLeftModuleError.setText(frontLeft.getErrorMessage("Back-Left"));
+
+        super.backRightModuleError.set(backRight.getError());
+        super.backRightModuleError.setText(frontLeft.getErrorMessage("Back-Right"));
     }
 
     private void displayActualSwerveStates() {

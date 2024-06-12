@@ -10,7 +10,7 @@ public class SimpleGyro {
     /** to use which axis as yaw */
     private final int yawAxis;
     private final double yawRate;
-    private final RawGyro gyroInstance;
+    public final RawGyro gyroInstance;
 
 
     public SimpleGyro(int yawAxis, boolean reversed, RawGyro gyroInstance) {

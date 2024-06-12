@@ -128,4 +128,9 @@ public class SwerveDriveOdometer extends RobotFieldPositionEstimator {
     public void setRobotRotation(double rotation) {
         gyro.calibrate(rotation);
     }
+
+    @Override
+    public boolean imuCommunicationHealthy() {
+        return this.gyro.gyroInstance.isConnected();
+    }
 }

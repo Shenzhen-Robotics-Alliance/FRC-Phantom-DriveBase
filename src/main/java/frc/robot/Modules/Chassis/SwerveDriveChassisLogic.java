@@ -3,14 +3,11 @@ package frc.robot.Modules.Chassis;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Modules.PositionReader.RobotFieldPositionEstimator;
 import frc.robot.Modules.RobotModuleBase;
-import frc.robot.Utils.ChassisPositionController;
-import frc.robot.Utils.EasyDataFlow;
+import frc.robot.Utils.*;
 import frc.robot.Utils.MathUtils.AngleUtils;
 import frc.robot.Utils.MathUtils.Rotation2D;
 import frc.robot.Utils.MathUtils.Vector2D;
 import frc.robot.Utils.MechanismControllers.EnhancedPIDController;
-import frc.robot.Utils.RobotConfigReader;
-import frc.robot.Utils.RobotModuleOperatorMarker;
 
 public abstract class SwerveDriveChassisLogic extends RobotModuleBase {
     /** the current translational task */
@@ -390,4 +387,9 @@ public abstract class SwerveDriveChassisLogic extends RobotModuleBase {
             this.rotationalValue = value;
         }
     }
+    protected final Alert imuError = new Alert("Fatal: IMU Module disconnected", Alert.AlertType.ERROR),
+            frontLeftModuleError = new Alert("Fatal: Front-Left Module Error", Alert.AlertType.ERROR),
+            frontRightModuleError = new Alert("Fatal: Front-Right Module Error", Alert.AlertType.ERROR),
+            backLeftModuleError = new Alert("Fatal: Back-Left Module Error", Alert.AlertType.ERROR),
+            backRightModuleError = new Alert("Fatal: Back-Right Module Error", Alert.AlertType.ERROR);
 }

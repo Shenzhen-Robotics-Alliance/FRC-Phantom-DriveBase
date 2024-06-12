@@ -126,4 +126,9 @@ public class TalonFXMotor extends RobotDriverBase implements Motor, Encoder {
     public EncoderMotorMechanism toEncoderAndMotorMechanism() {
         return new EncoderMotorMechanism(this,this);
     }
+
+    @Override
+    public boolean isAlive() {
+        return talonFXInstance.isAlive();
+    }
 }
