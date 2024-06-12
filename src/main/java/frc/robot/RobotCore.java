@@ -111,10 +111,11 @@ public class RobotCore {
                 // this.gyro = new SimpleGyro(0, false, new PigeonsIMU((int) robotConfig.getConfig("hardware/gyroPort")));
                 this.gyro = new SimpleGyro(0, true, new NavX2IMU());
 
-                this.positionEstimator = new VisionSupportedOdometer(new SwerveWheel[] {frontLeftWheel, frontRightWheel, backLeftWheel, backRightWheel}, gyro, new PhantomClient()); // TODO create phantom client
+                final SwerveDriveOdometer swerveDriveOdometer = new VisionSupportedOdometer(new SwerveWheel[] {frontLeftWheel, frontRightWheel, backLeftWheel, backRightWheel}, gyro, new PhantomClient()); // TODO create phantom client
+                this.positionEstimator = swerveDriveOdometer;
                 modules.add(positionEstimator);
 
-                this.chassis = new SwerveDriveChassis(frontLeftWheel, frontRightWheel, backLeftWheel, backRightWheel, positionEstimator, robotConfig);
+                this.chassis = new SwerveDriveChassis(frontLeftWheel, frontRightWheel, backLeftWheel, backRightWheel, swerveDriveOdometer, robotConfig);
                 modules.add(chassis);
 
                 this.statusLight = new AddressableLEDStatusLight(new AddressableLED(0), 155);

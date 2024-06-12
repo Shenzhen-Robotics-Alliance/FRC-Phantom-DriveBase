@@ -9,10 +9,10 @@ import frc.robot.Utils.RobotModuleOperatorMarker;
 
 public class SwerveDriveChassisSimulation extends SwerveDriveChassisLogic {
     private final PositionEstimatorSimulation positionEstimatorSimulation;
-    private final CollisionDetectionGrid collisionDetectionGrid;
+    private final CollisionDetectionGrid collisionDetectionGrid; // legacy
     private final AllRealFieldPhysicsSimulation physicsSimulation;
     private final AllRealFieldPhysicsSimulation.HolomonicRobotPhysicsSimulation chassisSimulation;
-    public SwerveDriveChassisSimulation(SwerveWheelLogic frontLeft, SwerveWheelLogic frontRight, SwerveWheelLogic backLeft, SwerveWheelLogic backRight, PositionEstimatorSimulation positionEstimatorSimulation, AllRealFieldPhysicsSimulation physicsSimulation, RobotConfigReader robotConfig) {
+    public SwerveDriveChassisSimulation(SwerveWheelSimulation frontLeft, SwerveWheelSimulation frontRight, SwerveWheelSimulation backLeft, SwerveWheelSimulation backRight, PositionEstimatorSimulation positionEstimatorSimulation, AllRealFieldPhysicsSimulation physicsSimulation, RobotConfigReader robotConfig) {
         super(frontLeft, frontRight, backLeft, backRight, positionEstimatorSimulation, robotConfig);
         this.physicsSimulation = physicsSimulation;
         collisionDetectionGrid = new CollisionDetectionGrid();

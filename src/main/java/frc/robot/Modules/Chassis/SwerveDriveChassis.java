@@ -1,6 +1,7 @@
 package frc.robot.Modules.Chassis;
 
 import frc.robot.Modules.PositionReader.RobotFieldPositionEstimator;
+import frc.robot.Modules.PositionReader.SwerveDriveOdometer;
 import frc.robot.Utils.*;
 import frc.robot.Utils.MathUtils.Vector2D;
 
@@ -9,8 +10,7 @@ import frc.robot.Utils.MathUtils.Vector2D;
  */
 public class SwerveDriveChassis extends SwerveDriveChassisLogic {
 
-    public SwerveDriveChassis(SwerveWheelLogic frontLeft, SwerveWheelLogic frontRight, SwerveWheelLogic backLeft, SwerveWheelLogic backRight, RobotFieldPositionEstimator positionEstimator, RobotConfigReader robotConfig) {
-
+    public SwerveDriveChassis(SwerveWheel frontLeft, SwerveWheelLogic frontRight, SwerveWheel backLeft, SwerveWheel backRight, SwerveDriveOdometer positionEstimator, RobotConfigReader robotConfig) {
         super(frontLeft, frontRight, backLeft, backRight, positionEstimator, robotConfig);
     }
 
