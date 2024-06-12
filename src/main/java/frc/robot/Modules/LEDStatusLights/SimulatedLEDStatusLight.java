@@ -2,9 +2,6 @@ package frc.robot.Modules.LEDStatusLights;
 
 import edu.wpi.first.wpilibj.AddressableLED;
 
-/**
- * TODO: led status light during simulation
- * */
 public class SimulatedLEDStatusLight extends LEDStatusLight {
     public SimulatedLEDStatusLight(int length) {
         super(length);
