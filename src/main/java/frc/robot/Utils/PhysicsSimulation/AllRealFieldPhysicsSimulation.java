@@ -13,6 +13,7 @@ import frc.robot.Utils.PhysicsSimulation.FieldMaps.CrescendoDefault;
 import frc.robot.Utils.RobotConfigReader;
 import org.dyn4j.dynamics.Body;
 import org.dyn4j.dynamics.BodyFixture;
+import org.dyn4j.dynamics.Force;
 import org.dyn4j.geometry.Geometry;
 import org.dyn4j.geometry.Mass;
 import org.dyn4j.geometry.MassType;
@@ -139,6 +140,33 @@ public class AllRealFieldPhysicsSimulation {
         public void setMotion(Vector2D linearVelocity, double angularVelocity) {
             super.setLinearVelocity(Vector2D.toVector2(linearVelocity));
             super.setAngularVelocity(angularVelocity);
+        }
+
+        public void simulateChassisTranslationalBehavior(Vector2D desiredMotionToRobot, Rotation2D currentRotation) {
+            super.setAtRest(false);
+            if (desiredMotionToRobot.getMagnitude() > 0.03)
+                super.applyForce(new Force(Vector2D.toVector2(
+                        desiredMotionToRobot.multiplyBy(currentRotation).multiplyBy(this.profile.propellingForce))));
+            else {
+                if (Vector2D.fromVector2(super.getLinearVelocity()).getMagnitude() > 0.03 * this.profile.robotMaxVelocity)
+                    super.applyForce(new Force(Vector2D.toVector2(
+                            new Vector2D(Vector2D.fromVector2(super.getLinearVelocity()).getHeading(), -this.profile.frictionForce)
+                    )));
+                else
+                    super.setLinearVelocity(0, 0);
+            }
+        }
+
+        public void simulateChassisRotationalBehavior(double rotationPower) {
+            EasyDataFlow.putNumber("chassis physics simulation", "desired rotational motion", rotationPower);
+            if (Math.abs(rotationPower) > 0.05)
+                super.applyTorque(rotationPower * this.profile.maxAngularAcceleration * super.getMass().getInertia());
+            else {
+                if (Math.abs(super.getAngularVelocity()) < this.profile.maxAngularVelocity * 0.05)
+                    super.setAngularVelocity(0);
+                else
+                    super.applyTorque(Math.copySign(this.profile.angularFrictionAcceleration * super.getMass().getInertia(), -super.getAngularVelocity()));
+            }
         }
 
         public Vector2D getFieldPosition() {
