@@ -6,10 +6,7 @@ import java.util.List;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.hardware.CANcoder;
 
-import edu.wpi.first.wpilibj.AddressableLED;
-import edu.wpi.first.wpilibj.AddressableLEDBuffer;
-import edu.wpi.first.wpilibj.PowerDistribution;
-import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.*;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Drivers.Encoders.CanCoder;
 import frc.robot.Drivers.IMUs.NavX2IMU;
@@ -24,6 +21,7 @@ import frc.robot.Modules.LEDStatusLights.SimulatedLEDStatusLight;
 import frc.robot.Modules.PositionReader.*;
 import frc.robot.Modules.RobotModuleBase;
 import frc.robot.Services.RobotServiceBase;
+import frc.robot.Utils.Alert;
 import frc.robot.Utils.MathUtils.Vector2D;
 import frc.robot.Utils.PhysicsSimulation.AllRealFieldPhysicsSimulation;
 import frc.robot.Utils.RobotConfigReader;
@@ -47,7 +45,8 @@ public class RobotCore {
         private final List<RobotModuleBase> modules;
         private List<RobotServiceBase> services;
         protected boolean wasEnabled;
-        public final PowerDistribution powerDistributionPanel = new PowerDistribution(1, PowerDistribution.ModuleType.kCTRE);
+        public final PowerDistribution powerDistributionPanel = new PowerDistribution(0, PowerDistribution.ModuleType.kCTRE);
+        private final Alert mainLoopTimeOverrunWarning = new Alert("Main-Loop Loop-Time Overrun", Alert.AlertType.WARNING);
 
         /**
          * creates a robot core
@@ -235,7 +234,7 @@ public class RobotCore {
         /**
          * called when the robot is enabled
          * */
-        private long t = System.currentTimeMillis();
+        private double t = Timer.getFPGATimestamp();
         public void updateRobot() {
                 updateServices();
                 updateModules();
@@ -244,8 +243,11 @@ public class RobotCore {
                 robotConfig.updateTuningConfigsFromDashboard();
 
                 /* monitor the program's performance */
-                SmartDashboard.putNumber("robot main thread delay", System.currentTimeMillis()-t);
-                t = System.currentTimeMillis();
+                final double delayMillis = (Timer.getFPGATimestamp()-t)*1000;
+                SmartDashboard.putNumber("robot main thread delay", delayMillis);
+                mainLoopTimeOverrunWarning.set(delayMillis > 50);
+
+                t = Timer.getFPGATimestamp();
 
                 testFunctions();
         }
