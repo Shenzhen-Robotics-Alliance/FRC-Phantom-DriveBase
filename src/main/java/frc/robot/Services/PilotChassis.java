@@ -1,13 +1,12 @@
 package frc.robot.Services;
 
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Modules.Chassis.SwerveDriveChassisLogic;
+import frc.robot.Utils.Alert;
 import frc.robot.Utils.EasyDataFlow;
-import frc.robot.Utils.MathUtils.AngleUtils;
 import frc.robot.Utils.MathUtils.Rotation2D;
 import frc.robot.Utils.PilotController;
 import frc.robot.Utils.RobotConfigReader;
@@ -33,7 +32,8 @@ public class PilotChassis extends RobotServiceBase {
 
     }
     private SendableChooser<ControllerType> controllerTypeSendableChooser = new SendableChooser<>();
-    private static final ControllerType defaultControllerType = ControllerType.RM_POCKET;
+    private final Alert controllerNotPluggedInError = new Alert("Pilot Controller Not Plugged In", Alert.AlertType.ERROR);
+    private static final ControllerType defaultControllerType = ControllerType.XBOX;
     private final XboxController copilotGamePad;
 
     /**
@@ -86,6 +86,9 @@ public class PilotChassis extends RobotServiceBase {
         previousSelectedController = selectedController;
 
         pilotController.update();
+
+        controllerNotPluggedInError.setText("Pilot Controller <" + selectedController + "> Not Attached To DriverStation Channel " + pilotController.getChannelOnDS());
+        controllerNotPluggedInError.setActivated(!pilotController.isConnected());
 
         /* set the orientation mode */
         chassis.setOrientationMode(orientationModeChooser.getSelected(), this);

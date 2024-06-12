@@ -23,7 +23,6 @@ import frc.robot.Modules.RobotModuleBase;
 import frc.robot.Services.RobotServiceBase;
 import frc.robot.Utils.Alert;
 import frc.robot.Utils.MathUtils.Vector2D;
-import frc.robot.Utils.PhysicsSimulation.AllRealFieldPhysicsSimulation;
 import frc.robot.Utils.RobotConfigReader;
 
 /**
@@ -248,7 +247,7 @@ public class RobotCore {
                 final int loopTimeOverrunWarningThresholdMS = 20,
                         warningMessageStickAroundTimeSeconds = 2;
                 if (delayMillis > loopTimeOverrunWarningThresholdMS) lastLoopOverrunTime = Timer.getFPGATimestamp();
-                mainLoopTimeOverrunWarning.set(Timer.getFPGATimestamp() - lastLoopOverrunTime < warningMessageStickAroundTimeSeconds); // let the message stick around for 5 seconds
+                mainLoopTimeOverrunWarning.setActivated(Timer.getFPGATimestamp() - lastLoopOverrunTime < warningMessageStickAroundTimeSeconds); // let the message stick around for 5 seconds
                 mainLoopTimeOverrunWarning.setText("Temporary Main-Loop Lagging, update time: " + (int)delayMillis + "(ms)");
 
                 t = Timer.getFPGATimestamp();

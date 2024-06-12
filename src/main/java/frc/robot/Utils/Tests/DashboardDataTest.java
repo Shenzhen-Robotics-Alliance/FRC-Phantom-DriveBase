@@ -10,10 +10,10 @@ public class DashboardDataTest implements SimpleRobotTest {
         testInfo = new Alert("Test Message", Alert.AlertType.INFO);
     @Override
     public void testStart() {
-        testError.set(true);
-        testError2.set(true);
-        testWarning.set(true);
-        testInfo.set(true);
+        testError.setActivated(true);
+        testError2.setActivated(true);
+        testWarning.setActivated(true);
+        testInfo.setActivated(true);
     }
 
     @Override

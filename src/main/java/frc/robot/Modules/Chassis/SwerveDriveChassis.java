@@ -1,6 +1,5 @@
 package frc.robot.Modules.Chassis;
 
-import frc.robot.Modules.PositionReader.RobotFieldPositionEstimator;
 import frc.robot.Modules.PositionReader.SwerveDriveOdometer;
 import frc.robot.Utils.*;
 import frc.robot.Utils.MathUtils.Vector2D;
@@ -27,18 +26,18 @@ public class SwerveDriveChassis extends SwerveDriveChassisLogic {
     }
 
     private void displayErrors() {
-        super.imuError.set(!positionEstimator.imuCommunicationHealthy());
+        super.imuError.setActivated(!positionEstimator.imuCommunicationHealthy());
 
-        super.frontLeftModuleError.set(frontLeft.getError());
+        super.frontLeftModuleError.setActivated(frontLeft.getError());
         super.frontLeftModuleError.setText(frontLeft.getErrorMessage("Front-Left"));
 
-        super.frontRightModuleError.set(frontRight.getError());
+        super.frontRightModuleError.setActivated(frontRight.getError());
         super.frontRightModuleError.setText(frontLeft.getErrorMessage("Front-Right"));
 
-        super.backLeftModuleError.set(backLeft.getError());
+        super.backLeftModuleError.setActivated(backLeft.getError());
         super.backLeftModuleError.setText(frontLeft.getErrorMessage("Back-Left"));
 
-        super.backRightModuleError.set(backRight.getError());
+        super.backRightModuleError.setActivated(backRight.getError());
         super.backRightModuleError.setText(frontLeft.getErrorMessage("Back-Right"));
     }
 

@@ -165,4 +165,12 @@ public class PilotController {
             return false;
         }
     }
+
+    public boolean isConnected() {
+        return this.rawController.isConnected();
+    }
+
+    public int getChannelOnDS() {
+        return rawController.getPort();
+    }
 }

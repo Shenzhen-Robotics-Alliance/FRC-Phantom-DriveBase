@@ -61,7 +61,7 @@ public class Alert {
      * Sets whether the alert should currently be displayed. When activated, the alert text will also
      * be sent to the console.
      */
-    public void set(boolean active) {
+    public void setActivated(boolean active) {
         if (active && !this.active) {
             activeStartTime = Timer.getFPGATimestamp();
             switch (type) {
