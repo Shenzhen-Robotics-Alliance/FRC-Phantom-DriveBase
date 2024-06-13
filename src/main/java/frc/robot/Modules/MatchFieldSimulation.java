@@ -28,9 +28,12 @@ public class MatchFieldSimulation extends RobotModuleBase {
     public void updatePhysics(double dt) {
         simulation.update(dt);
     }
-
     @Override
     public void onReset() {
+
+    }
+
+    public void addNoteToHumanPlayerStation() {
 
     }
 }

@@ -122,6 +122,14 @@ public class RobotShell extends LoggedRobot {
         robotCore.updateModules();
     }
 
+    @Override
+    public void simulationInit() {
+        final List<RobotServiceBase> services = new ArrayList<>();
+        final XboxController coachController = new XboxController(2);
+        final MatchSimulationService matchSimulationService = new MatchSimulationService(robotCore.matchFieldSimulation, coachController);
+        services.add(matchSimulationService);
+    }
+
     private SimpleRobotTest robotTest = null;
     @Override
     public void testInit() {
