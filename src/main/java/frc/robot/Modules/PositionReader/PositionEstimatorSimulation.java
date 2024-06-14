@@ -5,7 +5,6 @@ import frc.robot.Utils.MathUtils.AngleUtils;
 import frc.robot.Utils.MathUtils.Rotation2D;
 import frc.robot.Utils.MathUtils.Vector2D;
 import frc.robot.Utils.PhysicsSimulation.AllRealFieldPhysicsSimulation;
-import frc.robot.Utils.RobotConfigReader;
 
 public class PositionEstimatorSimulation extends RobotFieldPositionEstimator {
     private Vector2D robotPosition, robotVelocity, robotAcceleration;
@@ -91,7 +90,7 @@ public class PositionEstimatorSimulation extends RobotFieldPositionEstimator {
         robotPhysicsSimulation.resetMotion();
         robotVelocity = new Vector2D();
         robotAngularVelocity = 0;
-        setRobotRotation(RobotFieldPositionEstimator.getPilotFacing().getRadian());
+        setRobotRotation(RobotFieldPositionEstimator.getPilotFacing2D().getRadian());
         setRobotPosition(RobotFieldPositionEstimator.getRobotDefaultStartingPosition());
     }
 }

@@ -61,6 +61,14 @@ public class PilotController {
     public PilotController(RobotConfigReader robotConfig, String configDomainName) {
         this(
                 new GenericHID((int)robotConfig.getConfig(configDomainName, "controllerPort")),
+                robotConfig,
+                configDomainName
+        );
+    }
+
+    public PilotController(GenericHID genericHID, RobotConfigReader robotConfig, String configDomainName) {
+        this(
+                genericHID,
                 (int)robotConfig.getConfig(configDomainName, "xAxisPort"),
                 (int)robotConfig.getConfig(configDomainName, "yAxisPort"),
                 (int)robotConfig.getConfig(configDomainName, "zAxisPort"),

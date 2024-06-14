@@ -103,7 +103,7 @@ public abstract class RobotFieldPositionEstimator extends RobotModuleBase {
         return toActualPositionOnField(robotDefaultStartingPositionBlue);
     }
 
-    public static Rotation2D getPilotFacing() {
+    public static Rotation2D getPilotFacing2D() {
         return toActualRobotRotation(pilotFacingBlue);
     }
 

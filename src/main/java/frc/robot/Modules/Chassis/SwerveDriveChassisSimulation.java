@@ -92,7 +92,7 @@ public class SwerveDriveChassisSimulation extends SwerveDriveChassisLogic {
 
         /* simulate chassis translation behavior */
         simulation.robotPhysicsSimulation.simulateChassisRotationalBehavior(calculateRotationalPower(dt));
-        simulation.robotPhysicsSimulation.simulateChassisTranslationalBehavior(calculateTranslationalPowerToRobot(dt), positionEstimator.getRobotRotation2D());
+        simulation.robotPhysicsSimulation.simulateChassisTranslationalBehavior(calculateTranslationalPowerToRobot(dt));
         simulation.updatePhysics(dt);
         super.periodic(dt);
     }

@@ -1,5 +1,6 @@
 package frc.robot.Utils.PhysicsSimulation;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation3d;
@@ -28,6 +29,7 @@ public class AllRealFieldPhysicsSimulation {
     private final World<Body> field;
     private final FieldCollisionMap map;
     private final List<HolomonicRobotPhysicsSimulation> robots;
+    private HolomonicRobotPhysicsSimulation mainRobot = null;
     private final List<NoteOnField> notesOnField;
     private final List<NotesOnFly> notesOnFly = new ArrayList<>();
     public AllRealFieldPhysicsSimulation() {
@@ -39,10 +41,48 @@ public class AllRealFieldPhysicsSimulation {
         map.addObstaclesToField(field);
     }
 
+    public void update(double dt) {
+        for (NoteOnField noteOnField:notesOnField)
+            noteOnField.update();
+        this.field.step(1, dt);
+
+        EasyDataFlow.putPositionArray("opponent robots", getOtherRobotsPositions2D(), getOtherRobotsRotations2D());
+        EasyDataFlow.putPosition3dArray("notePositions", getNotesPose3d());
+        removeArrivedNotesOnFly();
+    }
+
+    public HolomonicRobotPhysicsSimulation setMainRobot(HolomonicRobotPhysicsSimulation robot) {
+        this.mainRobot = robot;
+        addRobot(mainRobot);
+        return mainRobot;
+    }
+
     public HolomonicRobotPhysicsSimulation addRobot(HolomonicRobotPhysicsSimulation robot) {
         robots.add(robot);
         field.addBody(robot);
         return robot;
+    }
+
+    public Vector2D[] getOtherRobotsPositions2D() {
+        if (robots.size() <= 1)
+            return new Vector2D[] {};
+        Vector2D[] positions2D = new Vector2D[robots.size()-1];
+        int i = 0;
+        for (HolomonicRobotPhysicsSimulation robot:robots)
+            if (robot != this.mainRobot)
+                positions2D[i++] = robot.getFieldPosition();
+        return positions2D;
+    }
+
+    public Rotation2D[] getOtherRobotsRotations2D() {
+        if (robots.size() <= 1)
+            return new Rotation2D[] {};
+        Rotation2D[] rotations2D = new Rotation2D[robots.size()-1];
+        int i = 0;
+        for (HolomonicRobotPhysicsSimulation robot:robots)
+            if (robot != this.mainRobot)
+                rotations2D[i++] = robot.getFacing();
+        return rotations2D;
     }
 
     public NoteOnField addNoteToField(Vector2D startingPosition) {
@@ -54,15 +94,6 @@ public class AllRealFieldPhysicsSimulation {
 
     public NoteOnField[] getNotesOnField() {
         return notesOnField.toArray(new NoteOnField[0]);
-    }
-
-    public void update(double dt) {
-        for (NoteOnField noteOnField:notesOnField)
-            noteOnField.update();
-        this.field.step(1, dt);
-
-        EasyDataFlow.putPosition3dArray("notePositions", getNotesPose3d());
-        removeArrivedNotesOnFly();
     }
 
     public static final class RobotProfile {
@@ -144,11 +175,15 @@ public class AllRealFieldPhysicsSimulation {
             super.setAngularVelocity(angularVelocity);
         }
 
-        public void simulateChassisTranslationalBehavior(Vector2D desiredMotionToRobot, Rotation2D currentRotation) {
+        public void simulateChassisTranslationalBehavior(Vector2D desiredMotionToRobot) {
+            simulateChassisTranslationalBehaviorFieldOriented(desiredMotionToRobot.multiplyBy(getFacing()));
+        }
+
+        public void simulateChassisTranslationalBehaviorFieldOriented(Vector2D desiredMotionToField) {
             super.setAtRest(false);
-            if (desiredMotionToRobot.getMagnitude() > 0.03)
+            if (desiredMotionToField.getMagnitude() > 0.03)
                 super.applyForce(new Force(Vector2D.toVector2(
-                        desiredMotionToRobot.multiplyBy(currentRotation).multiplyBy(this.profile.propellingForce))));
+                        desiredMotionToField.multiplyBy(this.profile.propellingForce))));
             else {
                 if (Vector2D.fromVector2(super.getLinearVelocity()).getMagnitude() > 0.03 * this.profile.robotMaxVelocity)
                     super.applyForce(new Force(Vector2D.toVector2(
