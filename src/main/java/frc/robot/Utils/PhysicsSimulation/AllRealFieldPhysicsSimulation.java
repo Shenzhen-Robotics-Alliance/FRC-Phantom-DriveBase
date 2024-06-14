@@ -52,7 +52,9 @@ public class AllRealFieldPhysicsSimulation {
         return noteOnField;
     }
 
-    // TODO: the removal of a note (remove a note with a given constrain)
+    public NoteOnField[] getNotesOnField() {
+        return notesOnField.toArray(new NoteOnField[0]);
+    }
 
     public void update(double dt) {
         for (NoteOnField noteOnField:notesOnField)
