@@ -48,8 +48,8 @@
         <robotMaxAngularVelocity type="double">680</robotMaxAngularVelocity>
         <robotMaxAngularAcceleration type="double">1200</robotMaxAngularAcceleration>
         <timeChassisStopsRotating>0.3</timeChassisStopsRotating>
-        <width>0.8</width>
-        <height>0.8</height>
+        <width>0.82</width>
+        <height>0.9</height>
 
         <!-- PID coefficients for steer wheels -->
         <steerWheelErrorTolerance type = "double">1</steerWheelErrorTolerance> <!-- the amount of error to ignore, in degrees -->
