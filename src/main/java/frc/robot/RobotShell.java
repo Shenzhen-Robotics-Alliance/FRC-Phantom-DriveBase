@@ -21,7 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class RobotShell extends LoggedRobot {
-    private static final int updateFreq = 100;
+    private static final int updateFreq = 60;
 
     private final XboxController copilotGamePad = new XboxController(1);
 
@@ -39,7 +39,7 @@ public class RobotShell extends LoggedRobot {
     @Override
     public void robotInit() {
         System.out.println("<-- Robot Shell | robot init -->");
-        robotCore = new RobotCore("5516-2022", isSimulation());
+        robotCore = new RobotCore("6433-2024", isSimulation());
 
         DataLogManager.start();
         DriverStation.startDataLog(DataLogManager.getLog());
@@ -135,7 +135,7 @@ public class RobotShell extends LoggedRobot {
     public void testInit() {
         // System.out.println("<-- Robot Shell | test init -->");
         if (robotTest == null)
-            this.robotTest = new DashboardDataTest();
+            this.robotTest = new WheelGearRatioMeasure();
         robotTest.testStart();
     }
 

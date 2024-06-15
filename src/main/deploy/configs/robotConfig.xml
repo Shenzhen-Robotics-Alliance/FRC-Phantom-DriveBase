@@ -35,6 +35,9 @@
         <backRightWheelZeroPosition type = "double">0.09</backRightWheelZeroPosition>
     </hardware>
     <chassis>
+        <swerveHorizontalDistance>0.6</swerveHorizontalDistance>
+        <swerveVerticalDistance>0.6</swerveVerticalDistance>
+
         <!-- all units are in meters -->
         <wheelDiameter type="double">0.1016</wheelDiameter>
         <wheelGearRatio type="double">6.12</wheelGearRatio>
@@ -53,9 +56,9 @@
 
         <!-- PID coefficients for steer wheels -->
         <steerWheelErrorTolerance type = "double">1</steerWheelErrorTolerance> <!-- the amount of error to ignore, in degrees -->
-        <steerWheelErrorStartDecelerate type = "double">60</steerWheelErrorStartDecelerate> <!-- the amount of error where the motors should try to correct using full motor speed, in degrees -->
+        <steerWheelErrorStartDecelerate type = "double">90</steerWheelErrorStartDecelerate> <!-- the amount of error where the motors should try to correct using full motor speed, in degrees -->
         <steerWheelMaximumPower type = "double">0.85</steerWheelMaximumPower> <!-- use this value as the full speed -->
-        <steerWheelMinimumPower type = "double">0.03</steerWheelMinimumPower> <!-- this is the minimum amount of motor speed needed to turn the steer, in percentage of the full speed -->
+        <steerWheelMinimumPower type = "double">0.02</steerWheelMinimumPower> <!-- this is the minimum amount of motor speed needed to turn the steer, in percentage of the full speed -->
         <steerWheelFeedForwardTime type = "double">0</steerWheelFeedForwardTime>
 <!--        <steerCorrectionPowerRateAtZeroWheelSpeed type="double">0.4</steerCorrectionPowerRateAtZeroWheelSpeed>-->
 <!--        <steerCorrectionPowerFullWheelSpeed type="'double">0.4</steerCorrectionPowerFullWheelSpeed>-->
@@ -178,9 +181,9 @@
         <yAxisPort type="int">5</yAxisPort>
         <zAxisPort type="int">0</zAxisPort>
 
-        <pilotControllerXAxisSensitivity>100</pilotControllerXAxisSensitivity>
-        <pilotControllerYAxisSensitivity>-100</pilotControllerYAxisSensitivity>
-        <pilotControllerZAxisSensitivity>-75</pilotControllerZAxisSensitivity>
+        <pilotControllerXAxisSensitivity>30</pilotControllerXAxisSensitivity>
+        <pilotControllerYAxisSensitivity>-30</pilotControllerYAxisSensitivity>
+        <pilotControllerZAxisSensitivity>-15</pilotControllerZAxisSensitivity>
         <!-- the minimum amount of stick input to respond to, in percentage -->
         <pilotStickThresholdWhenOtherAxisUnused>5</pilotStickThresholdWhenOtherAxisUnused>
         <pilotStickThresholdWhenOtherAxisFull>10</pilotStickThresholdWhenOtherAxisFull>

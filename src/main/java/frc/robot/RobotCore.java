@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj.*;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Drivers.Encoders.CanCoder;
 import frc.robot.Drivers.IMUs.NavX2IMU;
+import frc.robot.Drivers.IMUs.PigeonsIMU;
 import frc.robot.Drivers.IMUs.SimpleGyro;
 import frc.robot.Drivers.Motors.TalonFXMotor;
 import frc.robot.Drivers.Visions.PhantomClient;
@@ -32,7 +33,7 @@ import frc.robot.Utils.RobotConfigReader;
  * */
 public class RobotCore {
         private boolean initialized = false;
-        private static final long printTimeIfTimeMillisExceeds = 20;
+        private static final long printTimeIfTimeMillisExceeds = 30;
 
         public RobotConfigReader robotConfig;
         public SimpleGyro gyro;
@@ -44,7 +45,7 @@ public class RobotCore {
         private final List<RobotModuleBase> modules;
         private List<RobotServiceBase> services;
         protected boolean wasEnabled;
-        public final PowerDistribution powerDistributionPanel = new PowerDistribution(0, PowerDistribution.ModuleType.kCTRE);
+        public final PowerDistribution powerDistributionPanel = new PowerDistribution(1, PowerDistribution.ModuleType.kRev);
         private final Alert mainLoopTimeOverrunWarning = new Alert("Main-Loop Loop-Time Overrun", Alert.AlertType.WARNING);
 
         /**
@@ -80,10 +81,10 @@ public class RobotCore {
                 modules.add(statusLight);
 
                 final SwerveWheelSimulation
-                        frontLeftWheel = new SwerveWheelSimulation(1, robotConfig, new Vector2D(new double[] { -0.6, 0.6 })),
-                        backLeftWheel = new SwerveWheelSimulation(1, robotConfig, new Vector2D(new double[] { -0.6, -0.6 })),
-                        frontRightWheel = new SwerveWheelSimulation(1, robotConfig, new Vector2D(new double[] { 0.6, 0.6 })),
-                        backRightWheel = new SwerveWheelSimulation(1, robotConfig, new Vector2D(new double[] { 0.6, -0.6 }));
+                        frontLeftWheel = new SwerveWheelSimulation(1, robotConfig, new Vector2D(new double[] { -robotConfig.getConfig("chassis/swerveHorizontalDistance")/2, robotConfig.getConfig("chassis/swerveVerticalDistance")/2 })),
+                        backLeftWheel = new SwerveWheelSimulation(1, robotConfig, new Vector2D(new double[] { -robotConfig.getConfig("chassis/swerveHorizontalDistance")/2, -robotConfig.getConfig("chassis/swerveVerticalDistance")/2 })),
+                        frontRightWheel = new SwerveWheelSimulation(1, robotConfig, new Vector2D(new double[] { robotConfig.getConfig("chassis/swerveHorizontalDistance")/2, robotConfig.getConfig("chassis/swerveVerticalDistance")/2 })),
+                        backRightWheel = new SwerveWheelSimulation(1, robotConfig, new Vector2D(new double[] { robotConfig.getConfig("chassis/swerveHorizontalDistance")/2, -robotConfig.getConfig("chassis/swerveVerticalDistance")/2 }));
                 modules.add(frontLeftWheel);
                 modules.add(backLeftWheel);
                 modules.add(frontRightWheel);
@@ -105,8 +106,8 @@ public class RobotCore {
                 modules.add(frontRightWheel);
                 modules.add(backRightWheel);
 
-                // this.gyro = new SimpleGyro(0, false, new PigeonsIMU((int) robotConfig.getConfig("hardware/gyroPort")));
-                this.gyro = new SimpleGyro(0, true, new NavX2IMU());
+                this.gyro = new SimpleGyro(0, false, new PigeonsIMU((int) robotConfig.getConfig("hardware/gyroPort")));
+                // this.gyro = new SimpleGyro(0, true, new NavX2IMU());
 
                 final SwerveDriveOdometer swerveDriveOdometer = new VisionSupportedOdometer(new SwerveWheel[] {frontLeftWheel, frontRightWheel, backLeftWheel, backRightWheel}, gyro, new PhantomClient()); // TODO create phantom client
                 this.positionEstimator = swerveDriveOdometer;
@@ -244,9 +245,8 @@ public class RobotCore {
                 /* monitor the program's performance */
                 final double delayMillis = (Timer.getFPGATimestamp()-t)*1000;
                 SmartDashboard.putNumber("robot main thread delay", delayMillis);
-                final int loopTimeOverrunWarningThresholdMS = 20,
-                        warningMessageStickAroundTimeSeconds = 2;
-                if (delayMillis > loopTimeOverrunWarningThresholdMS) lastLoopOverrunTime = Timer.getFPGATimestamp();
+                final int warningMessageStickAroundTimeSeconds = 2;
+                if (delayMillis > printTimeIfTimeMillisExceeds) lastLoopOverrunTime = Timer.getFPGATimestamp();
                 mainLoopTimeOverrunWarning.setActivated(Timer.getFPGATimestamp() - lastLoopOverrunTime < warningMessageStickAroundTimeSeconds); // let the message stick around for 5 seconds
                 mainLoopTimeOverrunWarning.setText("Temporary Main-Loop Lagging, update time: " + (int)delayMillis + "(ms)");
 

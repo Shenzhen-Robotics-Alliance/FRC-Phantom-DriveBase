@@ -1,0 +1,67 @@
+<robotConfig>
+    <hardware>
+        <chassisOnCanivore>0</chassisOnCanivore>
+        <frontLeftWheelDriveMotor type="int">1</frontLeftWheelDriveMotor>
+        <frontLeftWheelSteerMotor type="int">2</frontLeftWheelSteerMotor>
+        <frontLeftWheelSteerMotorReversed type="int">1</frontLeftWheelSteerMotorReversed>
+        <frontLeftWheelEncoder type="int">1</frontLeftWheelEncoder>
+        <frontLeftWheelSteerEncoderReversed type="int">0</frontLeftWheelSteerEncoderReversed>
+
+        <frontRightWheelDriveMotor type="int">3</frontRightWheelDriveMotor>
+        <frontRightWheelSteerMotor type="int">4</frontRightWheelSteerMotor>
+        <frontRightWheelSteerMotorReversed type="int">1</frontRightWheelSteerMotorReversed>
+        <frontRightWheelEncoder type="int">2</frontRightWheelEncoder>
+        <frontRightWheelSteerEncoderReversed type="int">0</frontRightWheelSteerEncoderReversed>
+
+        <backLeftWheelDriveMotor type="int">5</backLeftWheelDriveMotor>
+        <backLeftWheelSteerMotor type="int">6</backLeftWheelSteerMotor>
+        <backLeftWheelSteerMotorReversed type="int">1</backLeftWheelSteerMotorReversed>
+        <backLeftWheelEncoder type="int">3</backLeftWheelEncoder>
+        <backLeftWheelSteerEncoderReversed type="int">0</backLeftWheelSteerEncoderReversed>
+
+        <backRightWheelDriveMotor type="int">7</backRightWheelDriveMotor>
+        <backRightWheelSteerMotor type="int">8</backRightWheelSteerMotor>
+        <backRightWheelSteerMotorReversed type="int">1</backRightWheelSteerMotorReversed>
+        <backRightWheelEncoder type="int">4</backRightWheelEncoder>
+        <backRightWheelSteerEncoderReversed type="int">0</backRightWheelSteerEncoderReversed>
+
+        <gyroPort type="int">0</gyroPort>
+
+         <!-- the zero position of encoders, to measure this value, turn the wheel to the direct front, and see the value of encoder.getRawSensorReading() -->
+        <frontLeftWheelZeroPosition type = "double">2.45</frontLeftWheelZeroPosition>
+        <frontRightWheelZeroPosition type = "double">-0.01</frontRightWheelZeroPosition>
+        <backLeftWheelZeroPosition type = "double">-2.71</backLeftWheelZeroPosition>
+        <backRightWheelZeroPosition type = "double">2.49</backRightWheelZeroPosition>
+    </hardware>
+    <chassis>
+        <swerveHorizontalDistance>0.6</swerveHorizontalDistance>
+        <swerveVerticalDistance>0.48</swerveVerticalDistance>
+
+        <wheelGearRatio type="double">8.14</wheelGearRatio>
+        <wheelsPowerConstrain type="double">0.3</wheelsPowerConstrain>
+        <wheelsPowerConstrainAtLowSpeedMode>0.5</wheelsPowerConstrainAtLowSpeedMode>
+<!--        <wheelsPowerConstrain type="double">0.5</wheelsPowerConstrain>-->
+<!--        <wheelsPowerConstrainAtLowSpeedMode>0.5</wheelsPowerConstrainAtLowSpeedMode>-->
+        <rotationalSpeedMaxSacrifice type="double">0.4</rotationalSpeedMaxSacrifice>
+
+        <robotPositionFeedForwardTime type="double">0.05</robotPositionFeedForwardTime>
+        <translationalTaskUpdatableRange type="double">0.1</translationalTaskUpdatableRange>
+        <ignoredAccelerateTime type="double">0.05</ignoredAccelerateTime>
+        <robotMaximumSpeed type="double">4.5</robotMaximumSpeed>
+        <timeNeededToFullyAccelerate type="double">0.3</timeNeededToFullyAccelerate>
+        <robotSpeedActivateSpeedControl type="double">0.1</robotSpeedActivateSpeedControl>
+
+        <rotationalErrorAsCommandFinished>3</rotationalErrorAsCommandFinished>
+    </chassis>
+
+    <auto>
+        <autoStageMaxAcceleration type="double">5</autoStageMaxAcceleration>
+        <autoStageMaxVelocity type="double">2.5</autoStageMaxVelocity>
+        <autoStageMaxAngularVelocity type="double">150</autoStageMaxAngularVelocity> <!-- in deg/s -->
+        <inAdvanceTime>0.3</inAdvanceTime>
+<!--        <autoStageMaxAcceleration type="double">2</autoStageMaxAcceleration>-->
+<!--        <autoStageMaxVelocity type="double">1</autoStageMaxVelocity>-->
+<!--        <autoStageMaxAngularVelocity type="double">45</autoStageMaxAngularVelocity> &lt;!&ndash; in deg/s &ndash;&gt;-->
+<!--        <inAdvanceTime>0.1</inAdvanceTime>-->
+    </auto>
+</robotConfig>
