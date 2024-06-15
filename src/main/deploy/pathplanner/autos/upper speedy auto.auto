@@ -1,0 +1,61 @@
+{
+  "version": 1.0,
+  "startingPose": {
+    "position": {
+      "x": 1.4204899755794556,
+      "y": 6.330993074868065
+    },
+    "rotation": 180.0
+  },
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "race to first note"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "shoot first race to second"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "shoot second fast"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "move back grab third fast"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "shoot third fast"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "grab fourth"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "shoot fourth and fifth"
+          }
+        }
+      ]
+    }
+  },
+  "folder": null,
+  "choreoAuto": false
+}
