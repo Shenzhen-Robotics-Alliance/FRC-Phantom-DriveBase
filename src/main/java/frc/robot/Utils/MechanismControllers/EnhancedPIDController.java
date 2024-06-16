@@ -242,6 +242,8 @@ public class EnhancedPIDController {
     }
 
     public static double simplifyPosition(double position, double loopLength) {
+        if (!Double.isFinite(position) || Math.abs(position / loopLength) > 100)
+            throw new IllegalArgumentException("cannot simplify position :" + position);
         while (position > loopLength)
             position -= loopLength;
         while (position < 0)
