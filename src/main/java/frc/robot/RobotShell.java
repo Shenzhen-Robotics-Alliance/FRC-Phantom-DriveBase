@@ -45,6 +45,8 @@ public class RobotShell extends LoggedRobot {
         DriverStation.startDataLog(DataLogManager.getLog());
         Logger.addDataReceiver(new WPILOGWriter()); // Log to a USB stick ("/U/logs")
         Logger.addDataReceiver(new NT4Publisher()); // Publish data to NetworkTables
+        Logger.start();
+        SmartDashboard.putData("PDP", robotCore.powerDistributionPanel);
     }
 
     /** called once when the driver station first connects to the robot */
@@ -76,8 +78,6 @@ public class RobotShell extends LoggedRobot {
         EasyDataFlow.putNumber("other", "Match Time (s)", DriverStation.getMatchTime());
         EasyDataFlow.putNumber("other", "Voltage (V)", robotCore.powerDistributionPanel.getVoltage());
         EasyDataFlow.putNumber("other", "Current (A)", robotCore.powerDistributionPanel.getTotalCurrent());
-
-        SmartDashboard.putData("PDP", robotCore.powerDistributionPanel);
     }
 
     /** called once when auto is selected and enable button is hit */

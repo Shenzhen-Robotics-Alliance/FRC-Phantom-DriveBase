@@ -33,7 +33,7 @@ import frc.robot.Utils.RobotConfigReader;
  * */
 public class RobotCore {
         private boolean initialized = false;
-        private static final long printTimeIfTimeMillisExceeds = 30;
+        private static final long printTimeIfTimeMillisExceeds = 50;
 
         public RobotConfigReader robotConfig;
         public SimpleGyro gyro;
@@ -245,7 +245,7 @@ public class RobotCore {
                 /* monitor the program's performance */
                 final double delayMillis = (Timer.getFPGATimestamp()-t)*1000;
                 SmartDashboard.putNumber("robot main thread delay", delayMillis);
-                final int warningMessageStickAroundTimeSeconds = 2;
+                final double warningMessageStickAroundTimeSeconds = 0.5;
                 if (delayMillis > printTimeIfTimeMillisExceeds) lastLoopOverrunTime = Timer.getFPGATimestamp();
                 mainLoopTimeOverrunWarning.setActivated(Timer.getFPGATimestamp() - lastLoopOverrunTime < warningMessageStickAroundTimeSeconds); // let the message stick around for 5 seconds
                 mainLoopTimeOverrunWarning.setText("Temporary Main-Loop Lagging, update time: " + (int)delayMillis + "(ms)");

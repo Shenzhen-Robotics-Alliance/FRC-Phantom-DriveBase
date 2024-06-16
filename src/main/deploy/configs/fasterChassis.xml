@@ -41,7 +41,7 @@
         <translationalTaskUpdatableRange type="double">0.1</translationalTaskUpdatableRange>
         <ignoredAccelerateTime type="double">0.05</ignoredAccelerateTime>
         <robotMaximumSpeed type="double">4.5</robotMaximumSpeed>
-        <timeNeededToFullyAccelerate type="double">0.3</timeNeededToFullyAccelerate>
+        <timeNeededToFullyAccelerate type="double">0.15</timeNeededToFullyAccelerate>
         <robotSpeedActivateSpeedControl type="double">0.1</robotSpeedActivateSpeedControl>
     </chassis>
     <auto>
