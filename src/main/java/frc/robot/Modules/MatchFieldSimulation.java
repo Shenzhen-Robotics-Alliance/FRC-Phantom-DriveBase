@@ -172,11 +172,14 @@ public class MatchFieldSimulation extends RobotModuleBase {
         }
 
         private void updateAutoCycle(double dt) {
+            final double
+                    rotationTargetWhenMoving = RobotFieldPositionEstimator.toActualRobotRotation(opponentRobotID == 0 ? new Rotation2D(0) : new Rotation2D(-Math.toRadians(90))).getRadian(),
+                    rotationTargetAtHumanPlayerStation = RobotFieldPositionEstimator.toActualRobotRotation(new Rotation2D(-Math.toRadians(30))).getRadian();
             t += dt;
             if (t > totalTimeNeeded)
                 t -= totalTimeNeeded;
             final Vector2D[] currentDesiredPositionAndVelocity = getCurrentDesiredPositionAndVelocityFromCurves();
-            final double desiredFacing = RobotFieldPositionEstimator.getPilotFacing2D().getRadian() + Math.PI;
+            final double desiredFacing = t < 0.5 || (totalTimeNeeded - t < 0.5) ? rotationTargetAtHumanPlayerStation : rotationTargetWhenMoving;
             rotationController.startNewTask(new EnhancedPIDController.Task(EnhancedPIDController.Task.TaskType.GO_TO_POSITION, desiredFacing));
             positionController.setDesiredPosition(
                     currentDesiredPositionAndVelocity[0]
@@ -184,7 +187,6 @@ public class MatchFieldSimulation extends RobotModuleBase {
             );
             EasyDataFlow.putCurvesOnField("match-simulation/ opponent robot " + opponentRobotID + " cycle path", fullCyclePath);
             EasyDataFlow.putPosition("match-simulation/ opponent robot " + opponentRobotID + " desired position", currentDesiredPositionAndVelocity[0], new Rotation2D(desiredFacing));
-
             super.simulateChassisRotationalBehavior(rotationController.getMotorPower(super.getFacing().getRadian(), super.getAngularVelocity(), dt));
             super.simulateChassisTranslationalBehaviorFieldOriented(positionController.getCorrectionPower(super.getFieldPosition(), super.getFieldVelocity()));
         }

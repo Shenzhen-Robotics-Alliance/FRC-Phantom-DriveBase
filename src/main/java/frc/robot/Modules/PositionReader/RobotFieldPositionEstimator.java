@@ -87,7 +87,7 @@ public abstract class RobotFieldPositionEstimator extends RobotModuleBase {
 
     public static Rotation2D toActualRobotRotation(Rotation2D robotRotationAtBlueAlliance) {
         return switch (DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue)) {
-            case Red -> new Rotation2D(robotRotationAtBlueAlliance.getRadian() + Math.PI);
+            case Red -> new Rotation2D(-robotRotationAtBlueAlliance.getRadian());
             case Blue -> robotRotationAtBlueAlliance;
         };
     }
