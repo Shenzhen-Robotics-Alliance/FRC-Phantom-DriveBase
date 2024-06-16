@@ -46,7 +46,7 @@ public class RobotCore {
         private List<RobotServiceBase> services;
         protected boolean wasEnabled;
         public final PowerDistribution powerDistributionPanel = new PowerDistribution(1, PowerDistribution.ModuleType.kRev);
-        private final Alert mainLoopTimeOverrunWarning = new Alert("Main-Loop Loop-Time Overrun", Alert.AlertType.WARNING);
+        private final Alert mainLoopTimeOverrunWarning = new Alert("Temporary Main-Loop Lagging", Alert.AlertType.WARNING);
 
         /**
          * creates a robot core
@@ -247,10 +247,9 @@ public class RobotCore {
                 /* monitor the program's performance */
                 final double delayMillis = (Timer.getFPGATimestamp()-t)*1000;
                 SmartDashboard.putNumber("robot main thread delay", delayMillis);
-                final double warningMessageStickAroundTimeSeconds = 0.5;
+                final double warningMessageStickAroundTimeSeconds = 1;
                 if (delayMillis > printTimeIfTimeMillisExceeds) lastLoopOverrunTime = Timer.getFPGATimestamp();
                 mainLoopTimeOverrunWarning.setActivated(Timer.getFPGATimestamp() - lastLoopOverrunTime < warningMessageStickAroundTimeSeconds); // let the message stick around for 5 seconds
-                mainLoopTimeOverrunWarning.setText("Temporary Main-Loop Lagging, update time: " + (int)delayMillis + "(ms)");
 
                 t = Timer.getFPGATimestamp();
         }
