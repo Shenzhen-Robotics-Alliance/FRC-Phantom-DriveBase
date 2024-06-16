@@ -225,6 +225,8 @@ public class RobotCore {
                 this.wasEnabled = false;
                 for (RobotModuleBase module: modules)
                         module.disable();
+                for (RobotServiceBase service: services)
+                        service.onDestroy();
                 this.services = new ArrayList<>();
 
                 System.out.println("<-- Robot | robot paused... -->");

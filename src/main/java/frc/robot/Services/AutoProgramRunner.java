@@ -102,11 +102,6 @@ public class AutoProgramRunner extends RobotServiceBase {
     }
 
     @Override
-    public void onDestroy() {
-
-    }
-
-    @Override
     public void reset() {
         this.currentSegmentID = -1;
         chassis.gainOwnerShip(this);
@@ -149,13 +144,14 @@ public class AutoProgramRunner extends RobotServiceBase {
     }
 
     public boolean isAutoStageComplete() {
-        if (this.commandSegments.size() - this.currentSegmentID == 1
-                && this.isCurrentSegmentComplete()) {
-            EasyDataFlow.putCurveOnField("auto/currentAutoPath", new BezierCurve(new Vector2D(), new Vector2D()));
-            EasyDataFlow.putPosition("/auto/currentAutoStagePosition", new Vector2D(new double[] {-100, -100}), new Rotation2D(0)); // remove the dashboard data
-            return true;
-        }
-        return false;
+        return this.commandSegments.size() - this.currentSegmentID == 1
+                && this.isCurrentSegmentComplete();
+    }
+
+    @Override
+    public void onDestroy() {
+        EasyDataFlow.putCurveOnField("auto/currentAutoPath", new BezierCurve(new Vector2D(), new Vector2D()));
+        EasyDataFlow.putPosition("/auto/currentAutoStagePosition", new Vector2D(new double[] {-100, -100}), new Rotation2D(0)); // remove the dashboard data
     }
 
     public boolean isCurrentSegmentComplete() {

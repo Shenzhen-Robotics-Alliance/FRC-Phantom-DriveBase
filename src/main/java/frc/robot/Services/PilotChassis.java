@@ -138,9 +138,4 @@ public class PilotChassis extends RobotServiceBase {
 
         EasyDataFlow.putRotation("chassis/rotation maintenance rotation", new Rotation2D(smartRotationControlDesiredHeading));
     }
-
-    @Override
-    public void onDestroy() {
-
-    }
 }

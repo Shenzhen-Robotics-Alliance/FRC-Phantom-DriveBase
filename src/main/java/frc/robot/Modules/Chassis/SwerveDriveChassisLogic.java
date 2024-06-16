@@ -58,41 +58,16 @@ public abstract class SwerveDriveChassisLogic extends RobotModuleBase {
         this.wheelsPowerConstrainAtLowSpeedMode = robotConfig.getConfig("chassis/wheelsPowerConstrainAtLowSpeedMode");
         this.rotationalSpeedMaxSacrifice = robotConfig.getConfig("chassis/rotationalSpeedMaxSacrifice");
 
-
-        double robotRotationalErrorTolerance = Math.toRadians(robotConfig.getConfig("chassis/robotRotationalErrorTolerance"));
-        this.rotationDifferenceAsTaskFinished = Math.toRadians(robotConfig.getConfig("chassis/rotationalErrorAsCommandFinished"));
-        double robotRotationalErrorStartDecelerate = Math.toRadians(robotConfig.getConfig("chassis/robotRotationalErrorStartDecelerate"));
-        double robotRotationMaximumCorrectionPower = robotConfig.getConfig("chassis/robotRotationMaximumCorrectionPower");
-        double robotRotationMinimumCorrectionPower = robotConfig.getConfig("chassis/robotRotationMinimumCorrectionPower");
-        double robotRotationFeedForwardTime = robotConfig.getConfig("chassis/robotRotationFeedForwardTime");
-
-        double robotPositionErrorTolerance = robotConfig.getConfig("chassis/robotPositionErrorTolerance");
         this.positionDifferenceAsTaskFinished = robotConfig.getConfig("chassis/translationalErrorAsCommandFinished");
-        double robotPositionErrorStartDecelerate = robotConfig.getConfig("chassis/robotPositionErrorStartDecelerate");
-        double robotPositionMaximumCorrectionPower = robotConfig.getConfig("chassis/robotPositionMaximumCorrectionPower");
-        double robotPositionMinimumCorrectionPower = robotConfig.getConfig("chassis/robotPositionMinimumCorrectionPower");
-        double robotPositionFeedForwardTime = robotConfig.getConfig("chassis/robotPositionFeedForwardTime");
-
-        this.goToRotationController = new EnhancedPIDController(new EnhancedPIDController.StaticPIDProfile(
-                Math.PI * 2,
-                robotRotationMaximumCorrectionPower,
-                robotRotationMinimumCorrectionPower,
-                robotRotationalErrorStartDecelerate,
-                robotRotationalErrorTolerance,
-                robotRotationFeedForwardTime,
-                0,
-                0
-        ));
-
-        final ChassisPositionController.ChassisPIDConfig chassisPIDConfig = new ChassisPositionController.ChassisPIDConfig(
-                robotPositionMaximumCorrectionPower,
-                robotPositionMinimumCorrectionPower,
-                robotPositionErrorStartDecelerate,
-                robotPositionErrorTolerance,
-                robotPositionFeedForwardTime
-        );
-
+        final ChassisPositionController.ChassisPIDConfig chassisPIDConfig = getChassisTranslationPIDConfigs(robotConfig);
         chassisPIDController = new ChassisPositionController(chassisPIDConfig);
+
+
+
+        this.rotationDifferenceAsTaskFinished = Math.toRadians(robotConfig.getConfig("chassis/rotationalErrorAsCommandFinished"));
+        this.goToRotationController = new EnhancedPIDController(getChassisRotationPIDConfigs(robotConfig));
+
+
 
         this.speedControlAccelerateTime = robotConfig.getConfig("chassis/timeNeededToFullyAccelerate");
         this.robotSpeedActivateSpeedControl = robotConfig.getConfig("chassis/robotSpeedActivateSpeedControl");
@@ -387,6 +362,31 @@ public abstract class SwerveDriveChassisLogic extends RobotModuleBase {
             this.rotationalValue = value;
         }
     }
+
+    public static ChassisPositionController.ChassisPIDConfig getChassisTranslationPIDConfigs(RobotConfigReader robotConfig) {
+        return new ChassisPositionController.ChassisPIDConfig(
+                robotConfig.getConfig("chassis/robotPositionMaximumCorrectionPower"),
+                robotConfig.getConfig("chassis/robotPositionMinimumCorrectionPower"),
+                robotConfig.getConfig("chassis/robotPositionErrorStartDecelerate"),
+                robotConfig.getConfig("chassis/robotPositionErrorTolerance"),
+                robotConfig.getConfig("chassis/robotPositionFeedForwardTime")
+        );
+    }
+
+    public static EnhancedPIDController.StaticPIDProfile getChassisRotationPIDConfigs(RobotConfigReader robotConfig) {
+        return new EnhancedPIDController.StaticPIDProfile(
+                Math.PI * 2,
+                robotConfig.getConfig("chassis/robotRotationMaximumCorrectionPower"),
+                robotConfig.getConfig("chassis/robotRotationMinimumCorrectionPower"),
+                Math.toRadians(robotConfig.getConfig("chassis/robotRotationalErrorStartDecelerate")),
+                Math.toRadians(robotConfig.getConfig("chassis/robotRotationalErrorTolerance")),
+                robotConfig.getConfig("chassis/robotRotationFeedForwardTime"),
+                0,
+                0
+        );
+    }
+
+
     protected final Alert imuError = new Alert("Fatal: IMU Module disconnected", Alert.AlertType.ERROR),
             frontLeftModuleError = new Alert("Fatal: Front-Left Module Error", Alert.AlertType.ERROR),
             frontRightModuleError = new Alert("Fatal: Front-Right Module Error", Alert.AlertType.ERROR),

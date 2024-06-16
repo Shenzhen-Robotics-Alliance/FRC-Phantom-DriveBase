@@ -36,5 +36,5 @@ public abstract class RobotServiceBase extends RobotModuleOperatorMarker {
     public void updateConfigs() {}
 
     /** called when the program ends */
-    abstract public void onDestroy();
+    public void onDestroy() {}
 }

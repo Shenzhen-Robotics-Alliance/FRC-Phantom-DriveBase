@@ -2,12 +2,17 @@ package frc.robot.Modules;
 
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
+import frc.robot.Modules.Chassis.SwerveDriveChassisLogic;
 import frc.robot.Modules.PositionReader.RobotFieldPositionEstimator;
+import frc.robot.Utils.*;
+import frc.robot.Utils.MathUtils.BezierCurve;
 import frc.robot.Utils.MathUtils.Rotation2D;
 import frc.robot.Utils.MathUtils.Vector2D;
+import frc.robot.Utils.MechanismControllers.EnhancedPIDController;
 import frc.robot.Utils.PhysicsSimulation.AllRealFieldPhysicsSimulation;
-import frc.robot.Utils.PilotController;
-import frc.robot.Utils.RobotConfigReader;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class MatchFieldSimulation extends RobotModuleBase {
@@ -42,7 +47,7 @@ public class MatchFieldSimulation extends RobotModuleBase {
         simulateHumanPlayer();
 
         for (OpponentRobot opponentRobot:opponentRobots)
-            opponentRobot.update();
+            opponentRobot.updateOpponentRobotBehavior(dt);
     }
 
     public void updatePhysics(double dt) {
@@ -66,9 +71,12 @@ public class MatchFieldSimulation extends RobotModuleBase {
     @Override
     public void onReset() {
         for (OpponentRobot opponentRobot:opponentRobots)
-            opponentRobot.resetPositionToStartingZone();
+            opponentRobot.resetOpponentRobotBehavior();
 
-        this.opponentRobots[0].setCurrentTaskAsMovingManually(new XboxController(2)); // TODO: this is just for testing, call it in service
+        // TODO: these are just for testing, call it in service
+        this.opponentRobots[0].setCurrentTaskAsMovingManually(new XboxController(2));
+        this.opponentRobots[1].setCurrentTaskAsAutoCycle();
+        this.opponentRobots[2].setCurrentTaskAsAutoCycle();
     }
 
     @Override
@@ -89,43 +97,105 @@ public class MatchFieldSimulation extends RobotModuleBase {
         }
 
         private final RobotConfigReader robotConfig;
+        private final ChassisPositionController positionController;
+        private final EnhancedPIDController rotationController;
+        private static final double cycleSpeed = 3.5, pidInAdvanceTime = 0.18;
 
         private Mode mode;
         private PilotController pilotController;
-        private final int robotNum;
-        public OpponentRobot(AllRealFieldPhysicsSimulation.RobotProfile robotProfile, RobotConfigReader robotConfig, int robotNum) {
+        private final int opponentRobotID;
+
+
+        public OpponentRobot(AllRealFieldPhysicsSimulation.RobotProfile robotProfile, RobotConfigReader robotConfig, int opponentRobotID) {
             super(robotProfile);
 
             this.robotConfig = robotConfig;
-            this.robotNum = robotNum;
+            this.opponentRobotID = opponentRobotID;
+
+            this.positionController = new ChassisPositionController(SwerveDriveChassisLogic.getChassisTranslationPIDConfigs(robotConfig));
+            this.rotationController = new EnhancedPIDController(SwerveDriveChassisLogic.getChassisRotationPIDConfigs(robotConfig));
+            resetOpponentRobotBehavior();
+        }
+
+        private void resetOpponentRobotBehavior() {
+            super.setRobotPosition(RobotFieldPositionEstimator.toActualPositionOnField(opponentRedRobotsStartingPositions[opponentRobotID]));
+            super.setRobotRotation(RobotFieldPositionEstimator.toActualRobotRotation(new Rotation2D(Math.toRadians(90))));
 
             this.mode = Mode.DEACTIVATED;
             pilotController = null;
         }
 
-        private void resetPositionToStartingZone() {
-            super.setRobotPosition(RobotFieldPositionEstimator.toActualPositionOnField(opponentRedRobotsStartingPositions[robotNum]));
-            super.setRobotRotation(RobotFieldPositionEstimator.toActualRobotRotation(new Rotation2D(Math.toRadians(90))));
-        }
-
-        public void update() {
+        public void updateOpponentRobotBehavior(double dt) {
             switch (mode) {
-                case AUTO_CYCLING -> {
-                    // TODO write this part
-                }
-                case MANUALLY_CONTROLLED -> {
-                    if (pilotController == null)
-                        return;
-                    pilotController.update();
-                    super.simulateChassisRotationalBehavior(pilotController.getRotationalStickValue());
-                    super.simulateChassisTranslationalBehaviorFieldOriented(
-                            pilotController.getTranslationalStickValue()
-                                    .multiplyBy(RobotFieldPositionEstimator.getPilotFacing2D()) // apply field-centric drive
-                                    .multiplyBy(new Rotation2D(Math.PI)) // notice that pilot facing is reversed for opponent
-                    );
-                }
+                case AUTO_CYCLING -> updateAutoCycle(dt);
+                case MANUALLY_CONTROLLED -> updateOpponentPilotActions();
                 case DEACTIVATED -> super.setRobotPosition(new Vector2D(new double[] {-10, -10}));
             }
+        }
+
+        private void updateOpponentPilotActions() {
+            if (pilotController == null)
+                return;
+            pilotController.update();
+            super.simulateChassisRotationalBehavior(pilotController.getRotationalStickValue());
+            super.simulateChassisTranslationalBehaviorFieldOriented(
+                    pilotController.getTranslationalStickValue()
+                            .multiplyBy(RobotFieldPositionEstimator.getPilotFacing2D()) // apply field-centric drive
+                            .multiplyBy(new Rotation2D(Math.PI)) // notice that pilot facing is reversed for opponent
+            );
+        }
+
+        double t, totalTimeNeeded;
+        List<BezierCurve> fullCyclePath = new ArrayList<>();
+        private void initializeAutoCycle() {
+            List<BezierCurve> halfWay = SequentialCommandFactory.getBezierCurvesFromPathFile("cycle path " + opponentRobotID);
+            fullCyclePath = new ArrayList<>();
+            fullCyclePath.addAll(halfWay);
+            fullCyclePath.addAll(SequentialCommandFactory.reversePath(halfWay));
+
+            totalTimeNeeded = 0;
+            for (BezierCurve bezierCurve: fullCyclePath)
+                totalTimeNeeded += bezierCurve.length / cycleSpeed;
+
+            t = totalTimeNeeded / 2; // start by half way
+            super.setRobotPosition(getCurrentDesiredPositionAndVelocityFromCurves()[0]);
+        }
+
+        private void updateAutoCycle(double dt) {
+            t += dt;
+            if (t > totalTimeNeeded)
+                t -= totalTimeNeeded;
+            final Vector2D[] currentDesiredPositionAndVelocity = getCurrentDesiredPositionAndVelocityFromCurves();
+            final double desiredFacing = RobotFieldPositionEstimator.getPilotFacing2D().getRadian() + Math.PI;
+            rotationController.startNewTask(new EnhancedPIDController.Task(EnhancedPIDController.Task.TaskType.GO_TO_POSITION, desiredFacing));
+            positionController.setDesiredPosition(
+                    currentDesiredPositionAndVelocity[0]
+                            .addBy(currentDesiredPositionAndVelocity[1].multiplyBy(pidInAdvanceTime)) // in-advance control
+            );
+            EasyDataFlow.putCurvesOnField("match-simulation/ opponent robot " + opponentRobotID + " cycle path", fullCyclePath);
+            EasyDataFlow.putPosition("match-simulation/ opponent robot " + opponentRobotID + " desired position", currentDesiredPositionAndVelocity[0], new Rotation2D(desiredFacing));
+
+            super.simulateChassisRotationalBehavior(rotationController.getMotorPower(super.getFacing().getRadian(), super.getAngularVelocity(), dt));
+            super.simulateChassisTranslationalBehaviorFieldOriented(positionController.getCorrectionPower(super.getFieldPosition(), super.getFieldVelocity()));
+        }
+
+        /**
+         * Assumption: 0 < t < totalTimeNeeded
+         * */
+        private Vector2D[] getCurrentDesiredPositionAndVelocityFromCurves() {
+            Vector2D[] currentDesiredPositionAndVelocity = new Vector2D[2];
+            double timeCount = 0;
+            for (BezierCurve currentCurve:fullCyclePath) {
+                final double currentCurveETA = currentCurve.length / cycleSpeed;
+                if (timeCount + currentCurveETA > t) {
+                    final double actualT = (t - timeCount) / currentCurveETA;
+                    currentDesiredPositionAndVelocity[0] = currentCurve.getPositionWithLERP(actualT);
+                    currentDesiredPositionAndVelocity[1] = currentCurve.getVelocityWithLERP(actualT);
+                    break;
+                }
+                timeCount += currentCurveETA;
+            }
+            return currentDesiredPositionAndVelocity;
         }
 
         public void setCurrentTaskAsMovingManually(GenericHID driverController) {
@@ -133,7 +203,11 @@ public class MatchFieldSimulation extends RobotModuleBase {
             this.mode = Mode.MANUALLY_CONTROLLED;
         }
 
-        public void setCurrentTaskAsMovingThroughPaths() { // TODO write this
+        public void setCurrentTaskAsAutoCycle() {
+            if (this.mode == Mode.AUTO_CYCLING)
+                return;
+            initializeAutoCycle();
+            this.mode = Mode.AUTO_CYCLING;
         }
 
         public void setCurrentTaskAsStayStill() {

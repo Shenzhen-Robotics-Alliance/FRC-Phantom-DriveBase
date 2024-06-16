@@ -9,6 +9,7 @@ package frc.robot.Utils.MathUtils;
  */
 public class BezierCurve {
     private static final int resolution = 20;
+    public final double length;
     private final Vector2D p0, p1, p2, p3;
     public final Vector2D[] previewPoints = new Vector2D[resolution];
 
@@ -33,6 +34,11 @@ public class BezierCurve {
 
         for (int i = 0; i < resolution; i++)
             previewPoints[i] = getPositionWithLERP(1.0 * i / resolution);
+        this.length = calculateLength(resolution);
+    }
+
+    public BezierCurve getReversedCurve() {
+        return new BezierCurve(p3, p2, p1, p0);
     }
 
     public Vector2D getPositionWithLERP(double t) {
@@ -95,7 +101,7 @@ public class BezierCurve {
 
     // TODO get the boundary box
 
-    public double getLength(int samples) {
+    public double calculateLength(int samples) {
         double length = 0;
         for (double t = 0; t <= 1; t += 1.0d/samples)
             length += getVelocityWithLERP(t).getMagnitude() / samples;

@@ -27,9 +27,4 @@ public class MatchSimulationService extends RobotServiceBase {
     public void periodic() {
 
     }
-
-    @Override
-    public void onDestroy() {
-
-    }
 }

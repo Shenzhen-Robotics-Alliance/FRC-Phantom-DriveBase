@@ -378,6 +378,13 @@ public class SequentialCommandFactory {
         }
     }
 
+    public static List<BezierCurve> reversePath(List<BezierCurve> originalPath) {
+        List<BezierCurve> reversedPath = new ArrayList<>();
+        for (int i = originalPath.size()-1; i >= 0; i--)
+            reversedPath.add(originalPath.get(i).getReversedCurve());
+        return reversedPath;
+    }
+
     /**
      * converts a point from pathplanner to vector2D
      * pathplanner is always in red alliance
