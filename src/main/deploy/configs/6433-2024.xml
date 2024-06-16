@@ -37,7 +37,7 @@
         <swerveHorizontalDistance>0.6</swerveHorizontalDistance>
         <swerveVerticalDistance>0.48</swerveVerticalDistance>
 
-        <wheelGearRatio type="double">8.14</wheelGearRatio>
+        <wheelGearRatio type="double">6.12</wheelGearRatio>
         <robotMaximumSpeed type="double">4.5</robotMaximumSpeed>
 
 

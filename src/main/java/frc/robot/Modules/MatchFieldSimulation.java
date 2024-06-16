@@ -75,6 +75,7 @@ public class MatchFieldSimulation extends RobotModuleBase {
 
         // TODO: these are just for testing, call it in service
         this.opponentRobots[0].setCurrentTaskAsMovingManually(new XboxController(2));
+        this.opponentRobots[0].setCurrentTaskAsAutoCycle();
         this.opponentRobots[1].setCurrentTaskAsAutoCycle();
         this.opponentRobots[2].setCurrentTaskAsAutoCycle();
     }
@@ -113,7 +114,16 @@ public class MatchFieldSimulation extends RobotModuleBase {
             this.opponentRobotID = opponentRobotID;
 
             this.positionController = new ChassisPositionController(SwerveDriveChassisLogic.getChassisTranslationPIDConfigs(robotConfig));
-            this.rotationController = new EnhancedPIDController(SwerveDriveChassisLogic.getChassisRotationPIDConfigs(robotConfig));
+            this.rotationController = new EnhancedPIDController(new EnhancedPIDController.StaticPIDProfile(
+                    Math.PI * 2,
+                    0.6,
+                    0.05,
+                    Math.toRadians(35),
+                    Math.toRadians(1),
+                    0.1,
+                    0,
+                    0
+            ));
             resetOpponentRobotBehavior();
         }
 
