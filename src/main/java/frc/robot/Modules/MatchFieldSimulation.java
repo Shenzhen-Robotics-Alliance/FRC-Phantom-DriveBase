@@ -10,7 +10,6 @@ import frc.robot.Utils.MathUtils.Vector2D;
 import frc.robot.Utils.MechanismControllers.EnhancedPIDController;
 import frc.robot.Utils.PhysicsSimulation.AllRealFieldPhysicsSimulation;
 import org.dyn4j.geometry.Segment;
-import org.dyn4j.geometry.Slice;
 import org.dyn4j.geometry.Vector2;
 
 import java.util.ArrayList;
@@ -123,6 +122,7 @@ public class MatchFieldSimulation extends RobotModuleBase {
             new Vector2D(new double[] {15.2, 4}),
             new Vector2D(new double[] {15.2, 2.5})
         };
+        private static final Vector2D robotQueeningPosition = new Vector2D(new double[] {-3, 5});
         public enum Mode {
             MANUALLY_CONTROLLED,
             AUTO_CYCLING,
@@ -174,7 +174,7 @@ public class MatchFieldSimulation extends RobotModuleBase {
             switch (mode) {
                 case AUTO_CYCLING -> updateAutoCycle(dt);
                 case MANUALLY_CONTROLLED -> updateOpponentPilotActions();
-                case DEACTIVATED -> super.setRobotPosition(new Vector2D(new double[] {-10, -10}));
+                case DEACTIVATED -> super.setRobotPosition(robotQueeningPosition);
             }
         }
 
@@ -204,6 +204,7 @@ public class MatchFieldSimulation extends RobotModuleBase {
 
             t = totalTimeNeeded / 2; // start by half way
             super.setRobotPosition(getCurrentDesiredPositionAndVelocityFromCurves()[0]);
+            EasyDataFlow.putCurvesOnField("match-simulation/ opponent robot " + opponentRobotID + " cycle path", fullCyclePath);
         }
 
         private void updateAutoCycle(double dt) {
@@ -220,10 +221,16 @@ public class MatchFieldSimulation extends RobotModuleBase {
                     currentDesiredPositionAndVelocity[0]
                             .addBy(currentDesiredPositionAndVelocity[1].multiplyBy(pidInAdvanceTime)) // in-advance control
             );
-            EasyDataFlow.putCurvesOnField("match-simulation/ opponent robot " + opponentRobotID + " cycle path", fullCyclePath);
             EasyDataFlow.putPosition("match-simulation/ opponent robot " + opponentRobotID + " desired position", currentDesiredPositionAndVelocity[0], new Rotation2D(desiredFacing));
             super.simulateChassisRotationalBehavior(rotationController.getMotorPower(super.getFacing().getRadian(), super.getAngularVelocity(), dt));
             super.simulateChassisTranslationalBehaviorFieldOriented(positionController.getCorrectionPower(super.getFieldPosition(), super.getFieldVelocity()));
+        }
+
+        private void removeRedundantDisplaysDuringAutoCycle() {
+            final List<BezierCurve> emptyCurves = new ArrayList<>();
+            emptyCurves.add(new BezierCurve(new Vector2D(), new Vector2D()));
+            EasyDataFlow.putCurvesOnField("match-simulation/ opponent robot " + opponentRobotID + " cycle path", emptyCurves);
+            EasyDataFlow.putPosition("match-simulation/ opponent robot " + opponentRobotID + " desired position", robotQueeningPosition, new Rotation2D(0));
         }
 
         /**
@@ -248,8 +255,11 @@ public class MatchFieldSimulation extends RobotModuleBase {
         public void setMode(Mode mode) {
             if (mode == Mode.AUTO_CYCLING && (this.mode != Mode.AUTO_CYCLING))
                 initializeAutoCycle();
+            if (mode != Mode.AUTO_CYCLING && (this.mode == Mode.AUTO_CYCLING))
+                removeRedundantDisplaysDuringAutoCycle();
             if (mode == Mode.MANUALLY_CONTROLLED && (this.mode == Mode.DEACTIVATED))
                 resetOpponentRobotPosition();
+
             this.mode = mode;
         }
     }

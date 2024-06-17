@@ -1,10 +1,10 @@
 {
   "hubs": [
     {
-      "x": 130,
-      "y": 262,
-      "width": 1120,
-      "height": 680,
+      "x": 443,
+      "y": 182,
+      "width": 1135,
+      "height": 694,
       "state": {
         "sidebar": {
           "width": 286,
@@ -45,14 +45,13 @@
             "/match-simulation/ opponent robot 0 desired position/rotation",
             "/RealOutputs/chassis",
             "/PowerDistribution",
-            "/Shuffleboard",
             "/Shuffleboard/other",
             "/Shuffleboard/led",
-            "/Shuffleboard/chassis physics simulation"
+            "/match-simulation"
           ]
         },
         "tabs": {
-          "selected": 4,
+          "selected": 2,
           "tabs": [
             {
               "type": 0,
@@ -128,6 +127,24 @@
                     "key": "NT:auto/currentAutoPath",
                     "sourceTypeIndex": 2,
                     "sourceType": "Pose2d[]"
+                  },
+                  {
+                    "type": "Trajectory",
+                    "key": "NT:match-simulation/ opponent robot 0 cycle path",
+                    "sourceTypeIndex": 2,
+                    "sourceType": "Pose2d[]"
+                  },
+                  {
+                    "type": "Trajectory",
+                    "key": "NT:match-simulation/ opponent robot 1 cycle path",
+                    "sourceTypeIndex": 2,
+                    "sourceType": "Pose2d[]"
+                  },
+                  {
+                    "type": "Trajectory",
+                    "key": "NT:match-simulation/ opponent robot 2 cycle path",
+                    "sourceTypeIndex": 2,
+                    "sourceType": "Pose2d[]"
                   }
                 ]
               ],
@@ -143,14 +160,14 @@
                 "cameraIndex": -1,
                 "orbitFov": 50,
                 "cameraPosition": [
-                  1.3488066311252764,
-                  9.12063380543883,
-                  9.62587695158986
+                  0.19849432703755987,
+                  11.025619019540908,
+                  -6.810192459180991
                 ],
                 "cameraTarget": [
-                  0.44027610796918243,
-                  -0.6493141497414175,
-                  1.8166955449662652
+                  -1.0476699816429815,
+                  -1.1188130984506361,
+                  -0.1743326587466361
                 ]
               },
               "title": "3D Field"
@@ -213,6 +230,31 @@
       }
     }
   ],
-  "satellites": [],
+  "satellites": [
+    {
+      "x": -8,
+      "y": -8,
+      "width": 1722,
+      "height": 1034,
+      "state": {
+        "type": 6,
+        "visualizer": {
+          "cameraIndex": -8,
+          "orbitFov": 50,
+          "cameraPosition": [
+            -9.769259244062383,
+            1.574799999999999,
+            -0.3071351152909609
+          ],
+          "cameraTarget": [
+            0,
+            0.5,
+            0
+          ]
+        }
+      },
+      "uuid": "zgmxb6bfcaodeikkjtshw2smsjc9dx4f"
+    }
+  ],
   "version": "3.2.1"
 }
