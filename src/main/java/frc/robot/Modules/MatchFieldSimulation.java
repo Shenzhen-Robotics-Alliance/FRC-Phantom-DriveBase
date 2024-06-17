@@ -9,6 +9,9 @@ import frc.robot.Utils.MathUtils.Rotation2D;
 import frc.robot.Utils.MathUtils.Vector2D;
 import frc.robot.Utils.MechanismControllers.EnhancedPIDController;
 import frc.robot.Utils.PhysicsSimulation.AllRealFieldPhysicsSimulation;
+import org.dyn4j.geometry.Segment;
+import org.dyn4j.geometry.Slice;
+import org.dyn4j.geometry.Vector2;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,6 +37,14 @@ public class MatchFieldSimulation extends RobotModuleBase {
             this.opponentRobots[i] = opponentRobot;
             this.simulation.addRobot(opponentRobot);
         }
+
+        AllRealFieldPhysicsSimulation.IntakeSimulation intakeSimulation = new AllRealFieldPhysicsSimulation.IntakeSimulation(
+                new Segment(new Vector2(-0.2, -robotProfile.height/2-0.05), new Vector2(0.2, -robotProfile.height/2-0.05)),
+                simulation
+        );
+        this.simulation.getMainRobot().addFixture(intakeSimulation);
+        this.simulation.field.addContactListener(intakeSimulation.getGamePieceOnFieldContactListener());
+        intakeSimulation.setIntakeEnabled(true);
     }
 
     @Override

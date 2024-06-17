@@ -11,21 +11,24 @@ import frc.robot.Utils.MathUtils.Rotation2D;
 import frc.robot.Utils.MathUtils.Vector2D;
 import frc.robot.Utils.PhysicsSimulation.FieldMaps.CrescendoDefault;
 import frc.robot.Utils.RobotConfigReader;
+import org.dyn4j.collision.CollisionBody;
+import org.dyn4j.collision.Fixture;
 import org.dyn4j.dynamics.Body;
 import org.dyn4j.dynamics.BodyFixture;
 import org.dyn4j.dynamics.Force;
-import org.dyn4j.geometry.Geometry;
-import org.dyn4j.geometry.Mass;
-import org.dyn4j.geometry.MassType;
-import org.dyn4j.geometry.Vector2;
+import org.dyn4j.dynamics.contact.Contact;
+import org.dyn4j.dynamics.contact.SolvedContact;
+import org.dyn4j.geometry.*;
+import org.dyn4j.world.ContactCollisionData;
 import org.dyn4j.world.PhysicsWorld;
 import org.dyn4j.world.World;
+import org.dyn4j.world.listener.ContactListener;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class AllRealFieldPhysicsSimulation {
-    private final World<Body> field;
+    public final World<Body> field;
     private final FieldCollisionMap map;
     private final List<HolomonicRobotPhysicsSimulation> robots;
     private HolomonicRobotPhysicsSimulation mainRobot = null;
@@ -53,6 +56,10 @@ public class AllRealFieldPhysicsSimulation {
     public HolomonicRobotPhysicsSimulation setMainRobot(HolomonicRobotPhysicsSimulation robot) {
         this.mainRobot = robot;
         addRobot(mainRobot);
+        return mainRobot;
+    }
+
+    public HolomonicRobotPhysicsSimulation getMainRobot() {
         return mainRobot;
     }
 
@@ -229,6 +236,64 @@ public class AllRealFieldPhysicsSimulation {
         }
     }
 
+    public static class IntakeSimulation extends BodyFixture {
+        private final AllRealFieldPhysicsSimulation simulation;
+        private boolean intakeEnabled;
+        public IntakeSimulation(Convex shape, AllRealFieldPhysicsSimulation simulation) {
+            super(shape);
+            this.simulation = simulation;
+            this.intakeEnabled = false;
+        }
+
+        public void setIntakeEnabled(boolean enabled) {
+            this.intakeEnabled = enabled;
+        }
+
+        public ContactListener<Body> getGamePieceOnFieldContactListener() {
+            return new ContactListener<>() {
+                @Override
+                public void begin(ContactCollisionData collision, Contact contact) {
+                    if (!intakeEnabled)
+                        return;
+                    CollisionBody<?> collisionBody1 = collision.getBody1();
+                    CollisionBody<?> collisionBody2 = collision.getBody2();
+                    Fixture fixture1 = collision.getFixture1();
+                    Fixture fixture2 = collision.getFixture2();
+
+                    if (collisionBody1 instanceof NoteOnField && fixture2 == IntakeSimulation.this)
+                        simulation.removeNoteOnField((NoteOnField) collisionBody1);
+                    else if (collisionBody2 instanceof NoteOnField && fixture1 == IntakeSimulation.this)
+                        simulation.removeNoteOnField((NoteOnField) collisionBody2);
+                }
+
+                /* functions not used */
+                @Override
+                public void persist(ContactCollisionData collision, Contact oldContact, Contact newContact) {
+                }
+
+                @Override
+                public void end(ContactCollisionData collision, Contact contact) {
+                }
+
+                @Override
+                public void destroyed(ContactCollisionData collision, Contact contact) {
+                }
+
+                @Override
+                public void collision(ContactCollisionData collision) {
+                }
+
+                @Override
+                public void preSolve(ContactCollisionData collision, Contact contact) {
+                }
+
+                @Override
+                public void postSolve(ContactCollisionData collision, SolvedContact contact) {
+                }
+            };
+        }
+    }
+
     public static class NoteOnField extends Body {
         public static final double
                 noteRadius = 0.1778,
@@ -304,7 +369,6 @@ public class AllRealFieldPhysicsSimulation {
         final double robotRotationRadian = Vector2D.displacementToTarget(robotFieldPosition, RobotFieldPositionEstimator.toActualPositionOnField(NotesOnFly.blueSpeakerPosition)).getHeading();
         final Vector2D launcherPositionField =
                 robotFieldPosition.addBy(shooterPositionOnRobot.multiplyBy(new Rotation2D(robotRotationRadian - Math.toRadians(90))));
-        System.out.println("robot rotation (deg)): " + Math.toDegrees(robotRotationRadian));
         this.notesOnFly.add(new NotesOnFly(launcherPositionField, launcherHeight, launchSpeed));
     }
 
