@@ -1,6 +1,5 @@
 package frc.robot.Utils.PhysicsSimulation;
 
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation3d;
@@ -94,6 +93,17 @@ public class AllRealFieldPhysicsSimulation {
 
     public NoteOnField[] getNotesOnField() {
         return notesOnField.toArray(new NoteOnField[0]);
+    }
+
+    public NoteOnField removeNoteOnField(NoteOnField noteOnField) {
+        field.removeBody(noteOnField);
+        notesOnField.remove(noteOnField);
+        return noteOnField;
+    }
+
+    public void removeAllNotesOnField() {
+        for (NoteOnField noteOnField:getNotesOnField())
+            removeNoteOnField(noteOnField);
     }
 
     public static final class RobotProfile {

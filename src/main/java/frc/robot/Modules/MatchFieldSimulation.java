@@ -70,6 +70,12 @@ public class MatchFieldSimulation extends RobotModuleBase {
 
     @Override
     public void onReset() {
+        onEnable();
+        resetField();
+    }
+
+    @Override
+    protected void onEnable() {
         for (OpponentRobot opponentRobot:opponentRobots)
             opponentRobot.resetOpponentRobotBehavior();
 
@@ -80,10 +86,28 @@ public class MatchFieldSimulation extends RobotModuleBase {
         this.opponentRobots[2].setCurrentTaskAsAutoCycle();
     }
 
-    @Override
-    protected void onEnable() {
-        onReset();
+    public void clearNotes() {
+        simulation.removeAllNotesOnField();
     }
+
+    public void resetField() {
+        clearNotes();
+        simulation.addNoteToField(new Vector2D(new double[] {2.90, 4.1}));
+        simulation.addNoteToField(new Vector2D(new double[] {2.90, 2.66}));
+        simulation.addNoteToField(new Vector2D(new double[] {2.90, 1.21}));
+
+        simulation.addNoteToField(new Vector2D(new double[] {8.27, 0.75}));
+        simulation.addNoteToField(new Vector2D(new double[] {8.27, 2.43}));
+        simulation.addNoteToField(new Vector2D(new double[] {8.27, 4.1}));
+        simulation.addNoteToField(new Vector2D(new double[] {8.27, 5.78}));
+        simulation.addNoteToField(new Vector2D(new double[] {8.27, 7.46}));
+
+        simulation.addNoteToField(new Vector2D(new double[] {13.64, 4.1}));
+        simulation.addNoteToField(new Vector2D(new double[] {13.64, 2.66}));
+        simulation.addNoteToField(new Vector2D(new double[] {13.64, 1.21}));
+    }
+
+
 
     public static class OpponentRobot extends AllRealFieldPhysicsSimulation.HolomonicRobotPhysicsSimulation {
         private static final Vector2D[] opponentRedRobotsStartingPositions = new Vector2D[] {
