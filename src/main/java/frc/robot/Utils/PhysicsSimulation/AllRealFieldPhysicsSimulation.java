@@ -51,6 +51,7 @@ public class AllRealFieldPhysicsSimulation {
         EasyDataFlow.putPositionArray("opponent robots", getOtherRobotsPositions2D(), getOtherRobotsRotations2D());
         EasyDataFlow.putPosition3dArray("notePositions", getNotesPose3d());
         removeArrivedNotesOnFly();
+        removeNotesByIntake();
     }
 
     public HolomonicRobotPhysicsSimulation setMainRobot(HolomonicRobotPhysicsSimulation robot) {
@@ -236,7 +237,14 @@ public class AllRealFieldPhysicsSimulation {
         }
     }
 
+    /* remove the notes after detection listening to avoid ConcurrentModificationException */
+    private void removeNotesByIntake() {
+        for (NoteOnField noteToRemove:IntakeSimulation.notesToRemove)
+            removeNoteOnField(noteToRemove);
+        IntakeSimulation.notesToRemove.clear();
+    }
     public static class IntakeSimulation extends BodyFixture {
+        private static final List<NoteOnField> notesToRemove = new ArrayList<>();
         private final AllRealFieldPhysicsSimulation simulation;
         private boolean intakeEnabled;
         public IntakeSimulation(Convex shape, AllRealFieldPhysicsSimulation simulation) {
@@ -261,9 +269,9 @@ public class AllRealFieldPhysicsSimulation {
                     Fixture fixture2 = collision.getFixture2();
 
                     if (collisionBody1 instanceof NoteOnField && fixture2 == IntakeSimulation.this)
-                        simulation.removeNoteOnField((NoteOnField) collisionBody1);
+                        notesToRemove.add((NoteOnField) collisionBody1);
                     else if (collisionBody2 instanceof NoteOnField && fixture1 == IntakeSimulation.this)
-                        simulation.removeNoteOnField((NoteOnField) collisionBody2);
+                        notesToRemove.add((NoteOnField) collisionBody2);
                 }
 
                 /* functions not used */
