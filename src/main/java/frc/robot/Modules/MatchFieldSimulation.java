@@ -1,6 +1,5 @@
 package frc.robot.Modules;
 
-import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import frc.robot.Modules.Chassis.SwerveDriveChassisLogic;
 import frc.robot.Modules.PositionReader.RobotFieldPositionEstimator;
@@ -31,7 +30,7 @@ public class MatchFieldSimulation extends RobotModuleBase {
 
         this.opponentRobots = new OpponentRobot[3];
         for (int i =0; i < 3; i++) {
-            final OpponentRobot opponentRobot = new OpponentRobot(robotProfile, robotConfig, i);
+            final OpponentRobot opponentRobot = new OpponentRobot(robotProfile, robotConfig, new PilotController(new XboxController(2), robotConfig, "control-XBOX"), i);
             this.opponentRobots[i] = opponentRobot;
             this.simulation.addRobot(opponentRobot);
         }
@@ -78,12 +77,10 @@ public class MatchFieldSimulation extends RobotModuleBase {
     protected void onEnable() {
         for (OpponentRobot opponentRobot:opponentRobots)
             opponentRobot.resetOpponentRobotBehavior();
+    }
 
-        // TODO: these are just for testing, call it in service
-        this.opponentRobots[0].setCurrentTaskAsMovingManually(new XboxController(2));
-        this.opponentRobots[0].setCurrentTaskAsAutoCycle();
-        this.opponentRobots[1].setCurrentTaskAsAutoCycle();
-        this.opponentRobots[2].setCurrentTaskAsAutoCycle();
+    public OpponentRobot getOpponentRobot(int index) {
+        return opponentRobots[index];
     }
 
     public void clearNotes() {
@@ -93,8 +90,8 @@ public class MatchFieldSimulation extends RobotModuleBase {
     public void resetField() {
         clearNotes();
         simulation.addNoteToField(new Vector2D(new double[] {2.90, 4.1}));
-        simulation.addNoteToField(new Vector2D(new double[] {2.90, 2.66}));
-        simulation.addNoteToField(new Vector2D(new double[] {2.90, 1.21}));
+        simulation.addNoteToField(new Vector2D(new double[] {2.90, 5.55}));
+        simulation.addNoteToField(new Vector2D(new double[] {2.90, 7}));
 
         simulation.addNoteToField(new Vector2D(new double[] {8.27, 0.75}));
         simulation.addNoteToField(new Vector2D(new double[] {8.27, 2.43}));
@@ -103,8 +100,8 @@ public class MatchFieldSimulation extends RobotModuleBase {
         simulation.addNoteToField(new Vector2D(new double[] {8.27, 7.46}));
 
         simulation.addNoteToField(new Vector2D(new double[] {13.64, 4.1}));
-        simulation.addNoteToField(new Vector2D(new double[] {13.64, 2.66}));
-        simulation.addNoteToField(new Vector2D(new double[] {13.64, 1.21}));
+        simulation.addNoteToField(new Vector2D(new double[] {13.64, 5.55}));
+        simulation.addNoteToField(new Vector2D(new double[] {13.64, 7}));
     }
 
 
@@ -127,14 +124,15 @@ public class MatchFieldSimulation extends RobotModuleBase {
         private static final double cycleSpeed = 3.5, pidInAdvanceTime = 0.18;
 
         private Mode mode;
-        private PilotController pilotController;
+        private final PilotController pilotController;
         private final int opponentRobotID;
 
 
-        public OpponentRobot(AllRealFieldPhysicsSimulation.RobotProfile robotProfile, RobotConfigReader robotConfig, int opponentRobotID) {
+        public OpponentRobot(AllRealFieldPhysicsSimulation.RobotProfile robotProfile, RobotConfigReader robotConfig, PilotController pilotController, int opponentRobotID) {
             super(robotProfile);
 
             this.robotConfig = robotConfig;
+            this.pilotController = pilotController;
             this.opponentRobotID = opponentRobotID;
 
             this.positionController = new ChassisPositionController(SwerveDriveChassisLogic.getChassisTranslationPIDConfigs(robotConfig));
@@ -152,11 +150,13 @@ public class MatchFieldSimulation extends RobotModuleBase {
         }
 
         private void resetOpponentRobotBehavior() {
+            resetOpponentRobotPosition();
+            this.mode = Mode.DEACTIVATED;
+        }
+
+        private void resetOpponentRobotPosition() {
             super.setRobotPosition(RobotFieldPositionEstimator.toActualPositionOnField(opponentRedRobotsStartingPositions[opponentRobotID]));
             super.setRobotRotation(RobotFieldPositionEstimator.toActualRobotRotation(new Rotation2D(Math.toRadians(90))));
-
-            this.mode = Mode.DEACTIVATED;
-            pilotController = null;
         }
 
         public void updateOpponentRobotBehavior(double dt) {
@@ -234,20 +234,12 @@ public class MatchFieldSimulation extends RobotModuleBase {
             return currentDesiredPositionAndVelocity;
         }
 
-        public void setCurrentTaskAsMovingManually(GenericHID driverController) {
-            this.pilotController = new PilotController(driverController, robotConfig, "control-XBOX");
-            this.mode = Mode.MANUALLY_CONTROLLED;
-        }
-
-        public void setCurrentTaskAsAutoCycle() {
-            if (this.mode == Mode.AUTO_CYCLING)
-                return;
-            initializeAutoCycle();
-            this.mode = Mode.AUTO_CYCLING;
-        }
-
-        public void setCurrentTaskAsStayStill() {
-            this.mode = Mode.DEACTIVATED;
+        public void setMode(Mode mode) {
+            if (mode == Mode.AUTO_CYCLING && (this.mode != Mode.AUTO_CYCLING))
+                initializeAutoCycle();
+            if (mode == Mode.MANUALLY_CONTROLLED && (this.mode == Mode.DEACTIVATED))
+                resetOpponentRobotPosition();
+            this.mode = mode;
         }
     }
 }

@@ -11,7 +11,7 @@ import frc.robot.Utils.MathUtils.Rotation2D;
 import frc.robot.Utils.PilotController;
 import frc.robot.Utils.RobotConfigReader;
 
-public class PilotChassis extends RobotServiceBase {
+public class PilotDriveService extends RobotServiceBase {
     /** the module of the robot's chassis */
     protected final SwerveDriveChassisLogic chassis;
 
@@ -41,7 +41,7 @@ public class PilotChassis extends RobotServiceBase {
      * @param chassis
      * @param robotConfig
      * */
-    public PilotChassis(SwerveDriveChassisLogic chassis, RobotConfigReader robotConfig, XboxController copilotGamePad) {
+    public PilotDriveService(SwerveDriveChassisLogic chassis, RobotConfigReader robotConfig, XboxController copilotGamePad) {
         super("pilotChassisService");
         this.chassis = chassis;
         this.robotConfig = robotConfig;

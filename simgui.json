@@ -11,6 +11,10 @@
   "NTProvider": {
     "types": {
       "/FMSInfo": "FMSInfo",
+      "/SmartDashboard/Opponent Robot 0 Mode": "String Chooser",
+      "/SmartDashboard/Opponent Robot 1 Mode": "String Chooser",
+      "/SmartDashboard/Opponent Robot 2 Mode": "String Chooser",
+      "/SmartDashboard/Reset Field": "Command",
       "/SmartDashboard/Select Auto": "String Chooser",
       "/SmartDashboard/field": "Field2d",
       "/SmartDashboard/orientation mode": "String Chooser",

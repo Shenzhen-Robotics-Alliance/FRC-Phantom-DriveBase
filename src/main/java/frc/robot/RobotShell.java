@@ -122,14 +122,6 @@ public class RobotShell extends LoggedRobot {
         robotCore.updateModules();
     }
 
-    @Override
-    public void simulationInit() {
-        final List<RobotServiceBase> services = new ArrayList<>();
-        final XboxController coachController = new XboxController(2);
-        final MatchSimulationService matchSimulationService = new MatchSimulationService(robotCore.matchFieldSimulation, coachController);
-        services.add(matchSimulationService);
-    }
-
     private SimpleRobotTest robotTest = null;
     @Override
     public void testInit() {
@@ -157,8 +149,10 @@ public class RobotShell extends LoggedRobot {
     private void startManualStage() {
         final List<RobotServiceBase> services = new ArrayList<>();
 
-        final PilotChassis pilotChassisService = new PilotChassis(robotCore.chassis, robotCore.robotConfig, copilotGamePad);
-        services.add(pilotChassisService);
+        final PilotDriveService pilotDriveServiceService = new PilotDriveService(robotCore.chassis, robotCore.robotConfig, copilotGamePad);
+        services.add(pilotDriveServiceService);
+        final ManualStageMatchSimulationService matchSimulationService = new ManualStageMatchSimulationService(robotCore.matchFieldSimulation);
+        services.add(matchSimulationService);
 
         robotCore.startStage(services);
     }
