@@ -38,8 +38,7 @@ public class MatchFieldSimulation extends RobotModuleBase {
         }
 
         AllRealFieldPhysicsSimulation.IntakeSimulation intakeSimulation = new AllRealFieldPhysicsSimulation.IntakeSimulation(
-                new Segment(new Vector2(-0.2, -robotProfile.height/2-0.05), new Vector2(0.2, -robotProfile.height/2-0.05)),
-                simulation
+                new Segment(new Vector2(-0.2, -robotProfile.height/2), new Vector2(0.2, -robotProfile.height/2-0.05))
         );
         this.simulation.getMainRobot().addFixture(intakeSimulation);
         this.simulation.field.addContactListener(intakeSimulation.getGamePieceOnFieldContactListener());

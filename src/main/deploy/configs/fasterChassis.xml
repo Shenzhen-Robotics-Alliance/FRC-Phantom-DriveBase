@@ -44,7 +44,7 @@
         <ignoredAccelerateTime type="double">0.05</ignoredAccelerateTime>
         <robotMaximumSpeed type="double">4.5</robotMaximumSpeed>
         <timeNeededToFullyAccelerate type="double">0.15</timeNeededToFullyAccelerate>
-        <robotSpeedActivateSpeedControl type="double">0.1</robotSpeedActivateSpeedControl>
+        <robotSpeedActivateSpeedControl type="double">10</robotSpeedActivateSpeedControl>
     </chassis>
     <auto>
         <autoStageMaxAcceleration type="double">3</autoStageMaxAcceleration>

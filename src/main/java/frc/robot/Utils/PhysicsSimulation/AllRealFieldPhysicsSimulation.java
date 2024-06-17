@@ -168,7 +168,7 @@ public class AllRealFieldPhysicsSimulation {
                     Geometry.createRectangle(profile.width, profile.height),
                     profile.robotMass / (profile.height * profile.width),
                     0.8,
-                    0.08
+                    0.05
             );
 
             super.setMass(MassType.NORMAL);
@@ -245,11 +245,9 @@ public class AllRealFieldPhysicsSimulation {
     }
     public static class IntakeSimulation extends BodyFixture {
         private static final List<NoteOnField> notesToRemove = new ArrayList<>();
-        private final AllRealFieldPhysicsSimulation simulation;
         private boolean intakeEnabled;
-        public IntakeSimulation(Convex shape, AllRealFieldPhysicsSimulation simulation) {
+        public IntakeSimulation(Convex shape) {
             super(shape);
-            this.simulation = simulation;
             this.intakeEnabled = false;
         }
 
@@ -419,7 +417,7 @@ public class AllRealFieldPhysicsSimulation {
             obstacle.setMass(MassType.INFINITE);
             final BodyFixture fixture = obstacle.addFixture(Geometry.createRectangle(width, height));
             fixture.setFriction(0.8);
-            fixture.setRestitution(0.4);
+            fixture.setRestitution(0.6);
             obstacle.getTransform().setTranslation(Vector2D.toVector2(centerPosition));
             obstacle.getTransform().setRotation(rotation.getRadian());
             addCustomObstacle(obstacle);

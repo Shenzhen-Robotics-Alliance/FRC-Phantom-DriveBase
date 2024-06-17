@@ -39,7 +39,7 @@ public class RobotShell extends LoggedRobot {
     @Override
     public void robotInit() {
         System.out.println("<-- Robot Shell | robot init -->");
-        robotCore = new RobotCore("5516-2024", isSimulation());
+        robotCore = new RobotCore("fasterChassis", isSimulation());
 
         DataLogManager.start();
         DriverStation.startDataLog(DataLogManager.getLog());
