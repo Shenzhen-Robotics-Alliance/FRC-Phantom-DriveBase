@@ -27,6 +27,7 @@
         <backRightWheelSteerEncoderReversed type="int">0</backRightWheelSteerEncoderReversed>
 
         <gyroPort type="int">15</gyroPort>
+        <powerDistributionPanel type="int">0</powerDistributionPanel>
 
         <!-- the zero position of encoders, to measure this value, turn the wheel to the direct front, and see the value of encoder.getRawSensorReading() -->
         <frontLeftWheelZeroPosition type = "double">0.711</frontLeftWheelZeroPosition>

@@ -45,7 +45,7 @@ public class RobotCore {
         private final List<RobotModuleBase> modules;
         private List<RobotServiceBase> services;
         protected boolean wasEnabled;
-        public final PowerDistribution powerDistributionPanel = new PowerDistribution(1, PowerDistribution.ModuleType.kRev);
+        public PowerDistribution powerDistributionPanel;
         private final Alert mainLoopTimeOverrunWarning = new Alert("Temporary Main-Loop Lagging", Alert.AlertType.WARNING);
 
         /**
@@ -80,6 +80,7 @@ public class RobotCore {
                 this.statusLight = new SimulatedLEDStatusLight(155);
                 modules.add(statusLight);
 
+                this.powerDistributionPanel = new PowerDistribution();
                 final SwerveWheelSimulation
                         frontLeftWheel = new SwerveWheelSimulation(1, robotConfig, new Vector2D(new double[] { -robotConfig.getConfig("chassis/swerveHorizontalDistance")/2, robotConfig.getConfig("chassis/swerveVerticalDistance")/2 })),
                         backLeftWheel = new SwerveWheelSimulation(1, robotConfig, new Vector2D(new double[] { -robotConfig.getConfig("chassis/swerveHorizontalDistance")/2, -robotConfig.getConfig("chassis/swerveVerticalDistance")/2 })),
@@ -96,6 +97,10 @@ public class RobotCore {
         private void createRobotReal() {
                 System.out.println("<-- Robot Core | creating real robot... -->");
 
+                this.powerDistributionPanel = robotConfig.getConfig("hardware/powerDistributionPanel") != 0 ?
+                        new PowerDistribution(1, PowerDistribution.ModuleType.kRev)
+                        :new PowerDistribution(0, PowerDistribution.ModuleType.kCTRE);
+
                 final SwerveWheel
                         frontLeftWheel = createSwerveWheel("frontLeft", 1, new Vector2D(new double[] { -0.6, 0.6 })),
                         backLeftWheel = createSwerveWheel("backLeft", 2, new Vector2D(new double[] { -0.6, -0.6 })),
@@ -106,8 +111,9 @@ public class RobotCore {
                 modules.add(frontRightWheel);
                 modules.add(backRightWheel);
 
-                this.gyro = new SimpleGyro(0, false, new PigeonsIMU((int) robotConfig.getConfig("hardware/gyroPort")));
-                // this.gyro = new SimpleGyro(0, true, new NavX2IMU());
+                this.gyro = robotConfig.getConfig("hardware/gyroPort") == -1 ?
+                        new SimpleGyro(0, true, new NavX2IMU())
+                        :new SimpleGyro(0, false, new PigeonsIMU((int) robotConfig.getConfig("hardware/gyroPort")));
 
                 final SwerveDriveOdometer swerveDriveOdometer = new VisionSupportedOdometer(new SwerveWheel[] {frontLeftWheel, frontRightWheel, backLeftWheel, backRightWheel}, gyro, new PhantomClient()); // TODO create phantom client
                 this.positionEstimator = swerveDriveOdometer;

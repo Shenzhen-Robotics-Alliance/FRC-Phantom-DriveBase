@@ -39,7 +39,7 @@ public class RobotShell extends LoggedRobot {
     @Override
     public void robotInit() {
         System.out.println("<-- Robot Shell | robot init -->");
-        robotCore = new RobotCore("6433-2024", isSimulation());
+        robotCore = new RobotCore("5516-2024", isSimulation());
 
         DataLogManager.start();
         DriverStation.startDataLog(DataLogManager.getLog());
@@ -151,8 +151,11 @@ public class RobotShell extends LoggedRobot {
 
         final PilotDriveService pilotDriveServiceService = new PilotDriveService(robotCore.chassis, robotCore.robotConfig, copilotGamePad);
         services.add(pilotDriveServiceService);
-        final ManualStageMatchSimulationService matchSimulationService = new ManualStageMatchSimulationService(robotCore.matchFieldSimulation);
-        services.add(matchSimulationService);
+
+        if (isSimulation()) {
+            final ManualStageMatchSimulationService matchSimulationService = new ManualStageMatchSimulationService(robotCore.matchFieldSimulation);
+            services.add(matchSimulationService);
+        }
 
         robotCore.startStage(services);
     }
